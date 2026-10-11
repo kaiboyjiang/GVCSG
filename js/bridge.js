@@ -6,13 +6,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Interior lights are evaluated only in the bridge's own shader, so they cost nothing for the rest of the scene.
 
 const KIND = {
-  hornet: 'fighter', wisp: 'fighter', kestrel: 'fighter', corvid: 'fighter', valkyrie: 'fighter', mantis: 'fighter',
-  mule: 'civil', atlas: 'civil', aurora: 'civil',
+  hornet: 'fighter', wisp: 'fighter', kestrel: 'fighter', corvid: 'fighter', valkyrie: 'fighter', mantis: 'fighter', talon: 'fighter', jackal: 'clan', auditor: 'combine',
+  mule: 'civil', atlas: 'civil', aurora: 'civil', courier: 'civil', monarch: 'civil', vanguard: 'command',
   warden: 'command', sabre: 'command', bastion: 'command', paladin: 'command', sovereign: 'command', leviathan: 'command',
   raider: 'clan', cutlass: 'clan', reaver: 'clan', marauder: 'clan', ravager: 'clan',
   unit: 'combine', enforcer: 'combine', crate: 'combine', commuter: 'combine', compliance: 'combine'
 };
-const LUXURY = new Set(['paladin', 'sabre', 'aurora']);
+const LUXURY = new Set(['paladin', 'sabre', 'aurora', 'monarch']);
 export const bridgeKind = (hull) => KIND[hull] || 'fighter';
 
 const ONE = new THREE.Vector3(1, 1, 1), Y = new THREE.Vector3(0, 1, 0);

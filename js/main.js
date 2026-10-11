@@ -126,6 +126,7 @@ const STATS = {
   cruiser: { cls: 'Corsair Marauder Cruiser', shield: 1700, armor: 2300, hull: 1900, speed: 95, accel: 20, turn: 0.22, bounty: 145000, sig: 3 },
   cutlass: { cls: 'Cutlass Scrap Gunboat', shield: 300, armor: 300, hull: 240, speed: 320, accel: 140, turn: 1.15, bounty: 30000, sig: 0.75, hullId: 'cutlass', ai: 'fighter', gunDmg: 13 },
   reaver: { cls: 'Reaver Boarding Frigate', shield: 1000, armor: 1300, hull: 950, speed: 200, accel: 55, turn: 0.55, bounty: 95000, sig: 1.4, hullId: 'reaver', ai: 'gunship', gunDmg: 24, orbit: 2600 },
+  jackal: { cls: 'Jackal Scrap Fighter', shield: 260, armor: 260, hull: 220, speed: 340, accel: 150, turn: 1.2, bounty: 24000, sig: 0.7, hullId: 'jackal', ai: 'fighter', gunDmg: 11 },
   ravager: { cls: 'Ravager Warlord Battleship', shield: 5500, armor: 7500, hull: 5600, speed: 80, accel: 12, turn: 0.16, bounty: 750000, sig: 5, hullId: 'ravager', ai: 'gunship', gunDmg: 55, orbit: 5000, scram: true },
   hauler: { cls: 'Bestower Hauler', shield: 500, armor: 1100, hull: 1000, speed: 140, accel: 15, turn: 0.28, bounty: 0, sig: 3 },
   navyKestrel: { cls: 'Helion Navy Kestrel', shield: 520, armor: 380, hull: 340, speed: 330, accel: 130, turn: 1.1, bounty: 0, sig: 0.6 },
@@ -134,9 +135,11 @@ const STATS = {
   navySabre: { cls: 'Helion Navy Sabre', shield: 2200, armor: 2100, hull: 1600, speed: 150, accel: 36, turn: 0.38, bounty: 0, sig: 2.0 },
   navyMantis: { cls: 'Helion Navy Mantis', shield: 1150, armor: 1150, hull: 850, speed: 210, accel: 72, turn: 0.75, bounty: 0, sig: 1.2 },
   secUnit: { cls: 'Combine Security Unit-7', shield: 220, armor: 160, hull: 150, speed: 320, accel: 135, turn: 1.0, bounty: 0, sig: 0.55, hullId: 'unit' },
+  secAuditor: { cls: 'Combine Security Auditor', shield: 420, armor: 360, hull: 300, speed: 290, accel: 110, turn: 0.85, bounty: 0, sig: 0.75, hullId: 'auditor' },
   secEnforcer: { cls: 'Combine Security Enforcer', shield: 650, armor: 550, hull: 450, speed: 215, accel: 62, turn: 0.6, bounty: 0, sig: 1.0, hullId: 'enforcer' },
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
+const lightPirate = () => { const r = Math.random(); return r < 0.25 ? 'cutlass' : r < 0.45 ? 'jackal' : 'raider'; };
 const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
@@ -674,7 +677,7 @@ function buildEncounters(def) {
     out.push({ loc, ships: [], timer: 0, wave: 0, spawn() {
       const n = 2 + dg + Math.min(3, this.wave), o = [];
       if (dg >= 2 && this.wave >= 1) o.push([Math.random() < 0.5 ? 'cruiser' : 'reaver', 3500]);
-      for (let i = 0; i < n; i++) o.push([Math.random() < 0.3 ? 'cutlass' : 'raider', 2500 + Math.random() * 3000]);
+      for (let i = 0; i < n; i++) o.push([lightPirate(), 2500 + Math.random() * 3000]);
       return o;
     } });
   }
@@ -683,7 +686,7 @@ function buildEncounters(def) {
       const o = [['cruiser', 3000]];
       if (this.wave >= 2 || dg >= 3) o.push(['cruiser', 4200]);
       if (dg >= 2) o.push(['reaver', 3800]);
-      for (let i = 0; i < 2 + dg + Math.min(3, this.wave); i++) o.push([Math.random() < 0.35 ? 'cutlass' : 'raider', 3500 + Math.random() * 2000]);
+      for (let i = 0; i < 2 + dg + Math.min(3, this.wave); i++) o.push([lightPirate(), 3500 + Math.random() * 2000]);
       return o;
     } });
   }
@@ -2086,7 +2089,7 @@ starmap.onToggle = (on) => {
 const NAVY_NAMES = ['HNS Vigilant', 'HNS Swift', 'HNS Harrier', 'HNS Bulwark', 'HNS Talon', 'HNS Resolute', 'HNS Aegis', 'HNS Lancer', 'HNS Sentinel', 'HNS Valor'];
 const HAULER_LINES = ['Orca Logistics', 'Kaltos Freight', 'Vexal Trading Co.', 'Helion Supply', 'Aster Bulk Lines'];
 // civilian traffic: the classic hauler plus catalogue freighters and liners
-const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner']];
+const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier']];
 const LINER_LINES = ['Aurora Starlines', 'Helion Spaceways', 'Mirel Cruise Lines', 'Tessaly Interstellar'];
 const CORP_CIVIL = [['crate', 'Vanta Logistics Crate'], ['crate', 'Combine Freight Division Crate'], ['commuter', 'Vanta Labour Transit Commuter']];
 const secName = (kind) => `Combine Security ${HULLS[STATS[kind].hullId].name} ${String(100 + Math.floor(Math.random() * 900))}`;
@@ -2117,7 +2120,7 @@ function populate(def, from) {
   } else if (def.gov === 'corp') {
     // Combine Security: cheap hulls in numbers, guarding company property; licensed traffic is left alone
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secCompliance', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secUnit'];
+      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secCompliance', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secUnit'];
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) makeEntity(kind, 'corp', home.clone().add(jitter(6000)), secName(kind)).ai.home.copy(home);
     }
@@ -2137,7 +2140,7 @@ function populate(def, from) {
       if (g.jump === from || Math.random() < 0.35) continue;
       const home = g.pos.clone().add(jitter(9000));
       for (let i = 0; i < def.danger; i++) {
-        const kind = Math.random() < 0.3 ? 'cutlass' : 'raider';
+        const kind = lightPirate();
         const e = makeEntity(kind, 'pirate', home.clone().add(jitter(1500)), pirateName(kind));
         e.ai.seed = Math.random(); e.ai.home.copy(home);
       }

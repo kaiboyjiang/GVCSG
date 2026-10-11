@@ -34,6 +34,11 @@ export function livery(name, env) {
     reaver: { base: [40, 40, 42], accent: [190, 24, 20], second: [16, 16, 18], eng: [1.0, 0.36, 0.16], labels: ['REAVER', 'BLOOD', 'R-66', 'RAM', 'HAZARD'], seed: 201, wear: 0.9, rust: 0.7, stripes: [0.3, 0.05, 0.04, 0] },
     ravager: { base: [70, 62, 56], accent: [150, 120, 96], second: [22, 20, 20], eng: [1.0, 0.32, 0.14], labels: ['RAVAGER', 'WARLORD', 'CLAN', 'KILL', 'HAZARD', '0666'], seed: 211, wear: 1.0, rust: 0.9, stripes: [0, 0.08, 0, 0] },
     combine: { base: [62, 64, 68], accent: [206, 168, 38], second: [26, 26, 28], eng: [1.0, 0.82, 0.42], labels: ['VANTA', 'COMBINE', 'PROPERTY OF VANTA', 'ASSET 00417', 'COMPLY', 'UNIT'], seed: 221, wear: 0.12, stripes: [0, 0, 0, 0] },
+    talon: { base: [86, 92, 102], accent: [236, 130, 24], second: [26, 28, 32], eng: [0.6, 0.8, 1.0], labels: ['TALON', 'SF-5', 'NO STEP', 'RCS', '0505'], seed: 231, wear: 0.3, stripes: [0.35, 0.04, 0.025, 0.007] },
+    courier: { base: [226, 222, 210], accent: [196, 40, 44], second: [54, 56, 60], eng: [0.6, 0.85, 1.0], labels: ['COURIER', 'EXPRESS', 'PR-12', 'PRIORITY', 'RCS'], seed: 241, wear: 0.2, stripes: [0.4, 0.05, 0.03, 0.008] },
+    vanguard: { base: [104, 110, 100], accent: [228, 228, 222], second: [36, 38, 36], eng: [0.5, 0.72, 1.0], labels: ['VANGUARD', 'FF-8', 'HELION YARDS', 'HAZARD', 'RCS'], seed: 251, wear: 0.45, stripes: [0.2, 0.06, 0, 0.01] },
+    monarch: { base: [240, 238, 232], accent: [168, 132, 58], second: [60, 54, 50], pin: [40, 40, 46], eng: [0.7, 0.8, 1.0], labels: ['MONARCH', 'PRIVATE', 'Y-1', 'SUITE 1', 'EXIT'], seed: 261, wear: 0.04, stripes: [0.3, 0.035, 0.022, 0.006] },
+    jackal: { base: [92, 86, 70], accent: [210, 96, 24], second: [28, 26, 22], eng: [1.0, 0.48, 0.2], labels: ['JACKAL', 'XX', 'SCRAP', '77', 'KILL'], seed: 271, wear: 1.0, rust: 1.0, stripes: [0.1, 0.07, 0, 0] },
     navy: { base: [72, 84, 98], accent: [230, 232, 236], second: [28, 32, 38], eng: [0.5, 0.8, 1.0], labels: ['HELION', 'NAVY', 'HN-12', 'RCS'], seed: 71, wear: 0.35, stripes: [0.3, 0.04, 0.02, 0.008] },
   }[name];
   // one paint colour per material; colour accents come from the painted stripes and trim parts, not random panels
@@ -1672,6 +1677,21 @@ export function buildSovereign(env, liv = 'sovereign') {
 export function buildLeviathan(env, liv = 'leviathan') {
   return design(env, liv, DESIGNS.leviathan);
 }
+export function buildTalon(env, liv = 'talon') {
+  return design(env, liv, DESIGNS.talon);
+}
+export function buildCourier(env, liv = 'courier') {
+  return design(env, liv, DESIGNS.courier);
+}
+export function buildVanguard(env, liv = 'vanguard') {
+  return design(env, liv, DESIGNS.vanguard);
+}
+export function buildMonarch(env, liv = 'monarch') {
+  return design(env, liv, DESIGNS.monarch);
+}
+export function buildJackal(env, liv = 'jackal') {
+  return design(env, liv, DESIGNS.jackal);
+}
 
 // ---------------------------------------------------------------- Vanta Combine mass-production hulls
 // every Combine hull is assembled from the same few stamped parts: chamfered box sections, square engine pods and hazard bands
@@ -1693,6 +1713,12 @@ const COMBINE = {
     segs: [[14, 10, 16, 30], [18, 12, 18, 13], [18, 12, 18, -6], [16, 11, 16, -24]], nose: [10, 6, 14, 44], bridge: [8, 8, 10, -10, 6], tower: true,
     sponsons: { x: 12, w: 5, h: 8, l: 40, z: -4 }, engines: { R: 2.2, xs: [5, 0, -5], ys: [2.6, -2.6], z: -34.5 },
     hp: [{ p: [0, 5.05, 30], flip: 0, s: 1.4 }, { p: [0, 6.05, 8], flip: 0, s: 1.6 }, { p: [12, 4.05, 6], flip: 0, s: 1.2 }, { p: [-12, 4.05, 6], flip: 0, s: 1.2 }, { p: [0, -6.05, 0], flip: 1, s: 1.4 }],
+  },
+  auditor: {
+    name: 'Auditor', radius: 13, cockpit: [0, 2.3, 6.2],
+    segs: [[3.6, 2.6, 5, 5.5], [4.4, 3.0, 5, 0.5], [3.8, 2.8, 4, -4]], nose: [2.6, 1.7, 3.6, 9.8], bridge: [2.2, 0.9, 2.2, 5.5, 1.3],
+    wings: { span: 11, t: 0.28, chord: 3, z: 0 }, engines: { R: 0.7, xs: [1.0, -1.0], ys: [0], z: -6.4 },
+    hp: [{ p: [0, 1.52, 2.6], flip: 0, s: 0.6 }, { p: [0, -1.52, 0.5], flip: 1, s: 0.6 }],
   },
   crate: {
     name: 'Crate', radius: 46, cockpit: [0, 5, 38],
@@ -2089,5 +2115,86 @@ const DESIGNS = {
     },
     engines: [{ p: [9, 6, -120], r: 5.6, len: 40, mirror: true }, { p: [9, -6, -120], r: 5.6, len: 40, mirror: true }, { p: [0, 0, -120], r: 3.6, len: 26 }, { p: [30, -2, -90], r: 5, len: 28, mirror: true }],
     slots: { g: [[14, 118, 1, 2.0], [-14, 118, 1, 2.0], [14, 118, -1, 1.8], [-14, 118, -1, 1.8]], t: [[0, -20, 1, 2.2], [0, 10, 1, 2.2], [0, 40, 1, 2.2], [0, 66, 1, 2.0], [30, -70, 1, 1.8], [-30, -70, 1, 1.8], [30, 0, -1, 1.6], [-30, 0, -1, 1.6]], m: [[14, 100, 1, 1.6], [-14, 100, 1, 1.6], [0, -60, -1, 1.8], [0, 20, -1, 1.8]] },
+  },
+  // strike fighter: dart fuselage on a cranked delta, twin canted tails, two big drives
+  talon: {
+    name: 'Talon', style: 'sleek', radius: 12, cockpit: [0, 1.3, 3.6], nav: [5.1, -0.2, -6], beacon: [0, 1.4, -6.5],
+    parts: [
+      { s: [[-9, 2.4, 1.1, 0.9, 0, 2.4], [-6, 3.0, 1.3, 1.0, 0, 2.4], [-1, 2.6, 1.2, 0.9, 0, 2.2], [4, 1.7, 0.9, 0.6, -0.1, 2.2], [9, 0.5, 0.3, 0.2, -0.2, 2], [11, 0.08, 0.05, 0.04, -0.2, 2]] },
+      { s: [[-8, 11, 0.18, 0.18, -0.2, 2], [-5, 10.5, 0.22, 0.2, -0.2, 2], [-2, 5, 0.24, 0.2, -0.2, 2], [1.5, 1.6, 0.16, 0.16, -0.2, 2]] },
+      { at: [1.9, -0.1, 0], mirror: true, key: 'dark', s: [[-9.5, 1.4, 0.75, 0.75, 0, 2], [-7, 1.6, 0.85, 0.85, 0, 2], [-3, 1.2, 0.6, 0.6, 0, 2], [0.5, 0.3, 0.15, 0.15, 0, 2]] },
+      { key: 'glass', s: [[1, 0.9, 0.05, 0, 1.0, 2], [3.2, 1.0, 0.45, 0, 0.85, 2], [5.8, 0.5, 0.2, 0, 0.5, 2]] },
+      { key: 'accent', hit: false, s: ridge([[-6, 3.0, 1.3, 1.0, 0, 2.4], [-1, 2.6, 1.2, 0.9, 0, 2.2], [4, 1.7, 0.9, 0.6, -0.1, 2.2]], -5.5, 0.5, 0.3, 0.05) },
+    ],
+    fins: [{ pts: [[-9, 0], [-7.4, 2.2], [-6.2, 2.2], [-5.6, 0]], t: 0.14, at: [1.9, 0.7, 0], roll: -0.3, mirror: true, key: 'accent' }],
+    engines: [{ p: [1.9, -0.1, -9.5], r: 0.68, len: 12, mirror: true }],
+    extra: (k) => {
+      k.addMirrored('dark', G.box(1.6, 0.08, 0.7), mat([1.2, -0.25, 6]));
+      k.add('metal', G.cyl(0.02, 0.05, 1.6, 6), mat([0, -0.2, 11.6], ALONG_Z));
+    },
+    slots: { g: [[3.4, -5, 1, 0.42], [-3.4, -5, 1, 0.42]], t: [], m: [[0, -2, -1, 0.4]] },
+  },
+  // express courier: slim liner hull with a dorsal priority-cargo pod and outboard drives
+  courier: {
+    name: 'Courier', style: 'sleek', radius: 17, cockpit: [0, 2.5, 9.6], nav: [5, -0.4, -10], beacon: [0, 4.2, -10],
+    parts: [
+      { s: [[-14, 4, 2, 1.8, 0, 2.4], [-10, 5, 2.4, 2, 0, 2.4], [0, 4.8, 2.3, 2, 0, 2.4], [8, 3.6, 1.8, 1.5, 0, 2.2], [13, 1.6, 0.9, 0.7, -0.2, 2], [16, 0.2, 0.1, 0.1, -0.3, 2]] },
+      { key: 'accent', s: [[-11, 3.6, 1.6, 0.2, 2.2, 3], [-6, 4, 1.8, 0.2, 2.3, 3], [2, 3.6, 1.6, 0.2, 2.2, 3], [5, 2, 0.8, 0.2, 2.0, 3]] },
+      { key: 'glass', s: [[6, 2.4, 0.05, 0, 1.9, 2], [9, 2.6, 0.8, 0, 1.6, 2], [12, 1.2, 0.3, 0, 1.0, 2]] },
+      { at: [3.4, -0.4, 0], mirror: true, key: 'dark', s: [[-15, 1.8, 0.95, 0.95, 0, 2], [-11, 2.1, 1.1, 1.1, 0, 2], [-5, 1.6, 0.8, 0.8, 0, 2], [-1, 0.3, 0.15, 0.15, 0, 2]] },
+      { s: [[-12, 10, 0.25, 0.22, -0.4, 2], [-8, 9.4, 0.3, 0.25, -0.4, 2], [-3, 4, 0.3, 0.25, -0.4, 2]] },
+    ],
+    windows: [{ part: 0, ys: [0.4], z0: -8, z1: 6, step: 2, h: 0.5 }],
+    engines: [{ p: [0, 0, -14], r: 1.3, len: 14 }, { p: [3.4, -0.4, -15], r: 0.85, len: 11, mirror: true }],
+    slots: { g: [], t: [[0, -9, 1, 0.55], [0, -1, -1, 0.6]], m: [] },
+  },
+  // armoured frigate: flat faceted slab with skirt armour and a dorsal command block
+  vanguard: {
+    name: 'Vanguard', style: 'armor', radius: 25, cockpit: [0, 6.2, -6], nav: [7.8, 0, -18], beacon: [0, 6.8, -9], tile: 8,
+    parts: [
+      { flat: true, seg: 16, s: [[-22, 14, 2.6, 2.2, 0, 4], [-14, 17, 3, 2.4, 0, 4], [4, 17, 3.1, 2.4, 0, 4], [14, 12, 2.6, 2, 0, 3.5], [21, 5, 1.4, 1.1, 0, 2.4], [24, 1.2, 0.4, 0.3, 0, 1.8]] },
+      { flat: true, seg: 16, key: 'dark', s: [[-16, 8, 1.6, 0.2, 2.8, 4], [-4, 9, 2, 0.2, 3, 4], [6, 6, 1.6, 0.2, 2.9, 4], [10, 2.5, 0.8, 0.2, 2.6, 3]] },
+      { flat: true, seg: 16, key: 'dark', s: [[-18, 6, 0.2, 1.6, -2.2, 4], [8, 5, 0.2, 1.4, -2.2, 4]] },
+      { key: 'accent', hit: false, s: ridge([[-14, 17, 3, 2.4, 0, 4], [4, 17, 3.1, 2.4, 0, 4], [14, 12, 2.6, 2, 0, 3.5]], 8, 18, 2.2, 0.12) },
+    ],
+    extra: (k) => {
+      k.add('hull', G.rbox(3, 2, 4, 0.2), mat([0, 5.4, -8]));
+      k.add('glass', G.box(2.6, 0.4, 0.2), mat([0, 6, -5.95]));
+      for (const z of [-16, -8, 0, 8]) k.addMirrored('dark', G.rbox(1.1, 3.6, 7, 0.2), mat([8.6, 0, z], [0, 0, -0.18]));
+    },
+    engines: [{ p: [3, 0, -22], r: 1.5, len: 12, mirror: true }, { p: [6.2, 0, -21.5], r: 1.0, len: 8, mirror: true }],
+    slots: { g: [[2, 18, 1, 0.65], [-2, 18, 1, 0.65]], t: [[0, -14, 1, 0.9], [0, -2, -1, 0.85]], m: [[5, 6, 1, 0.65], [-5, 6, 1, 0.65]] },
+  },
+  // luxury yacht: smooth white teardrop with swept wings, a glass dome and a gold tail fin
+  monarch: {
+    name: 'Monarch', style: 'sleek', radius: 38, cockpit: [0, 4.2, 22], nav: [14.5, -1, -24], beacon: [0, 13.4, -26], tile: 8,
+    parts: [
+      { s: [[-34, 9, 5, 4.5, 0, 2], [-28, 12, 6.5, 5.5, 0, 2], [-6, 14, 7, 6, 0, 2], [16, 11, 5.6, 4.6, 0, 2], [28, 6, 3.2, 2.6, -0.3, 2], [36, 1, 0.6, 0.5, -0.6, 2]] },
+      { key: 'glass', s: [[0, 6, 0.2, 0, 6.6, 2], [6, 7, 2.4, 0, 5.8, 2], [14, 3, 0.8, 0, 4.6, 2]] },
+      { s: [[-30, 30, 0.45, 0.45, -1, 2.5], [-22, 28, 0.5, 0.45, -1, 2.5], [-10, 12, 0.5, 0.45, -1, 2.5], [0, 4, 0.4, 0.4, -1, 2]] },
+      { at: [13, -1, 0], mirror: true, key: 'accent', s: [[-32, 3, 1.6, 1.6, 0, 2], [-26, 3.6, 1.9, 1.9, 0, 2], [-14, 2.8, 1.4, 1.4, 0, 2], [-6, 0.4, 0.2, 0.2, 0, 2]] },
+      { key: 'accent', hit: false, s: ridge([[-28, 12, 6.5, 5.5, 0, 2], [-6, 14, 7, 6, 0, 2], [16, 11, 5.6, 4.6, 0, 2]], -24, -2, 1.4, 0.12) },
+    ],
+    fins: [{ pts: [[-34, 0], [-28, 7], [-24, 7], [-18, 0]], t: 0.6, at: [0, 6, 0], key: 'accent' }],
+    windows: [{ part: 0, ys: [-2, 1.2, 3.8], z0: -24, z1: 22, step: 2, h: 0.6 }],
+    engines: [{ p: [0, 0, -34], r: 2.6, len: 18 }, { p: [13, -1, -32], r: 1.3, len: 12, mirror: true }],
+    slots: { g: [], t: [[0, -14, 1, 0.9], [0, -4, -1, 0.9], [0, 14, -1, 0.8]], m: [] },
+  },
+  // Clan scrap fighter: forward-swept salvage wings bolted to an oversized engine can, ram spikes on the tips
+  jackal: {
+    name: 'Jackal', style: 'pirate', radius: 12, cockpit: [0, 1.4, 3.2], nav: [5.4, -0.3, 2.5], beacon: [0, 2, -6],
+    parts: [
+      { s: [[-8, 3, 1.5, 1.3, 0, 3], [-5, 3.6, 1.7, 1.4, 0, 3], [1, 3, 1.4, 1.1, 0, 2.6], [6, 2, 1, 0.8, -0.1, 2.4], [9, 0.9, 0.5, 0.4, -0.2, 2]] },
+      { key: 'dark', s: [[-10, 3.4, 1.6, 1.6, 0, 3], [-7, 3.8, 1.8, 1.8, 0, 3], [-4, 3.2, 1.5, 1.5, 0, 3]] },
+      { s: [[-6, 6, 0.2, 0.2, -0.3, 2], [-2, 8, 0.2, 0.2, -0.3, 2], [2, 11, 0.2, 0.18, -0.3, 2], [3.5, 10.5, 0.16, 0.14, -0.3, 2]] },
+      { key: 'glass', s: [[1, 1.2, 0.05, 0, 1.3, 2], [3, 1.3, 0.45, 0, 1.15, 2], [5, 0.6, 0.2, 0, 0.8, 2]] },
+    ],
+    extra: (k) => {
+      k.addMirrored('metal', G.cyl(0.02, 0.14, 2.2, 6), mat([5.3, -0.3, 4], ALONG_Z));
+      k.add('accent', G.box(1.6, 0.12, 2.4), mat([0.6, 1.75, -3], [0, 0.2, 0.1]));
+      k.add('dark', G.box(1.2, 0.1, 1.4), mat([-3.2, -0.15, -1.5], [0, -0.3, 0.05]));
+    },
+    engines: [{ p: [0, 0, -10], r: 1.1, len: 11 }],
+    slots: { g: [[4.2, 1.5, 1, 0.42], [-4.2, 1.5, 1, 0.42]], t: [[0, -1, -1, 0.45]], m: [] },
   },
 };
