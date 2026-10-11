@@ -135,12 +135,15 @@ const STATS = {
   navySabre: { cls: 'Helion Navy Sabre', shield: 2200, armor: 2100, hull: 1600, speed: 150, accel: 36, turn: 0.38, bounty: 0, sig: 2.0 },
   navyMantis: { cls: 'Helion Navy Mantis', shield: 1150, armor: 1150, hull: 850, speed: 210, accel: 72, turn: 0.75, bounty: 0, sig: 1.2 },
   secUnit: { cls: 'Combine Security Unit-7', shield: 220, armor: 160, hull: 150, speed: 320, accel: 135, turn: 1.0, bounty: 0, sig: 0.55, hullId: 'unit' },
+  buccaneer: { cls: 'Buccaneer Boarding Corvette', shield: 700, armor: 850, hull: 700, speed: 240, accel: 70, turn: 0.7, bounty: 70000, sig: 1.1, hullId: 'buccaneer', ai: 'gunship', gunDmg: 20, orbit: 2200 },
+  secLiquidator: { cls: 'Combine Asset Recovery Liquidator', shield: 1500, armor: 1600, hull: 1200, speed: 190, accel: 50, turn: 0.45, bounty: 0, sig: 1.5, hullId: 'liquidator' },
+  navyHarbinger: { cls: 'Helion Navy Harbinger', shield: 2000, armor: 1900, hull: 1500, speed: 200, accel: 48, turn: 0.42, bounty: 0, sig: 1.6 },
   secAuditor: { cls: 'Combine Security Auditor', shield: 420, armor: 360, hull: 300, speed: 290, accel: 110, turn: 0.85, bounty: 0, sig: 0.75, hullId: 'auditor' },
   secEnforcer: { cls: 'Combine Security Enforcer', shield: 650, armor: 550, hull: 450, speed: 215, accel: 62, turn: 0.6, bounty: 0, sig: 1.0, hullId: 'enforcer' },
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
 const lightPirate = () => { const r = Math.random(); return r < 0.25 ? 'cutlass' : r < 0.45 ? 'jackal' : 'raider'; };
-const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre' };
+const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
 const PROFILES = { em: { s: 1.25, a: 0.7, h: 1 }, kinetic: { s: 0.85, a: 1.2, h: 1 }, explosive: { s: 0.9, a: 1.1, h: 1.2 }, thermal: { s: 1.0, a: 0.95, h: 1.1 } };
@@ -676,7 +679,7 @@ function buildEncounters(def) {
   if (dg > 0) for (const loc of LOCATIONS.filter((l) => l.icon === 'belt')) {
     out.push({ loc, ships: [], timer: 0, wave: 0, spawn() {
       const n = 2 + dg + Math.min(3, this.wave), o = [];
-      if (dg >= 2 && this.wave >= 1) o.push([Math.random() < 0.5 ? 'cruiser' : 'reaver', 3500]);
+      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer'][Math.floor(Math.random() * 3)], 3500]);
       for (let i = 0; i < n; i++) o.push([lightPirate(), 2500 + Math.random() * 3000]);
       return o;
     } });
@@ -2089,7 +2092,7 @@ starmap.onToggle = (on) => {
 const NAVY_NAMES = ['HNS Vigilant', 'HNS Swift', 'HNS Harrier', 'HNS Bulwark', 'HNS Talon', 'HNS Resolute', 'HNS Aegis', 'HNS Lancer', 'HNS Sentinel', 'HNS Valor'];
 const HAULER_LINES = ['Orca Logistics', 'Kaltos Freight', 'Vexal Trading Co.', 'Helion Supply', 'Aster Bulk Lines'];
 // civilian traffic: the classic hauler plus catalogue freighters and liners
-const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier']];
+const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier'], ['tern', 'Shuttle'], ['ox', 'Heavy Hauler']];
 const LINER_LINES = ['Aurora Starlines', 'Helion Spaceways', 'Mirel Cruise Lines', 'Tessaly Interstellar'];
 const CORP_CIVIL = [['crate', 'Vanta Logistics Crate'], ['crate', 'Combine Freight Division Crate'], ['commuter', 'Vanta Labour Transit Commuter']];
 const secName = (kind) => `Combine Security ${HULLS[STATS[kind].hullId].name} ${String(100 + Math.floor(Math.random() * 900))}`;
@@ -2100,7 +2103,7 @@ function populate(def, from) {
   if (def.gov === 'gov') {
     let ni = 0;
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre'] : st.kind === 'station' ? ['navyKestrel', 'navyMantis', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
+      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger'] : st.kind === 'station' ? ['navyKestrel', 'navyMantis', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) {
         const n = makeEntity(kind, 'navy', home.clone().add(jitter(6000)), NAVY_NAMES[ni++ % NAVY_NAMES.length]);
@@ -2120,7 +2123,7 @@ function populate(def, from) {
   } else if (def.gov === 'corp') {
     // Combine Security: cheap hulls in numbers, guarding company property; licensed traffic is left alone
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secCompliance', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secUnit'];
+      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secCompliance', 'secLiquidator', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secLiquidator', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secUnit'];
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) makeEntity(kind, 'corp', home.clone().add(jitter(6000)), secName(kind)).ai.home.copy(home);
     }

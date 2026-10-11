@@ -2,7 +2,7 @@ import {
   buildFrigate, buildKestrel, buildWarden, buildPaladin, buildMantis, buildCorvid, buildBastion,
   buildHornet, buildWisp, buildMule, buildAtlas, buildAurora, buildSabre, buildSovereign, buildLeviathan,
   buildTurret, buildGun, buildMissileBay, buildOutfitModel, buildRaider, buildCruiser, buildCutlass, buildReaver, buildRavager, buildCombine, paintStripes,
-  buildTalon, buildCourier, buildVanguard, buildMonarch, buildJackal,
+  buildTalon, buildCourier, buildVanguard, buildMonarch, buildJackal, buildTern, buildOx, buildHarbinger, buildBuccaneer,
 } from './ships.js';
 import { Kit, G, mat } from './geo.js';
 
@@ -193,6 +193,37 @@ Object.assign(HULLS, {
     stats: { cargo: 10, bunks: 1, shield: 420, armor: 420, hull: 360, speed: 360, boost: 980, accel: 165, turn: [2.0, 1.55, 3.2], cap: 650, capRegen: 20, shieldRegen: 14, sig: 0.7 },
     fit: { g: ['shredder', 'blaster'], t: ['pd'], m: [], sys: 1 },
   },
+  tern: {
+    name: 'Tern', cls: 'Tern Passenger Shuttle', price: 60000, build: buildTern,
+    desc: 'A stubby six-seat shuttle with stub wings and two pod drives. The cheapest way to start carrying passengers, with one point-defense turret for comfort.',
+    stats: { cargo: 8, bunks: 6, shield: 300, armor: 200, hull: 220, speed: 340, boost: 900, accel: 140, turn: [1.8, 1.4, 2.8], cap: 500, capRegen: 16, shieldRegen: 12, sig: 0.45 },
+    fit: { g: [], t: ['pd'], m: [], sys: 1 },
+  },
+  ox: {
+    name: 'Ox', cls: 'Ox Heavy Hauler', price: 820000, build: buildOx,
+    desc: 'An 80 m flat cargo spine carrying eight containers, with the bridge out on the prow. Holds more than a Mule and less than an Atlas, and is tougher than both.',
+    stats: { cargo: 420, bunks: 4, shield: 1400, armor: 1600, hull: 1800, speed: 150, boost: 380, accel: 26, turn: [0.4, 0.32, 0.7], cap: 1200, capRegen: 26, shieldRegen: 20, sig: 2.2 },
+    fit: { g: [], t: ['flak', 'pd'], m: [], sys: 4 },
+  },
+  harbinger: {
+    name: 'Harbinger', cls: 'Harbinger-class Destroyer', price: 980000, build: buildHarbinger,
+    desc: 'Long arrowhead destroyer with swept wings and a tall tail. Two nose guns, three turrets and two missile bays: the Helion Navy line ship between frigate and cruiser.',
+    stats: { cargo: 40, bunks: 12, shield: 2000, armor: 1900, hull: 1500, speed: 210, boost: 560, accel: 50, turn: [0.75, 0.58, 1.3], cap: 1800, capRegen: 40, shieldRegen: 34, sig: 1.6 },
+    fit: { g: ['rail', 'gauss'], t: ['pulse', 'flak', 'pd'], m: ['srm', 'swarm'], sys: 4 },
+  },
+  buccaneer: {
+    name: 'Buccaneer', cls: 'Buccaneer Boarding Corvette', price: 340000, build: buildBuccaneer, pirate: true,
+    desc: 'Blunt welded corvette with a ram prow and grapple arms, pushed by three salvage burners. Shotgun-heavy guns, two flak mounts and a rocket pod for taking freighters intact.',
+    stats: { cargo: 60, bunks: 10, shield: 900, armor: 1100, hull: 900, speed: 260, boost: 700, accel: 85, turn: [1.1, 0.85, 1.8], cap: 1000, capRegen: 24, shieldRegen: 18, sig: 1.1 },
+    fit: { g: ['shredder', 'scatter'], t: ['clanflak', 'flak'], m: ['swarm'], sys: 2 },
+  },
+  liquidator: {
+    name: 'Liquidator', cls: 'Combine Liquidator Destroyer', price: 640000, build: (env, liv) => buildCombine(env, 'liquidator', liv), corp: true,
+    desc: 'Four standard hull blocks with gun sponsons and four square drives. Combine Asset Recovery sends it after debtors; three mounts and two missile bays.',
+    stats: { cargo: 30, bunks: 10, shield: 1700, armor: 1800, hull: 1300, speed: 200, boost: 520, accel: 52, turn: [0.7, 0.55, 1.2], cap: 1500, capRegen: 34, shieldRegen: 26, sig: 1.5 },
+    bays: ['srm', 'srm'],
+    fit: { w: ['autogun', 'pulse', 'flak'], sys: 3 },
+  },
   auditor: {
     name: 'Auditor', cls: 'Combine Auditor Corvette', price: 120000, build: (env, liv) => buildCombine(env, 'auditor', liv), corp: true,
     desc: 'Three standard hull blocks, stub wings and two square drives. Combine Security sends it to inspect freighters; it carries a gun, a turret and one missile bay.',
@@ -203,12 +234,12 @@ Object.assign(HULLS, {
 
 // hull catalogues by shipyard type
 export const YARDS = {
-  fed: { name: 'Helion Yards hull catalogue', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'mantis', 'warden', 'sabre', 'aurora', 'atlas', 'bastion', 'paladin', 'sovereign', 'leviathan', 'talon', 'courier', 'vanguard', 'monarch'] },
-  light: { name: 'Civilian dealership', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'aurora', 'talon', 'courier', 'monarch'] },
-  corp: { name: 'Vanta Combine asset catalogue', hulls: ['unit', 'enforcer', 'crate', 'commuter', 'compliance', 'auditor', 'hornet', 'mule'] },
-  pirate: { name: 'Clan black-market hulls', hulls: ['raider', 'cutlass', 'reaver', 'marauder', 'ravager', 'jackal', 'hornet', 'mule'] },
+  fed: { name: 'Helion Yards hull catalogue', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'mantis', 'warden', 'sabre', 'aurora', 'atlas', 'bastion', 'paladin', 'sovereign', 'leviathan', 'talon', 'courier', 'vanguard', 'monarch', 'tern', 'ox', 'harbinger'] },
+  light: { name: 'Civilian dealership', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'aurora', 'talon', 'courier', 'monarch', 'tern', 'ox'] },
+  corp: { name: 'Vanta Combine asset catalogue', hulls: ['unit', 'enforcer', 'crate', 'commuter', 'compliance', 'auditor', 'liquidator', 'hornet', 'mule'] },
+  pirate: { name: 'Clan black-market hulls', hulls: ['raider', 'cutlass', 'reaver', 'marauder', 'ravager', 'jackal', 'buccaneer', 'hornet', 'mule'] },
 };
-export const HULL_ORDER = ['wisp', 'hornet', 'kestrel', 'talon', 'corvid', 'valkyrie', 'courier', 'mule', 'mantis', 'vanguard', 'warden', 'sabre', 'aurora', 'monarch', 'atlas', 'bastion', 'paladin', 'sovereign', 'leviathan', 'jackal', 'raider', 'cutlass', 'reaver', 'marauder', 'ravager', 'unit', 'auditor', 'enforcer', 'crate', 'commuter', 'compliance'];
+export const HULL_ORDER = ['wisp', 'tern', 'hornet', 'kestrel', 'talon', 'corvid', 'valkyrie', 'courier', 'mule', 'mantis', 'vanguard', 'harbinger', 'warden', 'sabre', 'aurora', 'monarch', 'atlas', 'ox', 'bastion', 'paladin', 'sovereign', 'leviathan', 'jackal', 'raider', 'cutlass', 'reaver', 'buccaneer', 'marauder', 'ravager', 'unit', 'auditor', 'enforcer', 'liquidator', 'crate', 'commuter', 'compliance'];
 
 // mount: gun = forward-fixed with a small gimbal, turret = free-tracking, bay = missile bay (always secondary).
 // group is the default firing role: primary = fires automatically at hostiles, secondary = fires on LMB / U. tech: basic (any station) / high (shipyard stations only)
@@ -349,6 +380,33 @@ export const OUTFITS = {
   cryo: { name: 'Cryo Berths', type: 'utility', cat: 'system', model: 'bunkmod', space: 30, price: 300000, tech: 'high', mods: { bunks: 60 }, desc: '+60 passenger berths in cold sleep.' },
   combinebunks: { name: 'Combine Bunk Stack', type: 'utility', cat: 'system', model: 'bunkmod', space: 20, price: 40000, tech: 'basic', shop: 'corp', mods: { bunks: 30 }, desc: '+30 standard bunks. Combine ports only.' },
 
+  // ---- third catalogue batch
+  needler: { name: 'Needle Gun', type: 'weapon', look: 'driver', space: 6, mount: 'gun', group: 'primary', turret: 'gauss', scale: 0.6, price: 55000, tech: 'basic', bolt: 'tracer', dmg: 14, rof: 0.12, cap: 3, speed: 4200, range: 5000, track: 3.2, spread: 0.002, profile: 'kinetic', flash: 0xffc070, sound: 'cannon', desc: 'Light fixed coilgun spitting needle slugs. Fast, accurate and cheap to run; ideal on fighters.' },
+  sunlance: { name: 'Sunlance', type: 'weapon', space: 24, mount: 'gun', group: 'secondary', turret: 'plasma', scale: 1.3, price: 520000, tech: 'high', bolt: 'plasma', dmg: 260, rof: 1.4, cap: 60, speed: 2400, range: 6500, track: 1.2, spread: 0.0008, profile: 'em', flash: 0xffa040, sound: 'plasma', desc: 'Spinal plasma accelerator. Each bolt hits like a torpedo, at a heavy capacitor cost.' },
+  clanrail: { name: 'Clan Spike Rail', type: 'weapon', look: 'clan', space: 12, mount: 'gun', group: 'secondary', turret: 'rail', scale: 0.85, price: 70000, tech: 'basic', shop: 'pirate', hitscan: true, ammo: true, dmg: 150, rof: 1.9, cap: 30, range: 8000, track: 1.5, spread: 0.0015, profile: 'kinetic', flash: 0x80c0ff, sound: 'rail', desc: 'Rail gun wound from scavenged coils, firing sharpened rebar. Clan ports only.' },
+  combinecarbine: { name: 'Combine Carbine Mk.III', type: 'weapon', space: 6, mount: 'gun', group: 'primary', turret: 'laser', scale: 0.9, price: 28000, tech: 'basic', shop: 'corp', bolt: 'laser', dmg: 20, rof: 0.2, cap: 5, speed: 3300, range: 4800, track: 2.8, spread: 0.003, profile: 'em', flash: 0x60a0ff, sound: 'laser', desc: 'Standard-issue fixed laser. Adequate. Combine ports only.' },
+  quadpulse: { name: 'Quad Pulse Turret', type: 'weapon', space: 16, mount: 'turret', group: 'primary', turret: 'laser', scale: 1.3, price: 230000, tech: 'high', bolt: 'laser', dmg: 26, rof: 0.08, cap: 5, speed: 3400, range: 5200, track: 2.2, spread: 0.003, profile: 'em', flash: 0x60a0ff, sound: 'laser', desc: 'Four pulse emitters on one heavy mount. A wall of fire against anything in range.' },
+  sentinel: { name: 'Sentinel Gatling', type: 'weapon', look: 'pd', space: 7, mount: 'turret', group: 'primary', turret: 'auto', scale: 0.8, price: 85000, tech: 'basic', bolt: 'tracer', dmg: 6, rof: 0.05, cap: 0, speed: 3000, range: 2400, track: 5, spread: 0.02, profile: 'kinetic', flash: 0xffb050, sound: 'cannon', desc: 'Fast-slewing close-in gatling. Tracks fighters effortlessly; useless past 2.4 km.' },
+  broadside: { name: 'Clan Broadside Cannon', type: 'weapon', look: 'clan', space: 18, mount: 'turret', group: 'secondary', turret: 'flak', scale: 1.5, price: 120000, tech: 'basic', shop: 'pirate', bolt: 'tracer', dmg: 30, pellets: 6, rof: 1.2, cap: 0, speed: 2200, range: 3400, track: 1.4, spread: 0.05, profile: 'kinetic', flash: 0xff9040, sound: 'cannon', desc: 'Huge scrap-shot mortar on a turret ring. One blast strips a freighter\'s shields. Clan ports only.' },
+  combinerailt: { name: 'Combine Rail Turret', type: 'weapon', look: 'driver', space: 16, mount: 'turret', group: 'secondary', turret: 'gauss', scale: 0.9, price: 160000, tech: 'basic', shop: 'corp', hitscan: true, ammo: true, dmg: 120, rof: 2, cap: 30, range: 8000, track: 1.2, spread: 0, profile: 'kinetic', flash: 0x80c0ff, sound: 'rail', desc: 'Licensed rail turret for asset recovery. Uses ammunition. Combine ports only.' },
+  cluster: { name: 'Cluster Missile Bay', type: 'weapon', space: 16, mount: 'bay', group: 'secondary', bay: 'swarm', price: 200000, tech: 'high', tubes: 8, salvo: 6, dmg: 60, rof: 6, mspeed: 950, range: 9000, ammoPer: 1, desc: 'Eight-cell bay firing six seekers at once. Overwhelms point defence on frigates.' },
+  clantorp: { name: 'Clan Hull-Breaker', type: 'weapon', space: 22, mount: 'bay', group: 'secondary', bay: 'torp', price: 140000, tech: 'basic', shop: 'pirate', tubes: 1, salvo: 1, dmg: 480, rof: 8, mspeed: 560, range: 6500, ammoPer: 2, desc: 'Boarding torpedo packed with demolition charges. Shorter-ranged than a navy torpedo but half the ammunition. Clan ports only.' },
+  microion: { name: 'Micro Ion Thruster', type: 'engine', cat: 'engine', space: 3, thrust: 5, steer: 6, price: 18000, tech: 'basic', desc: 'Tiny ion thruster for trimming a shuttle or topping up agility.' },
+  fushx: { name: 'Fusion Drive XL', type: 'engine', cat: 'engine', space: 52, thrust: 130, steer: 70, price: 780000, tech: 'high', mods: { sigMul: 1.15 }, desc: 'Battleship fusion drive. Enormous thrust, but its plume raises your signature 15%.' },
+  clanburner: { name: 'Clan Twin Burner', type: 'engine', cat: 'engine', space: 22, thrust: 46, steer: 30, price: 90000, tech: 'basic', shop: 'pirate', mods: { sigMul: 1.15 }, desc: 'Two salvage burners welded into one. Cheap thrust, loud signature. Clan ports only.' },
+  thorium: { name: 'Thorium Cell', type: 'utility', cat: 'reactor', model: 'caprecharger', space: 6, price: 30000, tech: 'basic', mods: { capRegen: 8 }, desc: '+8 GJ/s capacitor recharge. Small enough for a shuttle.' },
+  aegis: { name: 'Aegis Capital Shield Array', type: 'utility', cat: 'shield', model: 'shieldext', space: 46, price: 1200000, tech: 'high', mods: { shield: 5000, shieldRegen: 30 }, desc: '+5,000 shield HP, +30 HP/s regeneration.' },
+  flicker: { name: 'Flicker Shield', type: 'utility', cat: 'shield', model: 'shieldext', space: 4, price: 22000, tech: 'basic', mods: { shield: 150 }, desc: '+150 shield HP.' },
+  titan: { name: 'Titanium Composite Plate', type: 'utility', cat: 'armor', model: 'armorplate', space: 14, price: 150000, tech: 'high', mods: { armor: 500, speedMul: 0.98 }, desc: '+500 armor HP, only −2% max velocity.' },
+  bulkhead: { name: 'Hull Reinforcement', type: 'utility', cat: 'armor', model: 'armorplate', space: 10, price: 45000, tech: 'basic', mods: { hull: 300 }, desc: '+300 structure HP.' },
+  flywheel: { name: 'Flywheel Bank', type: 'utility', cat: 'battery', model: 'capbattery', space: 4, price: 20000, tech: 'basic', mods: { cap: 180 }, desc: '+180 capacitor.' },
+  combinebrick: { name: 'Combine Battery Brick', type: 'utility', cat: 'battery', model: 'capbattery', space: 10, price: 25000, tech: 'basic', shop: 'corp', mods: { cap: 500 }, desc: '+500 capacitor. Combine ports only.' },
+  qradar: { name: 'Quantum Radar', type: 'utility', cat: 'sensor', model: 'sensor', space: 20, price: 480000, tech: 'high', mods: { lockRange: 50000, lockMul: 0.8 }, desc: '+50 km lock range, −20% lock time.' },
+  noisebox: { name: 'Clan Noise Box', type: 'utility', cat: 'sensor', model: 'sensor', space: 10, price: 90000, tech: 'basic', shop: 'pirate', mods: { sigMul: 0.8, lockRange: -5000 }, desc: '−20% signature, −5 km lock range. Clan ports only.' },
+  reefer: { name: 'Refrigerated Hold', type: 'utility', cat: 'system', model: 'cargopod', space: 24, price: 110000, tech: 'basic', mods: { cargo: 100 }, desc: '+100 t cargo capacity.' },
+  suites: { name: 'Luxury Suites', type: 'utility', cat: 'system', model: 'bunkmod', space: 22, price: 420000, tech: 'high', mods: { bunks: 36 }, desc: '+36 passenger berths.' },
+  afterburner: { name: 'Afterburner Injector', type: 'utility', cat: 'system', model: 'caprecharger', space: 8, price: 130000, tech: 'basic', mods: { boostMul: 1.3 }, desc: '+30% boost velocity.' },
+
 };
 
 export const MOUNT_KEYS = ['g', 't', 'm'];
@@ -368,6 +426,7 @@ const STOCK_ENGINES = {
   marauder: ['salvage', 'salvage', 'salvage'], ravager: ['capdrive', 'salvage'], unit: ['combinedrive'], enforcer: ['combinedrive', 'combinedrive'],
   crate: ['combinedrive', 'combinedrive'], commuter: ['combinedrive', 'combinedrive', 'combinedrive'], compliance: ['combinedrive', 'combinedrive', 'combinedrive'],
   talon: ['fuss', 'fuss'], courier: ['fusm', 'ions', 'ions'], vanguard: ['ionm', 'ions'], monarch: ['fusm', 'fusm'], jackal: ['salvage'], auditor: ['combinedrive'],
+  tern: ['ions', 'ions'], ox: ['ionl', 'ionm'], harbinger: ['fusm', 'fusm', 'ions'], buccaneer: ['salvage', 'salvage', 'salvage'], liquidator: ['combinedrive', 'combinedrive'],
 };
 const ceil5 = (x) => Math.ceil(x / 5) * 5;
 const MOUNT_MIN = { g: 7, t: 8, m: 10 };
