@@ -141,6 +141,10 @@ export class Audio {
     this.tone('sawtooth', 60, 600, 3.0, 0.15, 0.6);
     this.noise(3.0, 'bandpass', 200, 2, 0.35, 0.8, 2500);
   }
+  gate() {
+    if (!this.ctx) return;
+    this.noise(1.6, 'lowpass', 900, 0.7, 0.4, 0.15, 120, this.brown);
+  }
   warpEnd() {
     if (!this.ctx) return;
     this.noise(1.2, 'lowpass', 3000, 0.7, 0.5, 0.01, 80, this.brown);

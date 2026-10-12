@@ -480,6 +480,35 @@ function finishPods(pods, addBeacon, colliders) {
   return pods.map((pd) => pd.bay);
 }
 
+// ---------------------------------------------------------------- shared station detail
+// panel ribs and lit window bands wrapped around a vertical cylinder section
+function ribbedSection(k, R, y0, y1, n, a0 = 0) {
+  for (let i = 0; i < n; i++) {
+    const a = a0 + i / n * Math.PI * 2;
+    k.add('dark', G.box(4, y1 - y0, 6), mat([Math.cos(a) * (R + 2), (y0 + y1) / 2, Math.sin(a) * (R + 2)], [0, -a, 0]));
+  }
+  for (let y = y0 + 24; y < y1 - 10; y += 34) k.add('window', G.cyl(R + 0.6, R + 0.6, 3, 48, true), mat([0, y, 0]));
+}
+function dish(k, p, R, tilt, yaw) {
+  const m = mat(p, [tilt, yaw, 0]);
+  k.add('hull', G.lathe([[0.5, 0], [R * 0.5, R * 0.08], [R, R * 0.3], [R * 1.02, R * 0.31]], 24), m);
+  k.add('dark', G.cyl(R * 0.03, R * 0.03, R * 0.7, 6), m.clone().multiply(mat([0, R * 0.35, 0])));
+  k.add('dark', G.cyl(R * 0.16, R * 0.2, R * 0.5, 10), m.clone().multiply(mat([0, -R * 0.2, 0])));
+}
+function containers(k, r, p, yaw, nx, ny, nz) {
+  const keys = ['hull', 'dark', 'gold'];
+  for (let x = 0; x < nx; x++) for (let y = 0; y < ny; y++) for (let z = 0; z < nz; z++) {
+    if (y > 0 && r() < 0.3) continue;
+    k.add(keys[Math.floor(r() * (r() < 0.9 ? 2 : 3))], G.box(11, 11, 26), mat(p, [0, yaw, 0]).multiply(mat([(x - (nx - 1) / 2) * 12, y * 12, (z - (nz - 1) / 2) * 27])));
+  }
+}
+function arrayLights(k, from, to, n) {
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    k.add('light', G.box(3, 3, 3), mat([from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t, from[2] + (to[2] - from[2]) * t]));
+  }
+}
+
 // ---------------------------------------------------------------- station
 function buildStation(M) {
   const root = new THREE.Group();
@@ -523,6 +552,11 @@ function buildStation(M) {
     ringK.add('hull', G.rbox(60, 80, 90, 6), mat([Math.cos(a) * 420, 0, Math.sin(a) * 420], [0, -a, 0]));
     ringK.add('light', G.box(2, 2, 2), mat([Math.cos(a) * 462, 0, Math.sin(a) * 462]));
   }
+  for (let i = 0; i < 48; i++) {
+    const a = (i + 0.5) / 48 * Math.PI * 2;
+    ringK.add('dark', G.box(70, 6, 8), mat([Math.cos(a) * 420, 34, Math.sin(a) * 420], [0, -a, 0]));
+    if (i % 8 !== 0) ringK.add('window', G.box(40, 2, 22), mat([Math.cos(a) * 420, 34.5, Math.sin(a) * 420], [0, -a + Math.PI / 2, 0]));
+  }
   const ring = ringK.build(M, { uvTile: { hull: 40, dark: 30 } });
   ring.position.y = 120;
   root.add(ring);
@@ -563,6 +597,27 @@ function buildStation(M) {
     k.add('dark', G.cyl(1.5, 1.5, 120, 6), mat([Math.cos(a) * 60, 380 + r() * 40, Math.sin(a) * 60], [r() * 0.3, 0, r() * 0.3]));
   }
   k.add('dark', G.cyl(60, 4, 30, 32), mat([90, 470, 40], [0.6, 0, 0.4]));
+  ribbedSection(k, 70, 20, 150, 24);
+  ribbedSection(k, 70, -190, -70, 24, 0.13);
+  k.add('hull', G.cyl(150, 130, 36, 48), mat([0, 270, 0]));
+  k.add('window', G.cyl(150.6, 150.6, 8, 48, true), mat([0, 274, 0]));
+  k.add('dark', G.cyl(156, 156, 6, 48), mat([0, 254, 0]));
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; k.add('dark', G.box(10, 30, 8), mat([Math.cos(a) * 146, 238, Math.sin(a) * 146], [0, -a, 0.5])); }
+  dish(k, [130, 300, -60], 46, -0.7, 0.6);
+  dish(k, [-120, 300, 70], 34, 0.8, -2.2);
+  dish(k, [0, 410, -90], 26, -1.1, 0);
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2 + Math.PI / 4, c = Math.cos(a), s = Math.sin(a), yaw = Math.atan2(c, s);
+    containers(k, r, [c * 260 - s * 52, -232, s * 260 + c * 52], yaw, 2, 2, 4);
+    k.add('dark', G.box(4, 60, 4), mat([c * 300, -175, s * 300]));
+    k.add('dark', G.box(4, 4, 120), mat([c * 300, -145, s * 300], [0, yaw + Math.PI / 2, 0]));
+    arrayLights(k, [c * 110, -202, s * 110], [c * 430, -202, s * 430], 8);
+  }
+  for (let i = 0; i < 6; i++) {
+    const a = i / 6 * Math.PI * 2 + 0.3;
+    k.add('hull', G.cyl(16, 16, 50, 16), mat([Math.cos(a) * 100, -290, Math.sin(a) * 100]));
+    k.add('dark', G.sphere(16, 12, 8), mat([Math.cos(a) * 100, -265, Math.sin(a) * 100]));
+  }
   const pods = [0, 1, 2, 3].map((i) => bayPod(k, Math.PI / 4 + i * Math.PI / 2, 478, -230, 220, 110, 340));
   const body = k.build(M, { uvTile: { hull: 40, dark: 30, window: 60 } });
   root.add(body);
@@ -707,6 +762,17 @@ function buildShipyard(M) {
     const m4 = new THREE.Matrix4().lookAt(p, new THREE.Vector3(), new THREE.Vector3(0, 1, 0)).setPosition(p);
     k.add(r() < 0.5 ? 'dark' : 'hull', g, m4);
   }
+  ribbedSection(k, 42, 150, 400, 20);
+  dish(k, [80, 420, 0], 50, -0.6, 1.0);
+  dish(k, [-70, -360, 40], 36, Math.PI - 0.5, 0.2);
+  for (const side of [1, -1]) {
+    for (let x = 300; x <= 1050; x += 250) {
+      k.add('dark', G.box(10, 10, 220), mat([x, 112, side * 120]));
+      k.add('hull', G.rbox(24, 20, 24, 3), mat([x, 100, side * 120 + (x % 500 ? 40 : -50)]));
+      k.add('dark', G.cyl(1.5, 1.5, 60, 6), mat([x, 70, side * 120 + (x % 500 ? 40 : -50)]));
+    }
+  }
+  containers(k, r, [0, -200, 260], 0, 3, 2, 3);
   const pods = [Math.PI / 2, Math.PI, Math.PI * 1.5].map((a) => bayPod(k, a, 396, -120, 220, 110, 320));
   root.add(k.build(M, { uvTile: { hull: 40, dark: 30, window: 60 } }));
   // rotating habitat ring
@@ -761,6 +827,13 @@ function buildGate(M) {
     k.add('dark', G.box(30, 140, 30), mat([Math.cos(a) * 470, Math.sin(a) * 470, 0], [0, 0, a]));
     k.add('blue', G.box(6, 30, 116), mat([Math.cos(a) * 382, Math.sin(a) * 382, 0], [0, 0, a]));
   }
+  for (let i = 0; i < 24; i++) {
+    const a = (i + 0.5) / 24 * Math.PI * 2;
+    k.add('dark', G.box(8, 60, 50), mat([Math.cos(a) * 448, Math.sin(a) * 448, 0], [0, 0, a]));
+    k.add('light', G.box(4, 4, 4), mat([Math.cos(a) * 452, Math.sin(a) * 452, 30]));
+  }
+  for (const z of [-30, 30]) k.add('metal' in M ? 'metal' : 'dark', G.torus(436, 4, 6, 128), mat([0, 0, z]));
+  dish(k, [60, -1180, 0], 40, Math.PI, 0);
   // support truss to control module
   k.add('dark', G.box(30, 600, 30), mat([0, -760, 0]));
   k.add('hull', G.rbox(160, 120, 160, 10), mat([0, -1100, 0]));
@@ -988,6 +1061,11 @@ function buildHabitat(M, seed) {
     k.add('dark', G.box(700, 6, 6), mat([side * 380, 380, 0]));
     for (let j = 0; j < 4; j++) k.add('solar', G.box(150, 2, 260), mat([side * (140 + j * 160), 380, 0]));
   }
+  ribbedSection(k, 46, -280, -150, 20);
+  ribbedSection(k, 46, 150, 280, 20, 0.15);
+  dish(k, [60, 470, 0], 40, -0.5, 1.2);
+  dish(k, [-50, -470, 30], 30, Math.PI - 0.6, 0.4);
+  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2; containers(k, r, [Math.cos(a) * 80, 40 + i * 30, Math.sin(a) * 80], -a, 1, 2, 2); }
   const pods = [0, 1, 2].map((i) => bayPod(k, i * Math.PI * 2 / 3 + 0.3, 150, -330, 200, 100, 300));
   for (let i = 0; i < 3; i++) {
     const a = i * Math.PI * 2 / 3 + 0.3;
@@ -1045,6 +1123,17 @@ function buildTower(M, seed) {
     const a = r() * Math.PI * 2, y = 100 + r() * 1100;
     k.add('dark', G.box(10 + r() * 16, 8 + r() * 20, 8), mat([Math.cos(a) * 118, y, Math.sin(a) * 118], [0, -a, 0]));
   }
+  for (let i = 0; i < floors; i++) {
+    const rad = 120 - i * 5, y = 70 + i * 90;
+    for (let j = 0; j < 8; j++) { const a = j / 8 * Math.PI * 2 + Math.PI / 8; k.add('dark', G.box(6, 84, 10), mat([Math.cos(a) * (rad - 2), y + 42, Math.sin(a) * (rad - 2)], [0, Math.PI / 2 - a, 0])); }
+    if (i % 4 === 3) k.add('gold', G.cyl(rad + 3, rad + 3, 4, 8), mat([0, y + 86, 0]));
+  }
+  k.add('hull', G.cyl(170, 170, 30, 8), mat([0, 560, 0]));
+  k.add('window', G.cyl(171, 171, 12, 8, true), mat([0, 562, 0]));
+  k.add('gold', G.cyl(174, 174, 4, 8), mat([0, 578, 0]));
+  dish(k, [70, topY + 150, 0], 30, -0.6, 1.4);
+  dish(k, [-60, topY + 110, 40], 22, -0.8, -1.8);
+  for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3 + 0.5 + Math.PI / 3; containers(k, r, [Math.cos(a) * 200, 80, Math.sin(a) * 200], -a, 2, 2, 2); }
   const pods = [0, 1, 2].map((i) => bayPod(k, i * Math.PI * 2 / 3 + 0.5, 190, -60, 200, 100, 300));
   root.add(k.build(M, { uvTile: { hull: 40, dark: 30, window: 60 } }));
   const beacons = [];
@@ -1082,8 +1171,17 @@ function buildDen(M, seed) {
     const a = r() * Math.PI * 2;
     k.add('dark', G.cyl(3, 3, 200 + r() * 200, 6), mat([Math.cos(a) * 200, 260 + r() * 80, Math.sin(a) * 200], [r() * 0.6 - 0.3, 0, r() * 0.6 - 0.3]));
   }
+  for (let i = 0; i < 5; i++) {
+    const a = i / 5 * Math.PI * 2 + 0.4;
+    const p = [Math.cos(a) * 300, 300 + r() * 60, Math.sin(a) * 300];
+    k.add('rust', G.cyl(26, 34, 30, 10), mat(p));
+    k.add('dark', G.box(10, 10, 70), mat([p[0], p[1] + 24, p[2]], [0.3, -a + Math.PI / 2, 0]));
+  }
+  containers(k, r, [0, 380, 220], 0.4, 3, 2, 2);
+  containers(k, r, [-200, 260, -160], 1.9, 2, 3, 2);
+  dish(k, [-120, 470, 60], 50, -0.4, 2.2);
   const pods = [0, 1, 2].map((i) => bayPod(k, i * Math.PI * 2 / 3, 280, -60, 200, 100, 300));
-  root.add(k.build(M, { uvTile: { dark: 30, rust: 30, window: 60 } }));
+  root.add(k.build(M, { uvTile: { dark: 30, rust: 30, window: 60, hull: 40 } }));
   const beacons = [];
   const addBeacon = beaconAdder(root, beacons);
   addBeacon(new THREE.Vector3(10, 835, 30), 0xff2010, 90, 0, 0.7);

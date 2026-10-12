@@ -110,7 +110,7 @@ const G = {
   selected: null, navTarget: null, lock: null, leadPoint: null, warp: null, scrambled: false,
   stick: new THREE.Vector2(), freeLook: false, look: new THREE.Vector2(),
   mouse: new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2), following: false, followToggle: false,
-  ctrlTargeting: false, ctrlHover: null, ctrlRadius: 110,
+  ctrlTargeting: false, ctrlHover: null, ctrlRadius: 110, navTargeting: false, navHover: null,
   input: { fire1: false, fire2: false, mmb: false, keys: {} }, flightAssist: true, boosting: false, boostFx: 0, engFx: 0.3, camMode: 0,
   credits: 250000, kills: 0, ammo: { rail: 40, missile: 24 }, cool: { pri: 0, sec: 0, tur: 0, missile: 0 },
   priOff: false, secOff: false, usesAmmo: true, leadSpeed: 3200, turretsAuto: true, hasTurrets: true, turFiring: false, gunAssist: false,
@@ -181,6 +181,7 @@ const STATS = {
   navyTriad: { cls: 'Helion Navy Triad', shield: 1450, armor: 1250, hull: 1050, speed: 220, accel: 52, turn: 0.6, bounty: 0, sig: 1.6 },
   navyGemini: { cls: 'Helion Navy Gemini', shield: 2300, armor: 2100, hull: 1800, speed: 175, accel: 34, turn: 0.4, bounty: 0, sig: 2.3 },
   secMonolith: { cls: 'Combine Monolith Slab Frigate', shield: 1500, armor: 1900, hull: 1400, speed: 185, accel: 38, turn: 0.45, bounty: 0, sig: 1.9, hullId: 'monolith' },
+  navyEmpyrean: { cls: 'Helion Navy Empyrean', shield: 6200, armor: 5600, hull: 4600, speed: 125, accel: 20, turn: 0.24, bounty: 0, sig: 4.2 },
   navyCitadel: { cls: 'Helion Navy Citadel', shield: 4000, armor: 4200, hull: 3000, speed: 130, accel: 28, turn: 0.26, bounty: 0, sig: 3.2 },
   navyLancer: { cls: 'Helion Navy Lancer', shield: 330, armor: 240, hull: 220, speed: 380, accel: 160, turn: 1.25, bounty: 0, sig: 0.5 },
   secCollector: { cls: 'Combine Debt Collector', shield: 700, armor: 650, hull: 520, speed: 240, accel: 75, turn: 0.7, bounty: 0, sig: 1.0, hullId: 'collector' },
@@ -189,7 +190,7 @@ const STATS = {
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
 const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.78 ? 'banshee' : r < 0.86 ? 'scythe' : r < 0.92 ? 'leech' : 'raider'; };
-const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini', navyHammerhead: 'hammerhead', navyTrident: 'trident', navyAegis: 'aegis', navyManta: 'manta', navyCorona: 'corona', navyPike: 'pike', navyHive: 'hive' };
+const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini', navyHammerhead: 'hammerhead', navyTrident: 'trident', navyAegis: 'aegis', navyManta: 'manta', navyCorona: 'corona', navyPike: 'pike', navyHive: 'hive', navyEmpyrean: 'empyrean' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
 const PROFILES = { em: { s: 1.25, a: 0.7, h: 1 }, kinetic: { s: 0.85, a: 1.2, h: 1 }, explosive: { s: 0.9, a: 1.1, h: 1.2 }, thermal: { s: 1.0, a: 0.95, h: 1.1 } };
@@ -959,6 +960,27 @@ function updateCtrlTargeting() {
   if (e && (!G.lock || G.lock.ent !== e)) startLock(e);
 }
 
+function pickNavNearPointer(radius) {
+  const w = window.innerWidth, h = window.innerHeight;
+  const px = G.mouseLocked ? w / 2 : G.mouse.x, py = G.mouseLocked ? h / 2 : G.mouse.y;
+  let best = null, bd = radius;
+  for (const l of LOCATIONS) {
+    if (_v.copy(l.pos).applyMatrix4(camera.matrixWorldInverse).z >= 0) continue;
+    _v.copy(l.pos).project(camera);
+    const d = Math.hypot((_v.x * 0.5 + 0.5) * w - px, (-_v.y * 0.5 + 0.5) * h - py);
+    if (d < bd) { bd = d; best = l; }
+  }
+  return best;
+}
+
+function updateNavTargeting() {
+  G.navTargeting = !!G.input.keys.Slash && G.state === 'flying' && !G.warp;
+  if (!G.navTargeting) { G.navHover = null; return; }
+  const l = pickNavNearPointer(G.ctrlRadius);
+  G.navHover = l;
+  if (l && G.navTarget !== l) { G.selected = l; G.navTarget = l; hud.ovT = 0; audio.ui(); hud.notice(`DESTINATION: ${l.name.toUpperCase()}`, 1.4); }
+}
+
 function startLock(e) {
   const R = lockRange();
   if (e.obj.position.distanceTo(G.player.obj.position) > R) { hud.notice(`TARGET OUT OF LOCK RANGE (${Math.round(R / 1000)} km)`, 1.6); return; }
@@ -1156,7 +1178,7 @@ function cineStep(dt) {
       cine.tEnd = cine.t;
       p.obj.visible = false;
       fx.flash(cine.gate.pos, 1400, 0x9fc8ff, 0.9);
-      audio.warpStart();
+      audio.gate();
     }
     if (cine.ending) cine.look.copy(cine.gate.pos);
     if (cine.ending && cine.t - cine.tEnd > 0.7 && !cine.crossed) {
@@ -1933,7 +1955,7 @@ $('pausecontrols').innerHTML = document.querySelector('#menu .cols').outerHTML;
 $('resume').addEventListener('click', togglePause);
 
 window.addEventListener('keydown', (ev) => {
-  if (ev.code === 'Tab' || ev.code === 'Space' || ev.code.startsWith('Arrow') || ev.code.startsWith('Page') || ev.code === 'F1' || (ev.ctrlKey && G.state === 'flying')) ev.preventDefault();
+  if (ev.code === 'Tab' || ev.code === 'Space' || ev.code.startsWith('Arrow') || ev.code.startsWith('Page') || ev.code === 'F1' || ev.code === 'Slash' || (ev.ctrlKey && G.state === 'flying')) ev.preventDefault();
   if (cine.mode) { if ((ev.code === 'Space' || ev.code === 'Escape') && !ev.repeat) skipCine(); return; }
   if (ev.code === 'Escape') { if (starmap.isOpen) starmap.toggle(false); else togglePause(); return; }
   if (ev.repeat) return;
@@ -1967,7 +1989,7 @@ hud.onSelect = (ref) => { G.selected = ref; if (ref.pos) G.navTarget = ref; else
 document.querySelectorAll('#selinfo button').forEach((b) => b.addEventListener('mousedown', (ev) => {
   ev.stopPropagation();
   const s = G.selected;
-  if (b.dataset.act === 'warp') { if (s && s.pos) G.navTarget = s; if (s && s.jump && nearJump() === s) jumpKey(); else warpKey(); }
+  if (b.dataset.act === 'warp') { if (s && s.pos) G.navTarget = s; if (s && s.jump && inJumpRange(s)) jumpKey(); else warpKey(); }
   if (b.dataset.act === 'lock') { if (s && s.ship) startLock(s); else hud.notice('SELECT A SHIP TO LOCK', 1.2); }
   if (b.dataset.act === 'dock') tryDock();
 }));
@@ -2133,6 +2155,7 @@ function frame(now) {
   const warpI = updateCamera(dt);
   cineCamera();
   updateCtrlTargeting();
+  updateNavTargeting();
   G.aimPoint.copy(camera.position).addScaledVector(G.aimDir, 5000);
   if (G.state === 'flying') playerWeapons(dt);
   const colliders = world.collidersNear(p.obj.position, 7000);
@@ -2173,10 +2196,12 @@ function frame(now) {
   let best = Infinity;
   for (const l of LOCATIONS) { const d = l.pos.distanceTo(p.obj.position) - l.arrive; if (d < best) { best = d; G.nearestName = d < 30000 ? l.name : `Deep space near ${l.name}`; } }
   if (G.state === 'flying' || G.state === 'dead') hud.update(dt, G);
-  if (G.autoJump && !G.warp) { const g = G.autoJump; G.autoJump = null; if (G.state === 'flying' && nearJump() === g) startJump(g); }
+  if (G.autoJump && !G.warp) { const g = G.autoJump; G.autoJump = null; if (G.state === 'flying' && inJumpRange(g)) startJump(g); }
   if (G.autoRoute && G.state === 'flying' && !G.warp) autoRouteStep(dt);
   const jp = G.state === 'flying' && !G.warp && nearJump();
-  const jh = jp ? `JUMP GATE IN RANGE — H TO JUMP TO ${G.explored.has(jp.jump) ? SYSTEMS[jp.jump].name.toUpperCase() : 'UNCHARTED SYSTEM'}` : '';
+  const hg = jp && jumpGate();
+  const gateName = (g) => (G.explored.has(g.jump) ? SYSTEMS[g.jump].name.toUpperCase() : 'UNCHARTED SYSTEM');
+  const jh = !jp ? '' : inJumpRange(hg) ? `JUMP GATE IN RANGE — H TO JUMP TO ${gateName(hg)}` : `H FOLLOWS ROUTE VIA ${gateName(hg)} — SELECT THIS GATE TO JUMP TO ${gateName(jp)}`;
   if ($('jumphint').textContent !== jh) $('jumphint').textContent = jh;
   composer.render(dt);
   holo.render(renderer, G.state === 'flying' ? hud.shown : null, camera, G.time, dt);
@@ -2205,7 +2230,7 @@ function populate(def, from) {
   if (def.gov === 'gov') {
     let ni = 0;
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius', 'navyTriad', 'navyGemini', 'navyHalo', 'navyHammerhead', 'navyTrident', 'navyAegis', 'navyManta', 'navyCorona', 'navyPike', 'navyHive'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
+      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius', 'navyTriad', 'navyGemini', 'navyHalo', 'navyHammerhead', 'navyTrident', 'navyAegis', 'navyManta', 'navyCorona', 'navyPike', 'navyHive', 'navyEmpyrean'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) {
         const n = makeEntity(kind, 'navy', home.clone().add(jitter(6000)), NAVY_NAMES[ni++ % NAVY_NAMES.length]);
@@ -2325,6 +2350,15 @@ function nearJump() {
   return best;
 }
 
+const inJumpRange = (g) => !!g && g.pos.distanceTo(G.player.obj.position) < 3500;
+
+// With a route plotted, H follows it unless the player has selected a different gate that is in jump range.
+function jumpGate() {
+  const hop = nextHop(), sel = G.navTarget && G.navTarget.jump ? G.navTarget : null;
+  if (hop) return sel && inJumpRange(sel) ? sel : hop;
+  return nearJump() || sel;
+}
+
 function warpKey() {
   if (G.state !== 'flying' || G.warp) return;
   G.autoRoute = null;
@@ -2338,14 +2372,13 @@ function jumpKey() {
   if (G.state !== 'flying') return;
   if (G.autoRoute) { G.autoRoute = null; G.autoJump = null; hud.notice('ROUTE AUTOPILOT OFF', 1.8); audio.ui(); return; }
   if (G.warp) return;
-  const jp = nearJump(), hop = nextHop();
-  const gate = jp || (G.navTarget && G.navTarget.jump && G.navTarget) || hop;
+  const hop = nextHop(), gate = jumpGate();
   if (!gate) { hud.notice('SELECT A JUMP GATE OR PLOT A ROUTE (M)', 1.8); audio.beep(220, 0.15); return; }
   if (gate === hop) {
     G.autoRoute = G.routeTo; G.autoT = 0;
     hud.log(`Route autopilot engaged: ${SYSTEMS[G.routeTo].name}. Press H again to stop.`, 'i');
   }
-  if (jp) { startJump(jp); return; }
+  if (inJumpRange(gate)) { startJump(gate); return; }
   G.navTarget = gate; G.selected = gate; hud.ovT = 0;
   warpTo(gate);
   if (G.warp) G.autoJump = gate;
@@ -2367,8 +2400,8 @@ function autoRouteStep(dt) {
   const hop = nextHop();
   if (!hop) { G.autoRoute = null; hud.notice('ROUTE AUTOPILOT OFF — NO ROUTE', 2); return; }
   G.navTarget = hop; G.selected = hop;
-  const p = G.player, jp = nearJump();
-  if (jp === hop) { startJump(hop); return; }
+  const p = G.player;
+  if (inJumpRange(hop)) { startJump(hop); return; }
   if (p.obj.position.distanceTo(hop.pos) < hop.arrive + 8000) { G.autoRoute = null; hud.notice(`ROUTE AUTOPILOT OFF — FLY TO ${hop.name.toUpperCase()}`, 2.5); return; }
   if (G.scrambled || p.cap < 250) { G.autoT = 2; hud.notice(G.scrambled ? 'AUTOPILOT: WARP DRIVE DISRUPTED' : 'AUTOPILOT: CHARGING CAPACITOR', 1.6); return; }
   warpTo(hop);
@@ -2399,7 +2432,6 @@ function startJump(jp) {
   ];
   Object.assign(cine, { gate: jp, to, from, warpFx: 0 });
   startCine('jumpout', { pos: jp.pos, dir: n }, path, 4.2 + dist / 2500, `JUMPING TO ${G.explored.has(to) ? SYSTEMS[to].name.toUpperCase() : 'UNCHARTED SYSTEM'}`);
-  audio.ui();
 }
 
 function arriveJump(to, from) {
@@ -2408,7 +2440,7 @@ function arriveJump(to, from) {
   p.obj.visible = true;
   const back = LOCATIONS.find((l) => l.jump === from);
   setFade(false);
-  audio.warpEnd();
+  audio.gate();
   if (!back) { finishJump(); return; }
   G.state = 'jumpin';
   const end = p.obj.position.clone();

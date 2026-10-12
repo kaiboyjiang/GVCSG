@@ -48,6 +48,7 @@ function clean(geo) {
 export class Kit {
   constructor() { this.parts = {}; }
   add(key, geo, matrix) {
+    if (this.pane(key, geo, matrix, false)) return this;
     const g = clean(geo.clone ? geo.clone() : geo);
     if (matrix) g.applyMatrix4(matrix);
     (this.parts[key] ||= []).push(g);
@@ -55,6 +56,7 @@ export class Kit {
   }
   // mirror across X (for symmetric ships)
   addMirrored(key, geo, matrix) {
+    if (this.pane(key, geo, matrix, true)) return this;
     this.add(key, geo, matrix);
     const m = new THREE.Matrix4().makeScale(-1, 1, 1).multiply(matrix || new THREE.Matrix4());
     const g = clean(geo.clone());
@@ -73,6 +75,28 @@ export class Kit {
     }
     (this.parts[key] ||= []).push(g);
     return this;
+  }
+  // a thin glass box becomes a recessed pane: thinner glass sunk between proud dark frame bars
+  pane(key, geo, matrix, mirrored) {
+    if (!this.panes || key !== 'glass' || geo.type !== 'BoxGeometry' || geo.userData.pane) return false;
+    const { width, height, depth } = geo.parameters, dims = [width, height, depth];
+    const ti = dims.indexOf(Math.min(...dims)), [a, b] = [0, 1, 2].filter((i) => i !== ti), t = dims[ti];
+    if (t > 0.3 * Math.min(dims[a], dims[b])) return false;
+    const f = Math.max(0.04, Math.min(dims[a], dims[b]) * 0.12);
+    const put = (k, size, off) => {
+      const g = new THREE.BoxGeometry(...size); g.userData.pane = true;
+      const m = new THREE.Matrix4().makeTranslation(...off);
+      const mm = (matrix ? matrix.clone() : new THREE.Matrix4()).multiply(m);
+      if (mirrored) this.addMirrored(k, g, mm); else this.add(k, g, mm);
+    };
+    const sz = (ia, ib, it) => { const s = [0, 0, 0]; s[a] = ia; s[b] = ib; s[ti] = it; return s; };
+    const at = (oa, ob, ot = 0) => { const o = [0, 0, 0]; o[a] = oa; o[b] = ob; o[ti] = ot; return o; };
+    put('glass', sz(dims[a] - f, dims[b] - f, t * 0.35), at(0, 0));
+    for (const s of [-1, 1]) {
+      put('dark', sz(f, dims[b], t * 0.9), at(s * (dims[a] - f) / 2, 0));
+      put('dark', sz(dims[a] - 2 * f, f, t * 0.9), at(0, s * (dims[b] - f) / 2));
+    }
+    return true;
   }
   build(materials, { uvTile = {}, shadows = true } = {}) {
     const group = new THREE.Group();
@@ -152,3 +176,7 @@ export const G = {
     return new THREE.LatheGeometry(v, seg);
   },
 };
+
+export class ShipKit extends Kit {
+  constructor() { super(); this.panes = true; }
+}

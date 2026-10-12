@@ -274,19 +274,20 @@ export class HUD {
         g.strokeRect(m.x - 6, m.y - 6, 12, 12);
         for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { g.beginPath(); g.moveTo(m.x + dx * 10, m.y + dy * 10); g.lineTo(m.x + dx * 15, m.y + dy * 15); g.stroke(); }
       }
-      if (G.ctrlTargeting) {
-        const tx = G.mouseLocked ? cx : m.x, ty = G.mouseLocked ? cy : m.y;
-        g.strokeStyle = 'rgba(255,176,64,0.6)'; g.setLineDash([6, 6]);
+      const tx = G.mouseLocked ? cx : m.x, ty = G.mouseLocked ? cy : m.y;
+      const reticle = (rgb, label, hp, dy) => {
+        g.strokeStyle = `rgba(${rgb},0.6)`; g.setLineDash([6, 6]);
         g.strokeRect(tx - G.ctrlRadius, ty - G.ctrlRadius, G.ctrlRadius * 2, G.ctrlRadius * 2); g.setLineDash([]);
-        const hv = G.ctrlHover;
-        if (hv && hv.alive && !isBehind(hv.obj.position)) {
-          const [hx, hy] = proj(hv.obj.position);
-          g.strokeStyle = 'rgba(255,176,64,0.9)';
+        if (hp && !isBehind(hp)) {
+          const [hx, hy] = proj(hp);
+          g.strokeStyle = `rgba(${rgb},0.9)`;
           g.beginPath(); g.moveTo(tx, ty); g.lineTo(hx, hy); g.stroke();
         }
-        g.fillStyle = '#ffb040'; g.font = '10px "Share Tech Mono", monospace'; g.textAlign = 'left';
-        g.fillText('TARGETING', tx + 18, ty - 12);
-      }
+        g.fillStyle = `rgb(${rgb})`; g.font = '10px "Share Tech Mono", monospace'; g.textAlign = 'left';
+        g.fillText(label, tx + 18, ty - 12 + dy);
+      };
+      if (G.ctrlTargeting) reticle('255,176,64', 'TARGETING', G.ctrlHover && G.ctrlHover.alive ? G.ctrlHover.obj.position : null, 0);
+      if (G.navTargeting) reticle('110,200,255', G.navHover ? `NAV: ${G.navHover.name.toUpperCase()}` : 'NAV TARGETING', G.navHover ? G.navHover.pos : null, G.ctrlTargeting ? 14 : 0)
     }
   }
   overview(G) {

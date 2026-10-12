@@ -166,14 +166,9 @@ export function hullMaps(opts = {}) {
       }
       c.restore();
     }
-    // stencilled markings
-    if (r() < 0.06 && w > size / 8 && hh > size / 20) {
-      const fs = Math.min(hh * 0.35, size / 28);
-      c.font = `bold ${fs}px monospace`;
-      c.fillStyle = r() < 0.5 ? 'rgba(30,30,30,0.75)' : 'rgba(240,240,240,0.7)';
-      const labels = opts.labels || ['UNS', 'A-07', 'NO STEP', 'RCS', '0731', 'MK-IV', 'FUEL', 'HP-2'];
-      c.fillText(labels[Math.floor(r() * labels.length)], x + seam * 6, y + seam * 6 + fs);
-    }
+    // lettering is not baked here: tiles are rotated and mirrored when sampled, which would scramble it.
+    // The draws are kept so the panel layout stays the same.
+    if (r() < 0.06 && w > size / 8 && hh > size / 20) { r(); r(); }
   }
 
   // seams (grooves)

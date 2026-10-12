@@ -79,7 +79,7 @@ export class TargetHolo {
     _inv.copy(g.matrixWorld).invert();
     const inner = new THREE.Group();
     g.traverse((o) => {
-      if (!o.isMesh || o === e.shieldMesh || !o.visible || !o.geometry.attributes.normal) return;
+      if (!o.isMesh || o === e.shieldMesh || o.userData.decal || !o.visible || !o.geometry.attributes.normal) return;
       const m0 = Array.isArray(o.material) ? o.material[0] : o.material;
       if (!m0.isMeshStandardMaterial) return;
       const m = new THREE.Mesh(o.geometry, this.mat);

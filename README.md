@@ -19,6 +19,7 @@ Open the [GitHub Pages deployment](https://kaiboyjiang.github.io/GVCSG/) in a de
 - Left mouse or U (or O): fire secondary guns, turrets and missile bays — only the mounts that can hit the target fire
 - Y: primary turrets hold fire (they keep tracking)
 - Hold right Ctrl: lock the ship nearest the pointer
+- Hold /: set the planet, station, gate or belt nearest the pointer as the nav destination
 - T: lock target near the pointer / reticle
 - Tab: cycle hostiles
 - Right mouse, ; or F: fire missile bays only (needs a lock)

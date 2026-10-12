@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { Kit, G, mat } from './geo.js';
+import { ShipKit as Kit, G, mat } from './geo.js';
 import { hullMaps, rng, glowTexture, engineCoreTexture, untile } from './textures.js';
 import { LOGDEPTH_VERT_PARS, LOGDEPTH_VERT, LOGDEPTH_FRAG_PARS, LOGDEPTH_FRAG } from './shaders.js';
 
@@ -102,6 +102,7 @@ export function livery(name, env) {
     pike: { base: [190, 196, 204], accent: [200, 40, 50], second: [36, 38, 44], pin: [240, 240, 240], eng: [0.55, 0.85, 1.0], labels: ['PIKE', 'LF-2', 'HELION', 'MUZZLE'], seed: 801, wear: 0.2, stripes: [0.4, 0.05, 0.03, 0.006] },
     spindle: { base: [236, 236, 240], accent: [20, 130, 160], second: [50, 54, 62], pin: [230, 170, 50], eng: [0.6, 0.85, 1.0], labels: ['SPINDLE', 'CX-9', 'PRIORITY', 'EXPRESS'], seed: 811, wear: 0.08, stripes: [0.45, 0.05, 0.03, 0.005] },
     prism: { base: [176, 186, 200], accent: [120, 70, 190], second: [40, 42, 50], pin: [220, 230, 240], eng: [0.6, 0.8, 1.0], labels: ['PRISM', 'SV-3', 'SCIENCE', 'LASER RADIATION'], seed: 821, wear: 0.15, stripes: [0.4, 0.05, 0.03, 0.006] },
+    empyrean: { base: [226, 229, 234], accent: [28, 52, 120], second: [38, 42, 50], pin: [214, 172, 64], eng: [0.7, 0.85, 1.0], labels: ['EMPYREAN'], seed: 1009, wear: 0.12, stripes: [0.3, 0.05, 0.03, 0.007] },
     hive: { base: [88, 98, 92], accent: [220, 170, 40], second: [32, 36, 34], pin: [230, 230, 220], eng: [0.55, 0.8, 1.0], labels: ['HIVE', 'CV-4', 'HELION NAVY', 'DRONE BAY'], seed: 831, wear: 0.3, stripes: [0.35, 0.05, 0.03, 0.006] },
     barnacle: { base: [96, 104, 96], accent: [200, 130, 40], second: [40, 40, 36], eng: [1.0, 0.5, 0.2], labels: ['BARNACLE', 'XX', 'SALVAGE', 'STAY OFF'], seed: 841, wear: 1.0, rust: 0.8, stripes: [0.3, 0.07, 0.04, 0] },
     furnace: { base: [66, 60, 58], accent: [230, 110, 30], second: [26, 24, 24], eng: [1.0, 0.45, 0.15], labels: ['FURNACE', 'XX', 'HOT', 'NO SHIELDING'], seed: 851, wear: 0.9, rust: 0.6, stripes: [0.3, 0.07, 0.04, 0] },
@@ -120,7 +121,7 @@ export function livery(name, env) {
     dark: untile(new THREE.MeshStandardMaterial({ map: d.map, normalMap: d.normalMap, roughnessMap: d.roughnessMap, metalness: 0.75, roughness: 0.45, envMap: env, envMapIntensity: 1.0 }), d),
     metal: new THREE.MeshStandardMaterial({ color: 0x8a8d92, metalness: 1.0, roughness: 0.28, envMap: env, envMapIntensity: 1.2 }),
     gun: new THREE.MeshStandardMaterial({ color: 0x2c2e31, metalness: 0.9, roughness: 0.35, envMap: env, envMapIntensity: 1.0 }),
-    glass: new THREE.MeshPhysicalMaterial({ color: 0x0b1420, metalness: 0.2, roughness: 0.04, clearcoat: 1, clearcoatRoughness: 0.02, envMap: env, envMapIntensity: 2.4, emissive: new THREE.Color(0.02, 0.05, 0.08) }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0x0a0e12, metalness: 0.1, roughness: 0.03, clearcoat: 1, clearcoatRoughness: 0.02, envMap: env, envMapIntensity: 1.6, emissive: new THREE.Color(0.012, 0.016, 0.02), transparent: true, opacity: 0.62 }),
     nozzle: nozzleMaterial(env, engColor),
     engine: new THREE.MeshBasicMaterial({ color: engColor.clone().multiplyScalar(2.6), map: coreTex() }),
     light: new THREE.MeshBasicMaterial({ color: new THREE.Color(5, 5, 5) }),
@@ -651,7 +652,7 @@ const GRID = 48;
 const greebleCache = new Map();
 
 function surfaceGrid(group) {
-  const T = [], blocked = [];
+  const T = [], blocked = [], keys = [];
   const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
   group.traverse((o) => {
     if (!o.isMesh || !(GREEBLE_SOLID.has(o.name) || GREEBLE_BLOCK.has(o.name))) return;
@@ -668,6 +669,7 @@ function surfaceGrid(group) {
         }
       }
       blocked.push(block);
+      keys.push(o.name);
     }
   });
   const count = blocked.length;
@@ -712,7 +714,7 @@ function surfaceGrid(group) {
     if (n.getComponent(a) * s < 0.55) return null;
     const p = new THREE.Vector3();
     p.setComponent(a, best * s); p.setComponent(g.u, pu); p.setComponent(g.v, pv);
-    return { p, n, h: best };
+    return { p, n, h: best, key: keys[bt] };
   };
   return { cast, min, max, count };
 }
@@ -725,7 +727,7 @@ function greebleFrame(p, n) {
   return new THREE.Matrix4().makeBasis(tx, n, tz).setPosition(p);
 }
 
-function makeGreebles(ship, S) {
+function makeGreebles(ship, S, keepOut = []) {
   const R = ship.radius;
   const r = rng(Math.round(R * 97) + S.count);
   const base = THREE.MathUtils.clamp(R * 0.013, 0.12, 1.8);
@@ -762,6 +764,9 @@ function makeGreebles(ship, S) {
       if (!c || Math.abs(c.h - hit.h) > base * 0.5 + e * 0.25) { flat = false; break; }
     }
     if (!flat) continue;
+    // keep painted markings clear, on both the sampled side and its mirror
+    const mir = _pv.set(-hit.p.x, hit.p.y, hit.p.z);
+    if (keepOut.some((b) => b.distanceToPoint(hit.p) < e + base || b.distanceToPoint(mir) < e + base)) continue;
     const F = greebleFrame(hit.p.addScaledVector(hit.n, -base * 0.03), hit.n);
     const add = (key, geo, local) => {
       const m = F.clone().multiply(local);
@@ -828,7 +833,8 @@ function addGreebles(ship, S0) {
   const S = S0 || surfaceGrid(ship.group);
   if (!S) return ship;
   const id = `${ship.name}|${S.count}|${ship.radius}`;
-  if (!greebleCache.has(id)) greebleCache.set(id, makeGreebles(ship, S));
+  const decals = addDecals(ship, S, id);
+  if (!greebleCache.has(id)) greebleCache.set(id, makeGreebles(ship, S, decals));
   const g = new THREE.Group();
   for (const { key, geo } of greebleCache.get(id)) {
     const m = new THREE.Mesh(geo, ship.M[key]);
@@ -838,6 +844,179 @@ function addGreebles(ship, S0) {
   }
   ship.group.add(g);
   return ship;
+}
+
+// painted markings: ship names on each flank plus any design decals, wrapped onto the hull surface and
+// oriented so text reads left to right from outside
+const decalMats = new Map(), decalGeos = new Map();
+function decalMaterial(kind, dark) {
+  const key = `${kind}|${dark}`;
+  if (decalMats.has(key)) return decalMats.get(key);
+  const H = 128, cv = document.createElement('canvas'), c = cv.getContext('2d');
+  if (kind === '+') {
+    cv.width = cv.height = H;
+    c.fillStyle = '#c4161c';
+    c.fillRect(H * 0.36, H * 0.06, H * 0.28, H * 0.88);
+    c.fillRect(H * 0.06, H * 0.36, H * 0.88, H * 0.28);
+  } else {
+    const font = `900 ${Math.round(H * 0.74)}px "Arial Black", "Arial", Helvetica, sans-serif`;
+    c.font = font;
+    cv.width = Math.ceil(c.measureText(kind).width + H * 0.4);
+    cv.height = H;
+    c.font = font;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.lineJoin = 'round';
+    c.lineWidth = H * 0.07;
+    c.strokeStyle = dark ? 'rgba(236,238,240,0.55)' : 'rgba(20,22,26,0.55)';
+    c.strokeText(kind, cv.width / 2, H * 0.54);
+    c.fillStyle = dark ? '#1c1e22' : '#eceef0';
+    c.fillText(kind, cv.width / 2, H * 0.54);
+  }
+  const map = new THREE.CanvasTexture(cv);
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 4;
+  const m = new THREE.MeshStandardMaterial({ map, transparent: true, depthWrite: false, metalness: 0.3, roughness: 0.55, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 });
+  m.userData.noShadow = true;
+  m.userData.aspect = cv.width / cv.height;
+  decalMats.set(key, m);
+  return m;
+}
+
+// a w x h grid laid onto the hull along axis a from side s, centred on (cu, cv) in that axis' cast plane;
+// null when it would hang off an edge, fold around a corner or cross a step
+const DECAL_AX = [[1, 2], [2, 0], [0, 1]];
+function wrapDecal(S, a, s, cu, cv, w, h, key, along) {
+  // image right/up in ship space: sides read toward -s*z with +y up; top/bottom read along x with +z up,
+  // or with `along`, read toward -z with -x up (upright when seen from the +x flank)
+  const at = (fx, fy) => {
+    const p = [0, 0, 0];
+    if (a === 0) { p[1] = cu + fy * h; p[2] = cv - s * fx * w; } else if (a === 1 && along) { p[0] = cu - fy * h; p[2] = cv - fx * w; } else if (a === 1) { p[2] = cu + fy * h; p[0] = cv - s * fx * w; } else { p[0] = cu - s * fx * w; p[1] = cv + fy * h; }
+    return p;
+  };
+  const nx = Math.max(4, Math.min(24, Math.ceil(w / h) * 3)), ny = 4;
+  const [iu, iv] = DECAL_AX[a];
+  const pos = [], nrm = [], uv = [], d = [];
+  for (let j = 0; j <= ny; j++) {
+    for (let i = 0; i <= nx; i++) {
+      const fx = i / nx - 0.5, fy = j / ny - 0.5;
+      const p = at(fx, fy);
+      const q = S.cast(a, s, p[iu], p[iv]);
+      if (!q || q.n.getComponent(a) * s < 0.7 || (key && q.key !== key)) return null;
+      d.push(q.h);
+      p[a] = q.p.getComponent(a) + s * h * 0.02;
+      pos.push(...p);
+      nrm.push(q.n.x, q.n.y, q.n.z);
+      uv.push(i / nx, j / ny);
+    }
+  }
+  const step = Math.max(w / nx, h / ny) * 1.2;
+  for (let j = 0; j <= ny; j++) {
+    for (let i = 0; i <= nx; i++) {
+      const k = j * (nx + 1) + i;
+      if ((i < nx && Math.abs(d[k] - d[k + 1]) > step) || (j < ny && Math.abs(d[k] - d[k + nx + 1]) > step)) return null;
+    }
+  }
+  if (Math.max(...d) - Math.min(...d) > h * 0.6) return null;
+  // fine pass so small windows and blocks between the mesh vertices still rule a spot out
+  for (let j = 0; j <= 12; j++) {
+    for (let i = 0; i <= nx * 2; i++) {
+      const p = at(i / (nx * 2) - 0.5, j / 12 - 0.5);
+      const q = S.cast(a, s, p[iu], p[iv]);
+      if (!q || q.n.getComponent(a) * s < 0.7 || (key && q.key !== key)) return null;
+    }
+  }
+  const idx = [];
+  for (let j = 0; j < ny; j++) {
+    for (let i = 0; i < nx; i++) {
+      const k = j * (nx + 1) + i;
+      idx.push(k, k + 1, k + nx + 1, k + 1, k + nx + 2, k + nx + 1);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  // face the winding outward
+  const A = new THREE.Vector3().fromArray(pos, 0), B = new THREE.Vector3().fromArray(pos, 3), C = new THREE.Vector3().fromArray(pos, (nx + 1) * 3);
+  if (B.sub(A).cross(C.sub(A)).getComponent(a) * s < 0) {
+    for (let t = 0; t < idx.length; t += 3) [idx[t + 1], idx[t + 2]] = [idx[t + 2], idx[t + 1]];
+    g.setIndex(idx);
+  }
+  return g;
+}
+
+const PLATE_U = [0, ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].flatMap((i) => [i * 0.025, -i * 0.025])];
+const PLATE_V = [0, 0.08, -0.08, 0.16, -0.16, 0.24, -0.24, 0.32, -0.32];
+
+// largest clean patch facing out along axis a; height runs along the first in-plane axis, text along the second
+function namePlate(S, a, s, R, aspect, key, along, avoid = []) {
+  const { min, max } = S, [iu, iv] = along ? [0, 2] : DECAL_AX[a];
+  const cu = (min[iu] + max[iu]) / 2, cv = (min[iv] + max[iv]) / 2, du = max[iu] - min[iu], dv = max[iv] - min[iv];
+  for (const k of [1, 0.75, 0.55, 0.4, 0.28]) {
+    const h = Math.min(R * 0.07, du * 0.22) * k, w = h * aspect;
+    if (h < 0.18 || w > dv * 0.8) continue;
+    for (const fu of PLATE_U) {
+      for (const fv of PLATE_V) {
+        const u = cu + fu * du, v = cv + fv * dv, c = along ? S.cast(a, s, v, u) : S.cast(a, s, u, v);
+        if (!c || c.n.getComponent(a) * s < 0.85 || (key && c.key !== key)) continue;
+        const g = wrapDecal(S, a, s, u, v, w, h, key, along);
+        if (!g) continue;
+        g.computeBoundingBox();
+        if (!avoid.some((b) => b.intersectsBox(g.boundingBox))) return g;
+      }
+    }
+  }
+  return null;
+}
+
+function addDecals(ship, S, id) {
+  const text = ship.name.toUpperCase(), base = ship.M.paint?.[0] || [180, 180, 180];
+  const dark = 0.2126 * base[0] + 0.7152 * base[1] + 0.0722 * base[2] > 120;
+  const name = decalMaterial(text, dark), list = [[name, null]];
+  for (const D of ship.decals || []) list.push([decalMaterial(D.kind, dark), D]);
+  const key = `${id}|${text}`;
+  if (!decalGeos.has(key)) {
+    const out = [], avoid = [];
+    // explicit markings first so the name plate can keep clear of them
+    for (const [m, D] of [...list.slice(1), list[0]]) {
+      const parts = [];
+      if (!D) {
+        // prefer bare hull plating, sides before the top
+        for (const key of ['hull', null]) {
+          for (const s of [1, -1]) parts.push(namePlate(S, 0, s, ship.radius, m.userData.aspect, key, false, avoid));
+          // long hulls get the top name lengthwise, broad ones across the beam
+          const long = S.max[2] - S.min[2] > 2 * (S.max[0] - S.min[0]);
+          if (!parts.some(Boolean)) parts.push(namePlate(S, 1, 1, ship.radius, m.userData.aspect, key, long, avoid));
+          if (parts.some(Boolean)) break;
+        }
+      }
+      else for (const s of D.a === 0 && D.mirror ? [1, -1] : [D.s || 1]) parts.push(wrapDecal(S, D.a, s, D.u, D.v, D.size * m.userData.aspect, D.size));
+      const ok = parts.filter(Boolean);
+      const geo = ok.length ? mergeGeometries(ok) : null;
+      if (geo) {
+        geo.userData.shared = true;
+        geo.computeBoundingBox();
+        avoid.push(geo.boundingBox.clone().expandByScalar(0.3));
+      }
+      out.push(geo);
+    }
+    out.unshift(out.pop());
+    decalGeos.set(key, out);
+  }
+  const boxes = [];
+  decalGeos.get(key).forEach((geo, i) => {
+    if (!geo) return;
+    const mesh = new THREE.Mesh(geo, list[i][0]);
+    mesh.name = 'decal';
+    mesh.userData.decal = true;
+    mesh.receiveShadow = true;
+    ship.group.add(mesh);
+    if (!geo.boundingBox) geo.computeBoundingBox();
+    boxes.push(geo.boundingBox);
+  });
+  return boxes;
 }
 
 // ---------------------------------------------------------------- player frigate (~36 m)
@@ -915,7 +1094,7 @@ export function buildFrigate(env, liv = 'player') {
   // pipes along flanks
   for (const y of [-0.8, -1.15]) k.addMirrored('metal', G.cyl(0.09, 0.09, 18, 8), mat([2.05, y, -2], [Math.PI / 2, 0, 0]));
   // RCS quads
-  for (const [x, y, z] of [[2.0, 2.4, 10.5], [2.4, 2.2, -12.5], [2.2, -1.9, 10.0], [2.6, -1.6, -12.5]]) {
+  for (const [x, y, z] of [[2.3, 0.9, 10.5], [2.3, 1.7, -12.5], [2.3, -0.9, 10.0], [2.3, -1.2, -12.5]]) {
     k.addMirrored('dark', G.rbox(0.6, 0.5, 0.6, 0.08), mat([x, y, z]));
     k.addMirrored('gun', G.cyl(0.1, 0.14, 0.2, 8), mat([x + 0.35, y, z], [0, 0, Math.PI / 2]));
   }
@@ -925,7 +1104,7 @@ export function buildFrigate(env, liv = 'player') {
   k.add('dark', G.cyl(0.55, 0.05, 0.25, 16), mat([0, 3.95, 1.6 + 6.5]));
   // deck greebles
   scatterGreebles(k, r, 40, { x0: -1.3, x1: 1.3, z0: -10, z1: 3, y: 3.5, s: 0.5 });
-  scatterGreebles(k, r, 30, { x0: -1.4, x1: 1.4, z0: -12, z1: 10, y: -2.85, s: 0.45 });
+  scatterGreebles(k, r, 30, { x0: -1.0, x1: 1.0, z0: -7, z1: 5, y: -2.95, s: 0.45 });
   for (let i = 0; i < 24; i++) {
     const z = -12 + r() * 20, y = -1.4 + r() * 3.4;
     k.addMirrored(r() < 0.5 ? 'dark' : 'gun', G.box(0.15 + r() * 0.2, 0.2 + r() * 0.5, 0.3 + r() * 1.2), mat([2.2, y, z]));
@@ -1864,6 +2043,9 @@ export function buildSpindle(env, liv = 'spindle') {
 export function buildPrism(env, liv = 'prism') {
   return design(env, liv, DESIGNS.prism);
 }
+export function buildEmpyrean(env, liv = 'empyrean') {
+  return design(env, liv, DESIGNS.empyrean);
+}
 export function buildHive(env, liv = 'hive') {
   return design(env, liv, DESIGNS.hive);
 }
@@ -2234,6 +2416,7 @@ function design(env, liv, D) {
   if (D.hs) hs.push(...D.hs);
   const step = Math.ceil(hs.length / 56);
   ship.hitSpheres = hs.filter((_, i) => i % step === 0);
+  ship.decals = D.decals;
   return addGreebles(ship, surfaceGrid(ship.group));
 }
 
@@ -2346,7 +2529,7 @@ const DESIGNS = {
     name: 'Aurora', style: 'sleek', radius: 62, cockpit: [0, 11, 40], nav: [21.4, -2, -40], beacon: [0, 21.4, -48], tile: 8,
     parts: [
       { s: [[-58, 14, 9, 8, 0, 2], [-50, 19, 12, 10, 0, 2], [-20, 23, 13, 11, 0, 2], [20, 22, 12.5, 10.5, 0, 2], [42, 16, 9.5, 8, 0, 2], [54, 8, 5, 4, -0.5, 2], [61, 1, 1, 0.8, -1, 2]] },
-      { key: 'glass', s: [[22, 11, 0.3, 0, 11.6, 2], [32, 12, 2.8, 0, 10.0, 2], [44, 6, 1.2, 0, 7.6, 2]] },
+      { key: 'glass', s: [[22, 11, 1.7, 0, 10.2, 2], [32, 12, 4.7, 0, 8.0, 2], [44, 6, 1.4, 0, 7.4, 2]] },
       { at: [16, -2, 0], mirror: true, key: 'accent', s: [[-56, 4.6, 2.4, 2.4, 0, 2], [-46, 5.4, 2.8, 2.8, 0, 2], [-28, 4.4, 2.2, 2.2, 0, 2], [-18, 0.6, 0.3, 0.3, 0, 2]] },
       { key: 'accent', s: [[-50, 34, 0.6, 0.6, -2, 2.5], [-32, 30, 0.6, 0.6, -2, 2.5]] },
       { key: 'accent', hit: false, s: ridge([[-50, 19, 12, 10, 0, 2], [-20, 23, 13, 11, 0, 2], [20, 22, 12.5, 10.5, 0, 2]], -44, 18, 2.2, 0.15) },
@@ -2534,7 +2717,7 @@ const DESIGNS = {
         k.add('dark', G.rbox(5, 5, 11, 0.15), mat([x, 7, z]));
         k.add('accent', G.box(5.08, 0.5, 11.08), mat([x, 8.6, z]));
       }
-      k.add('hull', G.rbox(6, 3, 5, 0.3), mat([0, 6, 30]));
+      k.add('hull', G.rbox(6, 4.6, 5, 0.3), mat([0, 5.2, 30]));
       k.add('glass', G.box(5.4, 0.6, 0.2), mat([0, 6.8, 32.55]));
       for (const z of [-26, 22]) k.addMirrored('dark', G.rbox(1, 2.4, 3, 0.2), mat([5.4, -1, z]));
     },
@@ -2835,7 +3018,8 @@ const DESIGNS = {
       { key: 'glass', s: [[6, 3.6, 0.05, 0, 2.6, 3], [8.5, 3.4, 0.5, 0, 2.2, 3], [10.5, 1.4, 0.15, 0, 1.2, 2]] },
     ],
     extra: (k) => {
-      k.addMirrored('dark', G.box(1, 1, 8), mat([4.6, -1.4, 10]));
+      k.addMirrored('dark', G.box(1, 1, 14), mat([3.9, -1.4, 7]));
+      k.addMirrored('dark', G.box(0.6, 2.2, 0.6), mat([3.9, -0.6, 4], [0, 0, 0.2]));
       k.addMirrored('metal', G.cyl(1.4, 1.4, 2.4, 16), mat([4.6, -1.4, 14.6], ALONG_Z));
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
@@ -2855,14 +3039,9 @@ const DESIGNS = {
       { key: 'glass', s: [[16, 4, 0.05, 0, 2.9, 2], [20, 3.8, 0.6, 0, 2.3, 2], [23, 1.6, 0.2, 0, 1.5, 2]] },
     ],
     windows: [{ part: 0, ys: [0.4, -1.2], z0: -18, z1: 14, step: 1.2, h: 0.4 }],
+    decals: [{ kind: '+', a: 0, mirror: true, u: 1.5, v: -12, size: 1.4 }, { kind: '+', a: 0, mirror: true, u: 1.5, v: 2, size: 1.4 }, { kind: '+', a: 1, s: 1, u: -6, v: 0, size: 3 }],
     extra: (k) => {
       k.add('hull', G.rbox(4, 1.6, 10, 0.4), mat([0, 3.9, -6]));
-      k.add('accent', G.box(4.1, 0.2, 1.2), mat([0, 4.7, -6]));
-      k.add('accent', G.box(1.2, 0.2, 4.1), mat([0, 4.7, -6]));
-      for (const z of [-12, 2]) {
-        k.addMirrored('accent', G.box(0.1, 2.4, 0.8), mat([4.02, 1.6, z]));
-        k.addMirrored('accent', G.box(0.1, 0.8, 2.4), mat([4.02, 1.6, z]));
-      }
       k.addMirrored('metal', G.cyl(0.06, 0.06, 4, 6), mat([1.2, 5.6, -10]));
     },
     engines: [{ p: [1.6, 0, -26.4], r: 1.1, len: 13, mirror: true }],
@@ -3487,6 +3666,45 @@ const DESIGNS = {
     },
     engines: [{ p: [1.2, 0, -10.6], r: 0.7, len: 9, mirror: true }],
     slots: { t: [[0, -4, 1, 0.45], [0.3, -6, -1, 0.45]] },
+  },
+  empyrean: {
+    name: 'Empyrean', style: 'sleek', radius: 46, tile: 9, cockpit: [0, 10.2, -9.4], nav: [15.6, -1, -27], beacon: [0, 12.6, -14],
+    hs: [[0, 0, -30, 9], [0, 0, -14, 9], [0, 0, 2, 8], [0, 0, 16, 6], [4.6, 0, 32, 3], [-4.6, 0, 32, 3], [0, 7, -14, 4], [0, 0, -38, 11]],
+    parts: [
+      // arrowhead main hull ending in two prongs
+      { s: [[-38, 7, 4, 3.4, 0, 2.6], [-28, 9.4, 5.2, 4.2, 0, 2.6], [-6, 8.6, 4.6, 3.8, 0, 2.6], [12, 6.6, 3.6, 3, 0, 2.6], [22, 4.6, 2.6, 2.2, 0, 2.6], [25, 2.4, 1.4, 1.2, 0, 2.4]], seg: 36 },
+      { mirror: true, at: [4.6, 0, 0], s: [[18, 2.2, 1.8, 1.6, 0, 2.4], [30, 1.8, 1.5, 1.3, 0, 2.4], [40, 1.1, 0.9, 0.8, 0, 2.2], [46, 0.25, 0.2, 0.2, 0, 2]] },
+      // command tower with a wraparound bridge window
+      { at: [0, 6, 0], s: [[-19, 2.6, 2.8, 2.2, 0, 2.4], [-13, 3.4, 3.6, 2.6, 0, 2.4], [-9, 2.6, 2.6, 2.2, 0, 2.4], [-7.6, 1.2, 1.4, 1.2, 0, 2.2]] },
+      { key: 'glass', at: [0, 6, 0], s: [[-10.6, 2.9, 0.05, 0, 3.0, 2.2], [-9.2, 2.3, 0.45, 0, 2.6, 2.2], [-8, 1.0, 0.05, 0, 1.7, 2.2]] },
+    ],
+    windows: [{ part: 0, ys: [1.6, -0.6], z0: -24, z1: 10, step: 2.4, h: 0.5 }],
+    extra: (k) => {
+      // spinal lance between the prongs
+      k.add('dark', G.cyl(0.9, 1.1, 6, 16), mat([0, 0, 25], ALONG_Z));
+      k.add('coil', G.cyl(0.45, 0.45, 18, 12), mat([0, 0, 36], ALONG_Z));
+      for (let z = 28; z <= 44; z += 4) k.add('metal', G.torus(0.8, 0.14, 6, 18), mat([0, 0, z]));
+      k.add('gun', G.cyl(0.95, 0.6, 1.4, 16), mat([0, 0, 45.4], ALONG_Z));
+      k.addMirrored('metal', G.box(4.2, 0.4, 0.6), mat([2.4, 0, 30]));
+      k.addMirrored('metal', G.box(4.2, 0.4, 0.6), mat([2.4, 0, 40]));
+      // swept stern blades with blue leading edges and tip lights
+      k.addMirrored('hull', G.box(9, 0.9, 16), mat([13, -1, -26], [0, 0.42, 0]));
+      k.addMirrored('accent', G.box(0.6, 1.0, 16.4), mat([16.2, -1, -24.4], [0, 0.42, 0]));
+      k.addMirrored('dark', G.rbox(3, 3, 9, 0.4), mat([15.6, -1, -30]));
+      // stern halo ring on four struts
+      k.add('accent', G.torus(11.5, 0.55, 8, 64), mat([0, 0, -34]));
+      k.add('coil', G.torus(11.5, 0.16, 6, 64), mat([0, 0, -34.7]));
+      for (let i = 0; i < 4; i++) {
+        const a = Math.PI / 4 + (i * Math.PI) / 2;
+        k.add('metal', G.box(0.5, 6.4, 0.9), mat([Math.cos(a) * 8.4, Math.sin(a) * 8.4, -34], [0, 0, a - Math.PI / 2]));
+      }
+      // gold-trimmed dorsal spine and tower masts
+      k.add('dark', G.box(1.4, 0.3, 30), mat([0, 4.55, -4]));
+      k.add('metal', G.cyl(0.06, 0.1, 3.4, 6), mat([1.2, 12.2, -15]));
+      k.add('metal', G.cyl(0.06, 0.1, 2.4, 6), mat([-1.2, 11.8, -16]));
+    },
+    engines: [{ p: [0, 0, -38.4], r: 3, len: 30 }, { p: [5.4, 0, -37.6], r: 2.1, len: 24, mirror: true }, { p: [15.6, -1, -34.6], r: 1.2, len: 16, mirror: true }],
+    slots: { g: [[4.6, 34, 1, 0.65], [-4.6, 34, 1, 0.65]], t: [[0, 10, 1, 0.85], [0, -1, 1, 0.85], [4, -26, 1, 0.75], [-4, -26, 1, 0.75], [0, 8, -1, 0.85], [0, -20, -1, 0.85], [4.6, 22, -1, 0.6], [-4.6, 22, -1, 0.6]], m: [[3.4, 16, 1, 0.6], [-3.4, 16, 1, 0.6], [0, -32, -1, 0.6]] },
   },
   hive: {
     name: 'Hive', style: 'armor', radius: 20, cockpit: [0, 3.6, 9.6], nav: [8.4, 0, -1], beacon: [0, 4.4, 7], hs: [-9, -3, 3, 9].flatMap((z) => [[5.4, 0, z, 3], [-5.4, 0, z, 3]]),
