@@ -61,6 +61,12 @@ export function livery(name, env) {
     mercy: { base: [236, 238, 240], accent: [200, 30, 36], second: [70, 74, 80], eng: [0.6, 0.85, 1.0], labels: ['MERCY', 'MEDICAL', 'H-1', 'NO WEAPONS', '0911'], seed: 471, wear: 0.08, stripes: [0.3, 0.06, 0.03, 0.006] },
     warlord: { base: [54, 46, 42], accent: [180, 30, 24], second: [20, 18, 16], eng: [1.0, 0.4, 0.14], labels: ['WARLORD', 'XX', 'BLOOD', '666', 'HAZARD'], seed: 481, wear: 1.0, rust: 0.9, stripes: [0.2, 0.08, 0.05, 0] },
     bulwark: { base: [96, 102, 108], accent: [210, 160, 40], second: [36, 38, 42], eng: [0.55, 0.75, 1.0], labels: ['BULWARK', 'BM-1', 'DANGER', 'SIEGE', 'MUZZLE'], seed: 491, wear: 0.4, stripes: [0.35, 0.05, 0.03, 0.006] },
+    rampart: { base: [120, 128, 136], accent: [226, 228, 232], second: [40, 44, 50], eng: [0.55, 0.78, 1.0], labels: ['RAMPART', 'CV-1', 'FLIGHT DECK', 'NO STEP', '01'], seed: 501, wear: 0.35, stripes: [0.4, 0.05, 0.03, 0.006] },
+    grapple: { base: [206, 96, 34], accent: [30, 30, 34], second: [70, 70, 74], eng: [0.7, 0.85, 1.0], labels: ['GRAPPLE', 'SALVAGE', 'TOW', 'HAZARD', '0451'], seed: 511, wear: 0.75, stripes: [0.3, 0.07, 0.04, 0] },
+    comet: { base: [240, 240, 244], accent: [220, 40, 40], second: [24, 26, 30], eng: [1.0, 0.7, 0.4], labels: ['COMET', '77', 'RACING', 'SPONSOR'], seed: 521, wear: 0.05, stripes: [0.5, 0.04, 0.025, 0.006] },
+    ranger: { base: [150, 160, 170], accent: [40, 80, 150], second: [36, 40, 46], eng: [0.55, 0.8, 1.0], labels: ['RANGER', 'PC-4', 'PATROL', 'HELION'], seed: 531, wear: 0.25, stripes: [0.4, 0.05, 0.03, 0.006] },
+    mauler: { base: [72, 80, 60], accent: [200, 90, 20], second: [26, 24, 22], eng: [1.0, 0.45, 0.15], labels: ['MAULER', 'XX', 'BOOM', 'TORP'], seed: 541, wear: 0.95, rust: 0.7, stripes: [0.3, 0.07, 0.04, 0] },
+    junker: { base: [110, 96, 80], accent: [160, 120, 40], second: [40, 36, 32], eng: [1.0, 0.5, 0.2], labels: ['JUNKER', 'SCRAP', 'XX', 'LOOT'], seed: 551, wear: 1.0, rust: 1.0, stripes: [0.25, 0.06, 0.04, 0] },
     navy: { base: [72, 84, 98], accent: [230, 232, 236], second: [28, 32, 38], eng: [0.5, 0.8, 1.0], labels: ['HELION', 'NAVY', 'HN-12', 'RCS'], seed: 71, wear: 0.35, stripes: [0.3, 0.04, 0.02, 0.008] },
   }[name];
   // one paint colour per material; colour accents come from the painted stripes and trim parts, not random panels
@@ -1780,6 +1786,24 @@ export function buildWarlord(env, liv = 'warlord') {
 export function buildBulwark(env, liv = 'bulwark') {
   return design(env, liv, DESIGNS.bulwark);
 }
+export function buildRampart(env, liv = 'rampart') {
+  return design(env, liv, DESIGNS.rampart);
+}
+export function buildGrapple(env, liv = 'grapple') {
+  return design(env, liv, DESIGNS.grapple);
+}
+export function buildComet(env, liv = 'comet') {
+  return design(env, liv, DESIGNS.comet);
+}
+export function buildRanger(env, liv = 'ranger') {
+  return design(env, liv, DESIGNS.ranger);
+}
+export function buildMauler(env, liv = 'mauler') {
+  return design(env, liv, DESIGNS.mauler);
+}
+export function buildJunker(env, liv = 'junker') {
+  return design(env, liv, DESIGNS.junker);
+}
 
 // ---------------------------------------------------------------- Vanta Combine mass-production hulls
 // every Combine hull is assembled from the same few stamped parts: chamfered box sections, square engine pods and hazard bands
@@ -1831,6 +1855,12 @@ const COMBINE = {
     segs: [[2.8, 1.8, 5, 3.5], [3.4, 2.2, 5, -1.5]], nose: [2, 1.2, 2.6, 7.3], bridge: [1.6, 0.6, 2, 4, 0.9],
     wings: { span: 11, t: 0.26, chord: 3.4, z: -1.5 }, engines: { R: 0.6, xs: [1.0, -1.0], ys: [0], z: -4.8 },
     hp: [{ p: [0, -0.92, 3], flip: 1, s: 0.5 }, { p: [0, 1.12, -2], flip: 0, s: 0.55 }, { p: [0, -1.12, -2.5], flip: 1, s: 0.5 }],
+  },
+  bailiff: {
+    name: 'Bailiff', radius: 18, cockpit: [0, 1.8, 7.0],
+    segs: [[3.6, 2.6, 6, 6], [4.6, 3.2, 7, -0.5], [4, 2.8, 5, -6.5]], nose: [2.6, 1.8, 3, 10.5], bridge: [2, 0.8, 2.4, 6, 1.3],
+    sponsons: { x: 3.1, w: 1.6, h: 2, l: 10, z: -2 }, engines: { R: 0.8, xs: [1.2, -1.2], ys: [0], z: -9.8 },
+    hp: [{ p: [0, -1.32, 6], flip: 1, s: 0.6 }, { p: [0, 1.62, -0.5], flip: 0, s: 0.7 }, { p: [0, 1.42, -6.5], flip: 0, s: 0.7 }, { p: [3.1, 1.02, -2], flip: 0, s: 0.5 }, { p: [-3.1, 1.02, -2], flip: 0, s: 0.5 }],
   },
   crate: {
     name: 'Crate', radius: 46, cockpit: [0, 5, 38],
@@ -2706,5 +2736,113 @@ const DESIGNS = {
     },
     engines: [{ p: [2.8, 0, -28.4], r: 1.8, len: 15, mirror: true }],
     slots: { g: [[0, 20, 1, 0.9]], t: [[0, 6, 1, 0.9], [0, -4, 1, 0.9], [3.6, -22, 1, 0.8], [-3.6, -22, 1, 0.8]], m: [[0, -26, 1, 0.6]] },
+  },
+  rampart: {
+    name: 'Rampart', style: 'armor', radius: 40, cockpit: [7, 10.2, -1.6], nav: [9, 5.2, -28], beacon: [7, 14.2, -8],
+    parts: [
+      { s: [[-32, 12, 4.4, 4, 0, 4], [-24, 14, 5, 4.6, 0, 4], [20, 14, 5, 4.6, 0, 4], [28, 10, 3.6, 3.4, -0.2, 3.2], [33, 4, 1.6, 1.4, -0.4, 2.4], [35, 1, 0.4, 0.4, -0.4, 2]] },
+    ],
+    extra: (k) => {
+      k.add('dark', G.box(18, 0.6, 60), mat([0, 5.2, 0]));
+      for (let z = -26; z <= 26; z += 6) k.add('accent', G.box(0.4, 0.06, 3), mat([-2, 5.53, z]));
+      k.addMirrored('accent', G.box(0.2, 0.08, 58), mat([8.8, 5.52, 0]));
+      k.add('accent', G.box(12, 0.06, 0.4), mat([-2, 5.53, 28]));
+      k.add('hull', G.rbox(3, 6, 10, 0.3), mat([7, 8.5, -6]));
+      k.add('glass', G.box(3.1, 0.8, 0.2), mat([7, 10.2, -0.95]));
+      k.add('metal', G.cyl(0.08, 0.12, 3, 6), mat([7, 12.8, -8]));
+      k.add('metal', G.box(2.4, 0.1, 0.4), mat([7, 13.4, -8]));
+      k.addMirrored('dark', G.box(0.2, 2.4, 10), mat([7.02, 0.6, 4]));
+      k.addMirrored('dark', G.box(0.2, 2.4, 10), mat([7.02, 0.6, -10]));
+    },
+    engines: [{ p: [3.6, 0, -32.4], r: 1.9, len: 16, mirror: true }],
+    slots: { t: [[-6, 18, 1, 0.9], [-6, -18, 1, 0.9], [4, 22, 1, 0.9], [0, 10, -1, 0.9]], m: [[6, -20, -1, 0.6], [-6, -20, -1, 0.6]] },
+  },
+  grapple: {
+    name: 'Grapple', style: 'armor', radius: 16, cockpit: [0, 2.3, 6.0], nav: [3.6, 0, -9], beacon: [0, 4.8, -5],
+    parts: [
+      { s: [[-11, 6, 2.6, 2.4, 0, 4], [-6, 7, 3, 2.8, 0, 4], [4, 7, 3, 2.8, 0, 4], [7, 5, 2.2, 2, 0, 3.4], [9, 2.4, 1, 0.9, 0, 2.4]] },
+      { key: 'glass', s: [[4.5, 3.4, 0.05, 0, 2.6, 3], [6.5, 3.2, 0.45, 0, 2.2, 3], [8.5, 1.4, 0.15, 0, 1.1, 2]] },
+    ],
+    extra: (k) => {
+      k.addMirrored('dark', G.box(0.9, 0.9, 6), mat([2.2, -1.6, 9]));
+      k.addMirrored('metal', G.box(0.5, 2.4, 0.6), mat([2.2, -1.6, 12.2]));
+      k.addMirrored('metal', G.box(0.4, 0.4, 2.4), mat([1.5, -0.6, 13.2], [0, 0.6, 0]));
+      k.addMirrored('metal', G.box(0.4, 0.4, 2.4), mat([1.5, -2.6, 13.2], [0, 0.6, 0]));
+      k.add('metal', G.cyl(1, 1, 4, 14), mat([0, 3.6, -5], [0, 0, Math.PI / 2]));
+      for (const x of [-1.4, 1.4]) k.add('accent', G.cyl(1.08, 1.08, 0.3, 14), mat([x, 3.6, -5], [0, 0, Math.PI / 2]));
+      k.add('metal', G.torus(0.6, 0.12, 6, 16), mat([0, -2.2, -10], [Math.PI / 2, 0, 0]));
+      k.addMirrored('metal', G.cyl(0.25, 0.2, 0.4, 8), mat([1.6, 2.2, 7.2], ALONG_Z));
+    },
+    engines: [{ p: [1.8, 0, -11.4], r: 0.9, len: 9, mirror: true }],
+    slots: { t: [[0, 0, 1, 0.55], [0, -6, -1, 0.55]] },
+  },
+  comet: {
+    name: 'Comet', style: 'sleek', radius: 12, cockpit: [0, 0.8, 2.6], nav: [3.4, -0.3, -5.5], beacon: [0, 0.9, -6],
+    parts: [
+      { s: [[-8, 1.6, 0.7, 0.6, 0, 2.4], [-4, 2, 0.9, 0.7, 0, 2.4], [3, 1.6, 0.7, 0.6, 0, 2.4], [7, 0.7, 0.3, 0.25, -0.05, 2.2], [11, 0.1, 0.05, 0.04, -0.05, 2]] },
+      { at: [3.4, -0.3, 0], mirror: true, key: 'dark', s: [[-9, 1.2, 0.6, 0.6, 0, 2], [-6, 1.4, 0.7, 0.7, 0, 2], [1, 1.1, 0.55, 0.55, 0, 2], [3, 0.3, 0.15, 0.15, 0, 2]] },
+      { flat: true, hit: false, s: [[-7, 7.4, 0.08, 0.08, 0, 2], [-4, 7.4, 0.08, 0.08, 0, 2], [-2, 1.6, 0.08, 0.08, 0, 2]] },
+      { key: 'glass', s: [[0, 0.9, 0.05, 0, 0.6, 2], [2.5, 0.9, 0.35, 0, 0.5, 2], [5, 0.4, 0.1, 0, 0.3, 2]] },
+    ],
+    fins: [{ pts: [[-8, 0], [-6.6, 1.6], [-5.8, 1.6], [-5.4, 0]], t: 0.08, at: [0, 0.6, 0], key: 'accent' }],
+    extra: (k) => {
+      for (const z of [-4, -1]) k.addMirrored('accent', G.cyl(0.62, 0.62, 0.4, 16), mat([3.4, -0.3, z], ALONG_Z));
+      k.add('metal', G.cyl(0.02, 0.04, 2, 5), mat([0, -0.05, 11.5], ALONG_Z));
+      k.addMirrored('accent', G.box(0.6, 0.04, 2), mat([1.6, 0.1, -5]));
+    },
+    engines: [{ p: [3.4, -0.3, -9.3], r: 0.55, len: 10, mirror: true }, { p: [0, 0, -8.3], r: 0.5, len: 8 }],
+    slots: { g: [[0, 4, -1, 0.28]] },
+  },
+  ranger: {
+    name: 'Ranger', style: 'sleek', radius: 16, cockpit: [0, 1.6, 7.2], nav: [5, 0, -5.5], beacon: [0, 2.2, -9],
+    parts: [
+      { s: [[-12, 4, 1.8, 1.6, 0, 2.6], [-8, 5, 2.2, 1.9, 0, 2.6], [4, 4.6, 2, 1.8, 0, 2.6], [9, 2.6, 1.2, 1.1, -0.1, 2.4], [13, 0.6, 0.3, 0.3, -0.1, 2]] },
+      { at: [0, -1.4, 0], key: 'dark', s: [[-10, 1.2, 0.5, 1.4, 0, 2], [-4, 1.4, 0.6, 1.6, 0, 2], [4, 1, 0.4, 1.0, 0, 2], [7, 0.2, 0.1, 0.2, 0, 2]] },
+      { flat: true, hit: false, s: [[-10, 3.4, 0.12, 0.1, 0, 2], [-7, 10, 0.14, 0.12, 0, 2], [-4, 10, 0.14, 0.12, 0, 2], [0, 4, 0.12, 0.1, 0, 2]] },
+      { key: 'glass', s: [[4, 2.4, 0.05, 0, 1.95, 2], [7, 2.2, 0.4, 0, 1.5, 2], [10, 0.9, 0.12, 0, 1.0, 2]] },
+    ],
+    fins: [{ pts: [[-12, 0], [-10.4, 2], [-9.4, 2], [-8.6, 0]], t: 0.12, at: [1.2, 1.4, 0], roll: -0.3, mirror: true, key: 'accent' }],
+    extra: (k) => {
+      k.addMirrored('accent', G.box(0.1, 0.4, 6), mat([2.42, 0.3, -2]));
+      k.add('metal', G.cyl(0.03, 0.05, 2.4, 6), mat([0.6, 2.9, -5]));
+      k.add('metal', G.sphere(0.5, 12, 8), mat([0, 2.0, 1], [0, 0, 0], [1, 0.5, 1.4]));
+    },
+    engines: [{ p: [1.0, 0, -12.4], r: 0.75, len: 10, mirror: true }],
+    slots: { g: [[0, 11, -1, 0.35]], t: [[0, -3, 1, 0.55], [0, 0, -1, 0.5]], m: [[3.6, -6, 1, 0.35], [-3.6, -6, 1, 0.35]] },
+  },
+  mauler: {
+    name: 'Mauler', style: 'pirate', radius: 14, cockpit: [0, 1.5, 3.6], nav: [4.5, 0, -5], beacon: [0, 2.0, -8],
+    parts: [
+      { s: [[-10, 3.4, 1.6, 1.4, 0, 2.6], [-6, 4.2, 2, 1.7, 0, 2.6], [3, 3.8, 1.8, 1.6, 0, 2.6], [7, 1.8, 0.9, 0.8, -0.1, 2.4], [9.5, 0.3, 0.15, 0.15, -0.1, 2]] },
+      { at: [2.6, -1.8, 0], mirror: true, key: 'dark', s: [[-7, 1.2, 0.6, 0.6, 0, 2], [-4, 1.4, 0.7, 0.7, 0, 2], [5, 1.3, 0.65, 0.65, 0, 2], [7.5, 0.3, 0.15, 0.15, 0, 2]] },
+      { flat: true, hit: false, s: [[-8, 3.6, 0.12, 0.12, 0, 2], [-5, 9, 0.14, 0.12, 0, 2], [-2, 9, 0.14, 0.12, 0, 2], [1, 3.6, 0.12, 0.12, 0, 2]] },
+      { key: 'glass', s: [[1, 1.8, 0.05, 0, 1.75, 2], [4, 1.7, 0.4, 0, 1.3, 2], [6.5, 0.7, 0.12, 0, 0.85, 2]] },
+    ],
+    extra: (k) => {
+      k.addMirrored('accent', G.cyl(0.02, 0.55, 1.4, 10), mat([2.6, -1.8, 8.0], ALONG_Z));
+      k.add('dark', G.box(1.6, 0.12, 2), mat([-0.4, 1.95, -4], [0, 0.2, 0.06]));
+      for (let i = 0; i < 3; i++) k.addMirrored('accent', G.box(0.8, 0.05, 0.3), mat([3.4, 0.16, -6 + i * 0.9]));
+      for (const z of [-7, -4.5]) k.add('metal', G.cyl(0.04, 0.3, 1.4, 6), mat([0, 2.1, z]));
+    },
+    engines: [{ p: [0, 0, -10.3], r: 1.0, len: 10 }, { p: [2.6, -1.8, -7.3], r: 0.5, len: 6, mirror: true }],
+    slots: { g: [[0, 7, -1, 0.3]], t: [[0, -3, 1, 0.5]], m: [[2.6, 0, -1, 0.45], [-2.6, 0, -1, 0.45]] },
+  },
+  junker: {
+    name: 'Junker', style: 'pirate', radius: 22, cockpit: [0, 1.7, 14.6], nav: [3, 0, -12], beacon: [0, 2.6, -8],
+    parts: [
+      { s: [[-16, 4, 2, 2, 0, 2], [-10, 4.4, 2.2, 2.2, 0, 2], [12, 4, 2, 2, 0, 2], [16, 2.6, 1.3, 1.3, 0, 2]] },
+      { key: 'glass', s: [[12.5, 2.6, 0.05, 0, 1.85, 2], [14.5, 2.4, 0.5, 0, 1.4, 2], [16.5, 1, 0.15, 0, 0.8, 2]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.rbox(6, 4, 6, 0.2), mat([0, 0, -6], [0, 0, 0.05]));
+      k.add('dark', G.rbox(5, 5, 5, 0.3), mat([0.6, 0.4, 1.5], [0, 0.1, 0]));
+      k.add('accent', G.rbox(4.4, 3.6, 6, 0.2), mat([-0.4, -0.2, 8]));
+      k.add('metal', G.cyl(1.6, 1.6, 7, 12), mat([3.4, -1, 0], ALONG_Z));
+      k.addMirrored('metal', G.box(0.3, 0.3, 28), mat([1.6, 2.1, 0]));
+      k.add('dark', G.box(2, 0.12, 2.4), mat([-1.2, 2.25, 4.6], [0, 0.3, 0.08]));
+      k.add('metal', G.cyl(0.06, 0.08, 3, 6), mat([-1.4, 3.4, -10]));
+    },
+    engines: [{ p: [0, 0, -16.4], r: 1.2, len: 11 }, { p: [3.4, -1, -3.9], r: 0.8, len: 7 }],
+    slots: { g: [[0, 8, -1, 0.4]], t: [[0, -6, 1, 0.55], [0, 1.5, 1, 0.55]] },
   },
 };

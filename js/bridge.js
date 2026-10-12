@@ -7,7 +7,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const KIND = {
   hornet: 'fighter', wisp: 'fighter', kestrel: 'fighter', corvid: 'fighter', valkyrie: 'fighter', mantis: 'fighter', talon: 'fighter', tern: 'civil', ox: 'civil', harbinger: 'command', buccaneer: 'clan', liquidator: 'combine', jackal: 'clan',
-  lancer: 'fighter', hyena: 'clan', heron: 'civil', caravel: 'civil', citadel: 'command', vulture: 'clan', collector: 'combine', osprey: 'fighter', pelican: 'civil', starling: 'civil', tempest: 'command', scorpion: 'clan', brigand: 'clan', arbiter: 'combine', kite: 'fighter', wasp: 'clan', prospector: 'civil', mercy: 'civil', warlord: 'clan', bulwark: 'command', notary: 'combine', auditor: 'combine',
+  lancer: 'fighter', hyena: 'clan', heron: 'civil', caravel: 'civil', citadel: 'command', vulture: 'clan', collector: 'combine', osprey: 'fighter', pelican: 'civil', starling: 'civil', tempest: 'command', scorpion: 'clan', brigand: 'clan', arbiter: 'combine', kite: 'fighter', wasp: 'clan', prospector: 'civil', mercy: 'civil', warlord: 'clan', bulwark: 'command', notary: 'combine', rampart: 'command', grapple: 'civil', comet: 'fighter', ranger: 'fighter', mauler: 'clan', junker: 'clan', bailiff: 'combine', auditor: 'combine',
   mule: 'civil', atlas: 'civil', aurora: 'civil', courier: 'civil', monarch: 'civil', vanguard: 'command',
   warden: 'command', sabre: 'command', bastion: 'command', paladin: 'command', sovereign: 'command', leviathan: 'command',
   raider: 'clan', cutlass: 'clan', reaver: 'clan', marauder: 'clan', ravager: 'clan',
