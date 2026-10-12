@@ -8,10 +8,18 @@ import { LOGDEPTH_VERT_PARS, LOGDEPTH_VERT, LOGDEPTH_FRAG_PARS, LOGDEPTH_FRAG } 
 
 const glow = glowTexture(128, 2.0);
 const liveryCache = {};
+const painted = [];
+let PAINT = null, pinnedM = null;
+export function withPaint(paint, fn) {
+  PAINT = paint;
+  try { return fn(); } finally { PAINT = null; }
+}
+export function pinLivery(M) { pinnedM = M; }
 
 export function livery(name, env) {
-  if (liveryCache[name]) return liveryCache[name];
-  const L = {
+  const key = PAINT ? `${name}|${PAINT.join('|')}` : name;
+  if (liveryCache[key]) return liveryCache[key];
+  const L0 = {
     player: { base: [214, 216, 218], accent: [228, 106, 22], second: [36, 38, 42], eng: [0.55, 0.75, 1.0], labels: ['UNS', 'VALKYRIE', 'FA-31', 'NO STEP', 'RCS', '0731', 'DANGER'], seed: 3, wear: 0.35, stripes: [0.3, 0.05, 0.035, 0.008] },
     pirate: { base: [74, 76, 80], accent: [168, 28, 22], second: [24, 24, 26], eng: [1.0, 0.45, 0.2], labels: ['XX', 'KILL', 'CR-9', '666', 'RCS'], seed: 9, wear: 0.85, rust: 0.9, stripes: [0.1, 0.06, 0, 0] },
     cruiser: { base: [96, 84, 74], accent: [176, 34, 26], second: [30, 28, 28], eng: [1.0, 0.4, 0.18], labels: ['CORSAIR', 'BAY', 'C-01', 'HAZARD'], seed: 13, wear: 1.0, rust: 1.0, stripes: [-0.2, 0.07, 0, 0] },
@@ -73,8 +81,15 @@ export function livery(name, env) {
     skiff: { base: [70, 120, 170], accent: [240, 240, 240], second: [40, 42, 46], eng: [0.6, 0.85, 1.0], labels: ['SKIFF', 'S-1', 'RENTAL', 'NO 12'], seed: 591, wear: 0.4, stripes: [0.5, 0.06, 0.03, 0] },
     gorger: { base: [96, 60, 48], accent: [210, 170, 40], second: [30, 28, 26], eng: [1.0, 0.5, 0.2], labels: ['GORGER', 'XX', 'RAM', 'CHEW'], seed: 601, wear: 1.0, rust: 0.8, stripes: [0.3, 0.07, 0.04, 0] },
     banshee: { base: [34, 34, 40], accent: [130, 60, 200], second: [18, 18, 22], eng: [0.8, 0.5, 1.0], labels: ['BANSHEE', 'XX', 'WAIL', 'GHOST'], seed: 611, wear: 0.6, rust: 0.2, stripes: [0.45, 0.03, 0.02, 0.006] },
+    halo: { base: [220, 224, 228], accent: [40, 170, 200], second: [44, 50, 58], eng: [0.55, 0.85, 1.0], labels: ['HALO', 'RE-2', 'HELION', 'NO STEP'], seed: 621, wear: 0.2, stripes: [0.4, 0.05, 0.03, 0.006] },
+    gemini: { base: [130, 138, 150], accent: [230, 230, 236], second: [36, 40, 46], pin: [220, 170, 60], eng: [0.55, 0.78, 1.0], labels: ['GEMINI', 'CC-2', 'HELION YARDS', 'PORT', 'STARBOARD'], seed: 631, wear: 0.3, stripes: [0.35, 0.05, 0.03, 0.006] },
+    triad: { base: [70, 78, 92], accent: [240, 150, 30], second: [28, 30, 36], pin: [220, 224, 230], eng: [0.55, 0.8, 1.0], labels: ['TRIAD', 'TF-3', 'HELION', 'ORDNANCE'], seed: 641, wear: 0.3, stripes: [0.4, 0.05, 0.03, 0.006] },
+    pearl: { base: [236, 232, 224], accent: [190, 150, 70], second: [70, 66, 62], pin: [40, 60, 100], eng: [0.7, 0.85, 1.0], labels: ['PEARL', 'STARLINES', 'DECK 6', 'EXIT'], seed: 651, wear: 0.06, stripes: [0.5, 0.04, 0.03, 0.006] },
+    gantry: { base: [88, 84, 76], accent: [220, 120, 30], second: [34, 32, 30], eng: [1.0, 0.48, 0.2], labels: ['GANTRY', 'XX', 'SCRAP', 'FRAME 9'], seed: 661, wear: 1.0, rust: 0.9, stripes: [0.3, 0.07, 0.04, 0] },
+    scythe: { base: [40, 44, 40], accent: [200, 200, 190], second: [20, 20, 20], eng: [1.0, 0.45, 0.18], labels: ['SCYTHE', 'XX', 'REAP', '13'], seed: 671, wear: 0.8, rust: 0.4, stripes: [0.4, 0.04, 0.025, 0] },
     navy: { base: [72, 84, 98], accent: [230, 232, 236], second: [28, 32, 38], eng: [0.5, 0.8, 1.0], labels: ['HELION', 'NAVY', 'HN-12', 'RCS'], seed: 71, wear: 0.35, stripes: [0.3, 0.04, 0.02, 0.008] },
   }[name];
+  const L = PAINT ? { ...L0, base: PAINT[0], accent: PAINT[1], second: PAINT[2] } : L0;
   // one paint colour per material; colour accents come from the painted stripes and trim parts, not random panels
   const h = hullMaps({ seed: L.seed, base: L.base, accentChance: 0, darkChance: 0, hazardChance: 0, toneVar: 10, wear: L.wear, labels: L.labels, rust: L.rust || 0 });
   const a = hullMaps({ seed: L.seed + 1, base: L.accent, accentChance: 0, darkChance: 0, hazardChance: 0, toneVar: 10, wear: L.wear * 0.8, labels: L.labels, size: 512, rust: (L.rust || 0) * 0.7 });
@@ -98,7 +113,19 @@ export function livery(name, env) {
     engColor,
   };
   for (const k of ['engine', 'light', 'coil', 'plasma', 'amber', 'window']) M[k].userData.noShadow = true;
-  liveryCache[name] = M;
+  M.paint = [L.base, L.accent, L.second];
+  liveryCache[key] = M;
+  if (PAINT) {
+    painted.push(key);
+    for (let i = 0; painted.length > 6 && i < painted.length;) {
+      const old = liveryCache[painted[i]];
+      if (old === pinnedM) { i++; continue; }
+      for (const k of ['hull', 'accent', 'dark']) for (const t of ['map', 'normalMap', 'roughnessMap']) old[k][t]?.dispose();
+      for (const m of Object.values(old)) if (m && m.isMaterial) m.dispose();
+      delete liveryCache[painted[i]];
+      painted.splice(i, 1);
+    }
+  }
   return M;
 }
 
@@ -1810,6 +1837,24 @@ export function buildMauler(env, liv = 'mauler') {
 export function buildJunker(env, liv = 'junker') {
   return design(env, liv, DESIGNS.junker);
 }
+export function buildHalo(env, liv = 'halo') {
+  return design(env, liv, DESIGNS.halo);
+}
+export function buildGemini(env, liv = 'gemini') {
+  return design(env, liv, DESIGNS.gemini);
+}
+export function buildTriad(env, liv = 'triad') {
+  return design(env, liv, DESIGNS.triad);
+}
+export function buildPearl(env, liv = 'pearl') {
+  return design(env, liv, DESIGNS.pearl);
+}
+export function buildGantry(env, liv = 'gantry') {
+  return design(env, liv, DESIGNS.gantry);
+}
+export function buildScythe(env, liv = 'scythe') {
+  return design(env, liv, DESIGNS.scythe);
+}
 export function buildGladius(env, liv = 'gladius') {
   return design(env, liv, DESIGNS.gladius);
 }
@@ -1891,6 +1936,12 @@ const COMBINE = {
     segs: [[9, 6.4, 10, 22], [11, 7.6, 10, 12], [11, 7.6, 10, 2], [11, 7.6, 10, -8], [11, 7.6, 10, -18], [9, 6.4, 8, -27]], nose: [6, 4, 7, 30.5], bridge: [5, 3, 6, 20, 3.2],
     sponsons: { x: 7.4, w: 3, h: 4, l: 30, z: -4 }, engines: { R: 1.6, xs: [2.8, -2.8], ys: [1.8, -1.8], z: -31.3 },
     hp: [{ p: [0, 3.82, 12], flip: 0, s: 1.0 }, { p: [0, 3.82, 2], flip: 0, s: 1.0 }, { p: [0, 3.82, -8], flip: 0, s: 1.0 }, { p: [0, 3.82, -18], flip: 0, s: 0.9 }, { p: [7.4, 2.02, 6], flip: 0, s: 0.7 }, { p: [-7.4, 2.02, 6], flip: 0, s: 0.7 }, { p: [7.4, 2.02, -14], flip: 0, s: 0.7 }, { p: [-7.4, 2.02, -14], flip: 0, s: 0.7 }, { p: [0, -3.82, -8], flip: 1, s: 1.0 }, { p: [0, -3.82, 6], flip: 1, s: 0.9 }],
+  },
+  monolith: {
+    name: 'Monolith', radius: 18, cockpit: [0, 7.6, 13],
+    segs: [[3.4, 14, 10, 10], [3.4, 14, 10, 0], [3.4, 14, 10, -10]], nose: [3, 10, 4, 17], bridge: [2.4, 1.2, 3, 12, 7.4],
+    engines: { R: 1.1, xs: [0], ys: [4.5, 0, -4.5], z: -16.5 },
+    hp: [{ p: [0, 7, 4], flip: 0, s: 0.6 }, { p: [0, 7, -6], flip: 0, s: 0.6 }, { p: [0, -7, 4], flip: 1, s: 0.6 }, { p: [0, -7, -6], flip: 1, s: 0.6 }],
   },
   crate: {
     name: 'Crate', radius: 46, cockpit: [0, 5, 38],
@@ -2093,6 +2144,7 @@ function design(env, liv, D) {
       }
     }
   }
+  if (D.hs) hs.push(...D.hs);
   const step = Math.ceil(hs.length / 56);
   ship.hitSpheres = hs.filter((_, i) => i % step === 0);
   return addGreebles(ship, surfaceGrid(ship.group));
@@ -2973,5 +3025,105 @@ const DESIGNS = {
     },
     engines: [{ p: [1.3, 0, -7.2], r: 0.42, len: 6, mirror: true }],
     slots: { g: [[1.6, 2, -1, 0.25], [-1.6, 2, -1, 0.25]], m: [[0, -3, -1, 0.3]] },
+  },
+  halo: {
+    name: 'Halo', style: 'sleek', radius: 11, cockpit: [0, 1.6, 4.2], nav: [10.3, 0, 0], beacon: [0, 1.6, -5], hs: [[9.0, 0, 0.0, 1.6], [6.36, 0, 6.36, 1.6], [0.0, 0, 9.0, 1.6], [-6.36, 0, 6.36, 1.6], [-9.0, 0, 0.0, 1.6], [-6.36, 0, -6.36, 1.6], [-0.0, 0, -9.0, 1.6], [6.36, 0, -6.36, 1.6]],
+    parts: [
+      { s: [[-7, 2.6, 1.3, 1.2, 0, 2.4], [-4, 3, 1.5, 1.4, 0, 2.4], [4, 2.8, 1.4, 1.3, 0, 2.4], [7, 1, 0.5, 0.5, -0.1, 2.2]] },
+      { key: 'glass', s: [[2, 1.4, 0.05, 0, 1.4, 2], [4, 1.2, 0.4, 0, 1.2, 2], [6, 0.4, 0.1, 0, 0.8, 2]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.torus(9, 1.3, 14, 72), mat([0, 0, 0], [Math.PI / 2, 0, 0]));
+      k.add('accent', G.torus(9, 0.2, 6, 72), mat([0, 1.18, 0], [Math.PI / 2, 0, 0]));
+      k.add('dark', G.box(15.6, 0.5, 0.8), mat([0, 0, 0]));
+      k.add('dark', G.box(0.8, 0.5, 15.6), mat([0, -0.4, 0]));
+      k.addMirrored('dark', G.rbox(1.8, 1.8, 3, 0.2), mat([9, 0, -1]));
+    },
+    engines: [{ p: [0, 0, -7.3], r: 0.9, len: 9 }, { p: [9, 0, -2.6], r: 0.7, len: 7, mirror: true }],
+    slots: { g: [[0, 5, -1, 0.35]], t: [[9, 3, 1, 0.5], [-9, 3, 1, 0.5], [0, -9, 1, 0.5]], m: [[0, 9, 1, 0.4]] },
+  },
+  gemini: {
+    name: 'Gemini', style: 'armor', radius: 22, cockpit: [0, 2.4, 8.6], nav: [8.2, 0, -4], beacon: [0, 2.8, 4], hs: [[0, 0.4, 2, 4], [0, 0.4, -6, 4]],
+    parts: [
+      { at: [6, 0, 0], mirror: true, s: [[-18, 3.6, 1.8, 1.8, 0, 2.6], [-12, 4.2, 2.2, 2, 0, 2.6], [10, 4, 2, 1.9, 0, 2.6], [15, 2.6, 1.3, 1.2, -0.1, 2.4], [19, 0.6, 0.3, 0.3, -0.2, 2.2]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.rbox(8.4, 1.2, 14, 0.2), mat([0, 0.4, 2]));
+      k.add('dark', G.rbox(3, 1.6, 5, 0.3), mat([0, 1.8, 6]));
+      k.add('glass', G.box(3.04, 0.5, 0.2), mat([0, 2.2, 8.52]));
+      k.add('dark', G.box(9, 0.6, 1.2), mat([0, 0, -12]));
+      k.add('accent', G.box(8.44, 0.1, 10), mat([0, 1.0, 2]));
+    },
+    engines: [{ p: [6, 0, -18.4], r: 1.2, len: 12, mirror: true }],
+    slots: { g: [[6, 12, -1, 0.5], [-6, 12, -1, 0.5]], t: [[6, 10, 1, 0.7], [-6, 10, 1, 0.7], [6, -8, 1, 0.7], [-6, -8, 1, 0.7], [0, -2, 1, 0.6]], m: [[0, -2, -1, 0.5]] },
+  },
+  triad: {
+    name: 'Triad', style: 'std', radius: 16, cockpit: [0, 4.9, 7.6], nav: [4.4, -1.7, -4], beacon: [0, 5, -10],
+    parts: [
+      { at: [0, 3.4, 0], s: [[-14, 2.6, 1.3, 1.3, 0, 2.4], [-10, 3, 1.5, 1.5, 0, 2.4], [8, 2.6, 1.3, 1.3, 0, 2.4], [12, 1.2, 0.6, 0.6, 0, 2.2], [14, 0.3, 0.15, 0.15, 0, 2]] },
+      { at: [2.95, -1.7, 0], mirror: true, s: [[-14, 2.6, 1.3, 1.3, 0, 2.4], [-10, 3, 1.5, 1.5, 0, 2.4], [8, 2.6, 1.3, 1.3, 0, 2.4], [12, 1.2, 0.6, 0.6, 0, 2.2], [14, 0.3, 0.15, 0.15, 0, 2]] },
+      { key: 'dark', s: [[-10, 2, 1, 1, 0, 2.4], [10, 2, 1, 1, 0, 2.4], [13, 0.6, 0.3, 0.3, 0, 2]] },
+      { at: [0, 3.4, 0], key: 'glass', s: [[6, 1.2, 0.05, 0, 1.3, 2], [8, 1.0, 0.3, 0, 1.1, 2], [10, 0.4, 0.08, 0, 0.8, 2]] },
+    ],
+    extra: (k) => {
+      k.add('dark', G.box(0.3, 3.4, 16), mat([0, 1.7, -1]));
+      k.addMirrored('dark', G.box(0.3, 3.4, 16), mat([1.47, -0.85, -1], [0, 0, -2.094]));
+    },
+    engines: [{ p: [0, 3.4, -14.3], r: 0.9, len: 10 }, { p: [2.95, -1.7, -14.3], r: 0.9, len: 10, mirror: true }],
+    slots: { g: [[2.95, 6, -1, 0.4], [-2.95, 6, -1, 0.4]], t: [[0, 2, 1, 0.55], [2.95, -8, 1, 0.45], [-2.95, -8, 1, 0.45]], m: [[0, -6, 1, 0.5], [2.95, -4, -1, 0.45], [-2.95, -4, -1, 0.45]] },
+  },
+  pearl: {
+    name: 'Pearl', style: 'std', radius: 18, cockpit: [0, 0.6, 9.4], nav: [9.1, 0, 0], beacon: [0, 9.8, 0],
+    parts: [
+      { seg: 40, s: [[-9, 0.6, 0.3, 0.3, 0, 2], [-8, 8.2, 4.1, 4.1, 0, 2], [-5, 15, 7.5, 7.5, 0, 2], [0, 18, 9, 9, 0, 2], [5, 15, 7.5, 7.5, 0, 2], [8, 8.2, 4.1, 4.1, 0, 2], [9, 0.6, 0.3, 0.3, 0, 2]] },
+      { key: 'dark', s: [[-17, 3, 1.5, 1.5, 0, 2.4], [-14, 2.4, 1.2, 1.2, 0, 2.4], [-7, 2.2, 1.1, 1.1, 0, 2.4]] },
+    ],
+    extra: (k) => {
+      k.add('accent', G.torus(9.02, 0.35, 8, 72), mat([0, 0, 0], [Math.PI / 2, 0, 0]));
+      for (const y of [2.2, -2.2, 4.4]) k.add('window', G.torus(Math.sqrt(81 - y * y) + 0.02, 0.12, 4, 72), mat([0, y, 0], [Math.PI / 2, 0, 0]));
+      k.add('glass', G.sphere(2.4, 24, 14), mat([0, 0.4, 8.4], [0, 0, 0], [1, 0.7, 0.6]));
+      k.add('metal', G.cyl(0.08, 0.12, 2, 6), mat([0, 9.6, -1]));
+      k.add('metal', G.cyl(1.2, 1.4, 0.6, 16), mat([0, -9.1, 0]));
+    },
+    engines: [{ p: [1.5, 0, -17.3], r: 0.9, len: 10, mirror: true }],
+    slots: { t: [[0, 2, 1, 0.5], [0, 2, -1, 0.5]] },
+  },
+  gantry: {
+    name: 'Gantry', style: 'pirate', radius: 16, cockpit: [0, 1.3, 12], nav: [2.7, 0, 0], beacon: [0, 2.8, -10], hs: [-10, -5, 0, 5].map((z) => [0, 0, z, 3.4]),
+    parts: [
+      { s: [[9, 3, 1.4, 1.4, 0, 2.4], [12, 2.6, 1.2, 1.2, 0, 2.4], [14.5, 1, 0.4, 0.4, 0, 2]] },
+      { key: 'glass', s: [[10.5, 1.6, 0.05, 0, 1.3, 2], [12.5, 1.2, 0.3, 0, 1.1, 2], [14, 0.4, 0.08, 0, 0.6, 2]] },
+    ],
+    extra: (k) => {
+      for (const [x, y] of [[2.4, 2.4], [-2.4, 2.4], [2.4, -2.4], [-2.4, -2.4]]) k.add(y > 0 ? 'hull' : 'dark', G.rbox(0.5, 0.5, 22, 0.08), mat([x, y, -1]));
+      for (const z of [-10, -6, -2, 2, 6]) {
+        for (const y of [2.4, -2.4]) k.add('dark', G.box(5.3, 0.4, 0.6), mat([0, y, z]));
+        for (const x of [2.4, -2.4]) k.add('dark', G.box(0.4, 5.3, 0.6), mat([x, 0, z]));
+      }
+      let i = 0;
+      for (const z of [-8, -4, 0, 4]) { k.addMirrored('metal', G.box(0.18, 6.2, 0.18), mat([2.45, 0, z], [i++ % 2 ? 0.69 : -0.69, 0, 0])); }
+      k.add('dark', G.sphere(1.6, 18, 12), mat([0, 0, 0]));
+      k.add('amber', G.torus(1.62, 0.08, 6, 32), mat([0, 0, 0], [Math.PI / 2, 0, 0]));
+      k.add('accent', G.rbox(2.2, 2.2, 3, 0.1), mat([0, 0, -6.5]));
+      k.add('hull', G.rbox(2.2, 2.2, 3, 0.1), mat([0, 0, 4.2]));
+      k.add('dark', G.rbox(4.6, 2.4, 2.4, 0.2), mat([0, 0, -11.2]));
+      k.add('dark', G.rbox(2.6, 2.6, 1.4, 0.2), mat([0, 0, 8.6]));
+    },
+    engines: [{ p: [1.4, 0, -12.4], r: 0.9, len: 9, mirror: true }],
+    slots: { g: [[2.4, 8, -1, 0.35], [-2.4, 8, -1, 0.35]], t: [[2.4, 0, 1, 0.45], [-2.4, 0, 1, 0.45], [0, -6, 1, 0.45]], m: [[0, -6, -1, 0.4]] },
+  },
+  scythe: {
+    name: 'Scythe', style: 'pirate', radius: 12, cockpit: [0, 1.1, 3], nav: [10.6, 0.3, -3.2], beacon: [0, 1.2, -4], hs: [[5, 0, 1, 2.5], [-5, 0, 1, 2.5], [8.5, 0, -1, 2], [-8.5, 0, -1, 2]],
+    parts: [
+      { s: [[-6, 2.2, 0.9, 0.7, 0, 2.4], [-3, 2.6, 1.1, 0.8, 0, 2.4], [3, 2, 0.9, 0.6, 0, 2.4], [6, 0.8, 0.4, 0.3, -0.1, 2.2], [7.5, 0.2, 0.1, 0.1, -0.1, 2]] },
+      { at: [2.6, 0, 0], mirror: true, key: 'dark', s: [[-4, 1.4, 0.7, 0.7, 0, 2], [-2, 1.6, 0.8, 0.8, 0, 2], [3, 1.2, 0.6, 0.6, 0, 2], [4, 0.4, 0.2, 0.2, 0, 2]] },
+      { key: 'glass', s: [[0.5, 1.2, 0.05, 0, 1.0, 2], [2.5, 1.0, 0.3, 0, 0.85, 2], [4.5, 0.4, 0.08, 0, 0.5, 2]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.extrude([[-10.63, -3.15], [-9.53, -0.5], [-7.78, 1.78], [-5.5, 3.53], [-2.85, 4.63], [0.0, 5.0], [2.85, 4.63], [5.5, 3.53], [7.78, 1.78], [9.53, -0.5], [10.63, -3.15], [6.06, -4.0], [4.95, -2.55], [3.5, -1.44], [1.81, -0.74], [0.0, -0.5], [-1.81, -0.74], [-3.5, -1.44], [-4.95, -2.55], [-6.06, -4.0]], 0.5, 0.12), mat([0, 0, 0], [Math.PI / 2, 0, 0]));
+      k.addMirrored('dark', G.box(0.2, 1.6, 1.6), mat([10.5, 0.6, -3.2], [0, 0, -0.3]));
+    },
+    engines: [{ p: [0, 0, -6.3], r: 0.7, len: 8 }, { p: [2.6, 0, -4.3], r: 0.6, len: 7, mirror: true }],
+    slots: { g: [[5, 2, -1, 0.3], [-5, 2, -1, 0.3]], t: [[0, -3, 1, 0.4]], m: [[7.5, -1, -1, 0.35], [-7.5, -1, -1, 0.35]] },
   },
 };

@@ -1387,7 +1387,7 @@ export function buildWorld(renderer, scene, skySize = 512) {
         noSpin.add(S.planet);
       } else b.root.rotation.y = S.rot;
       sys.add(b.root);
-      const loc = { id: S.id, name: S.name, type: S.kind === 'port' ? PORT_TYPE[S.style] : LOC_TYPE[S.kind], pos: S.pos, arrive: S.kind === 'port' ? 2600 : S.kind === 'shipyard' ? 3000 : 3200, icon: S.kind, dock: S.dock, yard: S.yard || null, kind: S.kind, style: S.style || S.kind, up: S.up || null };
+      const loc = { id: S.id, name: S.name, type: S.kind === 'port' ? PORT_TYPE[S.style] : LOC_TYPE[S.kind], pos: S.pos, arrive: S.kind === 'port' ? 2600 : S.kind === 'shipyard' ? 3000 : 3200, icon: S.kind, dock: S.dock, yard: S.yard || null, paint: !!S.paint, kind: S.kind, style: S.style || S.kind, up: S.up || null };
       structures.push({ obj: b.root, colliders: b.colliders, loc });
       if (b.root.userData.ring) spinners.push({ o: b.root.userData.ring, s: S.kind === 'shipyard' ? -0.025 : 0.03 });
       beaconSets.push(b.root.userData.beacons);

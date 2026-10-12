@@ -170,6 +170,10 @@ body[data-state="docked"] #c:active { cursor: grabbing; }
 .item:hover { border-color: rgba(169, 174, 181, 0.5); }
 .item.on { border-color: #adb2b8; background: rgba(88, 94, 102, 0.4); }
 .item.dis { opacity: 0.45; }
+.swatches { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 12px; }
+.swatches b { width: 22px; height: 22px; border: 1px solid rgba(164, 169, 176, 0.35); cursor: pointer; }
+.swatches b.on { outline: 2px solid #fff; outline-offset: 1px; }
+.sw3 { display: inline-flex; gap: 2px; vertical-align: middle; } .sw3 i { width: 14px; height: 14px; border: 1px solid rgba(164, 169, 176, 0.35); }
 .job { padding: 8px 9px; margin-bottom: 6px; border: 1px solid rgba(164, 169, 176, 0.18); border-left: 3px solid #6f7780; background: rgba(35, 37, 40, 0.35); }
 .job.r1 { border-left-color: #b8a050; } .job.r2 { border-left-color: #d07a30; } .job.r3 { border-left-color: #d03a30; }
 .job .jh { display: flex; justify-content: space-between; gap: 8px; } .job .nm { color: #f6f6f7; } .job .pr { color: #fd8; white-space: nowrap; }

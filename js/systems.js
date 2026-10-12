@@ -201,6 +201,7 @@ function addSettlements(def, S) {
       pos: P.pos.clone().addScaledVector(up, P.radius + lift),
       dock: pirate ? 'pirate' : 'basic',
       yard: pirate ? 'pirate' : corp ? (style === 'company' && city++ === 0 && r() < 0.5 ? 'corp' : null) : style === 'city' && city++ === 0 && r() < 0.7 ? 'light' : null,
+      paint: pirate ? i === 0 : !corp && (style === 'city' || style === 'aerostat'),
       rot: r() * 6,
     });
   });

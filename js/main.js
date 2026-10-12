@@ -5,7 +5,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { buildWorld, LOCATIONS } from './world.js';
 import { SYSTEMS, GOVS, systemDef, route, allPorts, hops, fullRoute } from './systems.js';
 import { StarMap } from './map.js';
-import { buildRaider, buildCruiser, buildHauler, animateShip, mergeStatic, paintStripes } from './ships.js';
+import { buildRaider, buildCruiser, buildHauler, animateShip, mergeStatic, paintStripes, pinLivery } from './ships.js';
 import { HULLS, OUTFITS, YARDS, emptyFit, bareFit, normFit, cloneFit, fitItems, roleOf, slotAccepts, SLOT_KEYS, MOUNT_KEYS, OUTFIT_CATS, CAP_NAME, catOf, fitLoad, fitProblem, buildFitted, outfitPreview, fittedStats } from './catalog.js';
 import { Hangar } from './hangar.js';
 import { buildBridge } from './bridge.js';
@@ -115,7 +115,7 @@ const G = {
   credits: 250000, kills: 0, ammo: { rail: 40, missile: 24 }, cool: { pri: 0, sec: 0, tur: 0, missile: 0 },
   priOff: false, secOff: false, usesAmmo: true, leadSpeed: 3200, turretsAuto: true, hasTurrets: true, turFiring: false, gunAssist: false,
   aimDir: new THREE.Vector3(0, 0, 1), aimPoint: new THREE.Vector3(), aimActive: false, mouseLocked: false,
-  hull: 'valkyrie', owned: { valkyrie: emptyFit('valkyrie') }, inventory: {}, dockedAt: null,
+  hull: 'valkyrie', owned: { valkyrie: emptyFit('valkyrie') }, paint: {}, inventory: {}, dockedAt: null,
   system: 'kaltos', explored: new Set(['kaltos']), routeTo: null, autoJump: null, autoRoute: null, autoT: 0, dockSys: 'kaltos', dockId: 'station',
   jobs: [], access: {}, jumps: 0, ambush: null, boardT: 0, bribe: null, bribeT: 0,
   nearestName: '', time: 0, shake: 0, hitFlash: 0,
@@ -160,6 +160,12 @@ const STATS = {
   navyGladius: { cls: 'Helion Navy Gladius', shield: 600, armor: 500, hull: 400, speed: 320, accel: 105, turn: 1.05, bounty: 0, sig: 0.7 },
   navyHalberd: { cls: 'Helion Navy Halberd', shield: 1800, armor: 1700, hull: 1400, speed: 190, accel: 42, turn: 0.45, bounty: 0, sig: 1.9 },
   secExecutor: { cls: 'Combine Executor Battleship', shield: 4400, armor: 5000, hull: 3600, speed: 115, accel: 19, turn: 0.22, bounty: 0, sig: 3.6, hullId: 'executor' },
+  gantry: { cls: 'Gantry Clan Frame Raider', shield: 560, armor: 820, hull: 740, speed: 235, accel: 62, turn: 0.7, bounty: 40000, sig: 1.2, hullId: 'gantry', ai: 'gunship', gunDmg: 15, orbit: 1700 },
+  scythe: { cls: 'Scythe Clan Crescent Bomber', shield: 380, armor: 340, hull: 300, speed: 310, accel: 115, turn: 1.1, bounty: 30000, sig: 0.8, hullId: 'scythe', ai: 'fighter', gunDmg: 13 },
+  navyHalo: { cls: 'Helion Navy Halo', shield: 1150, armor: 860, hull: 760, speed: 250, accel: 66, turn: 0.8, bounty: 0, sig: 1.3 },
+  navyTriad: { cls: 'Helion Navy Triad', shield: 1450, armor: 1250, hull: 1050, speed: 220, accel: 52, turn: 0.6, bounty: 0, sig: 1.6 },
+  navyGemini: { cls: 'Helion Navy Gemini', shield: 2300, armor: 2100, hull: 1800, speed: 175, accel: 34, turn: 0.4, bounty: 0, sig: 2.3 },
+  secMonolith: { cls: 'Combine Monolith Slab Frigate', shield: 1500, armor: 1900, hull: 1400, speed: 185, accel: 38, turn: 0.45, bounty: 0, sig: 1.9, hullId: 'monolith' },
   navyCitadel: { cls: 'Helion Navy Citadel', shield: 4000, armor: 4200, hull: 3000, speed: 130, accel: 28, turn: 0.26, bounty: 0, sig: 3.2 },
   navyLancer: { cls: 'Helion Navy Lancer', shield: 330, armor: 240, hull: 220, speed: 380, accel: 160, turn: 1.25, bounty: 0, sig: 0.5 },
   secCollector: { cls: 'Combine Debt Collector', shield: 700, armor: 650, hull: 520, speed: 240, accel: 75, turn: 0.7, bounty: 0, sig: 1.0, hullId: 'collector' },
@@ -167,8 +173,8 @@ const STATS = {
   secEnforcer: { cls: 'Combine Security Enforcer', shield: 650, armor: 550, hull: 450, speed: 215, accel: 62, turn: 0.6, bounty: 0, sig: 1.0, hullId: 'enforcer' },
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
-const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.8 ? 'banshee' : 'raider'; };
-const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd' };
+const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.78 ? 'banshee' : r < 0.86 ? 'scythe' : 'raider'; };
+const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
 const PROFILES = { em: { s: 1.25, a: 0.7, h: 1 }, kinetic: { s: 0.85, a: 1.2, h: 1 }, explosive: { s: 0.9, a: 1.1, h: 1.2 }, thermal: { s: 1.0, a: 0.95, h: 1.1 } };
@@ -184,7 +190,8 @@ function makeEntity(kind, faction, pos, name, civHull) {
   let ship, s = STATS[kind];
   if (kind === 'player') {
     const fit = G.owned[G.hull];
-    ship = buildFitted(G.hull, fit, env);
+    ship = buildFitted(G.hull, fit, env, undefined, G.paint[G.hull]);
+    pinLivery(ship.M);
     s = fittedStats(G.hull, fit);
   } else if (NAVY_HULL[kind]) ship = buildFitted(NAVY_HULL[kind], emptyFit(NAVY_HULL[kind]), env, 'navy');
   else if (civHull) ship = buildFitted(civHull, bareFit(civHull), env);
@@ -704,7 +711,7 @@ function buildEncounters(def) {
   if (dg > 0) for (const loc of LOCATIONS.filter((l) => l.icon === 'belt')) {
     out.push({ loc, ships: [], timer: 0, wave: 0, spawn() {
       const n = 2 + dg + Math.min(3, this.wave), o = [];
-      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger'][Math.floor(Math.random() * 11)], 3500]);
+      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger', 'gantry', 'scythe'][Math.floor(Math.random() * 13)], 3500]);
       for (let i = 0; i < n; i++) o.push([lightPirate(), 2500 + Math.random() * 3000]);
       return o;
     } });
@@ -1186,7 +1193,8 @@ const yardOf = () => (G.dockedAt.yard ? YARDS[G.dockedAt.yard] : null);
 
 function hangarShow(hullId, keepView) {
   const fit = G.owned[hullId] || emptyFit(hullId);
-  hangar.setShip(buildFitted(hullId, fit, world.env), keepView);
+  const paint = D.tab === 'paint' && hullId === G.hull ? D.paintSel : G.paint[hullId];
+  hangar.setShip(buildFitted(hullId, fit, world.env, undefined, paint || undefined), keepView);
   D.shown = hullId;
 }
 
@@ -1253,7 +1261,7 @@ function renderDock() {
   $('dockwallet').innerHTML = `Wallet <b>${fmtIsk(G.credits)}</b>`;
   document.querySelectorAll('#docktop .dtabs b').forEach((b) => {
     b.classList.toggle('on', b.dataset.tab === D.tab);
-    b.classList.toggle('na', b.dataset.tab === 'shipyard' && !yardOf());
+    b.classList.toggle('na', (b.dataset.tab === 'shipyard' && !yardOf()) || (b.dataset.tab === 'paint' && !G.dockedAt.paint));
   });
   const p = G.player, H = HULLS[G.hull], fit = G.owned[G.hull];
   if (D.tab === 'services') {
@@ -1285,6 +1293,8 @@ function renderDock() {
       ${D.browse === G.hull ? '<button disabled>Active ship</button>' : own ? `<button data-a="board" class="primary">Board this ship</button><button data-a="sellship">Sell hull (${fmtIsk(h.price * 0.5)}, fittings to cargo)</button>`
     : forSale.has(D.browse) ? `<button data-a="buy" class="primary" ${G.credits < h.price ? 'disabled' : ''}>Buy &amp; board (${fmtIsk(h.price)})</button>` : '<button disabled>Not sold here</button>'}
       ${capOk(D.browse, G.owned[D.browse] || emptyFit(D.browse)) ? '' : `<p class="warn">Too small for your active jobs (${usedCargo()} t cargo, ${usedBunks()} passengers).</p>`}`;
+  } else if (D.tab === 'paint') {
+    renderPaint(L, R);
   } else if (D.tab === 'jobs') {
     renderJobs(L, R);
   } else {
@@ -1326,15 +1336,63 @@ function showOutfit(id) {
 
 function slotMarkers() {
   const s = hangar.ship;
-  if (D.tab === 'services' || D.tab === 'jobs' || !s) { hangar.setSlots(null); return; }
+  if (D.tab === 'services' || D.tab === 'jobs' || D.tab === 'paint' || !s) { hangar.setSlots(null); return; }
   const fit = D.tab === 'shipyard' ? (G.owned[D.browse] || HULLS[D.browse].fit) : G.owned[G.hull];
   const list = MOUNT_KEYS.flatMap((k) => (s.slots ? s.slots[k] : []).slice(0, fit[k].length).map((h, i) => ({ k, i, ...h })));
   hangar.setSlots(list, D.tab === 'outfitter' ? D.slot : null, D.focusSlot);
   D.focusSlot = false;
 }
 
+const PALETTE = [['White', [236, 236, 232]], ['Silver', [180, 184, 190]], ['Grey', [120, 126, 134]], ['Gunmetal', [70, 76, 86]], ['Black', [30, 32, 36]], ['Navy', [36, 52, 96]],
+  ['Blue', [40, 100, 190]], ['Cyan', [40, 170, 200]], ['Teal', [30, 120, 110]], ['Green', [50, 120, 60]], ['Olive', [100, 108, 70]], ['Tan', [190, 164, 120]],
+  ['Gold', [196, 156, 70]], ['Yellow', [228, 186, 40]], ['Orange', [226, 116, 26]], ['Red', [190, 36, 32]], ['Maroon', [110, 30, 36]], ['Purple', [110, 60, 170]]];
+const PAINT_SCHEMES = [['Arctic', 0, 7, 3], ['Fleet grey', 2, 5, 4], ['Racing', 0, 15, 4], ['Midnight', 5, 12, 4], ['Hazard', 13, 4, 3], ['Stealth', 4, 3, 4],
+  ['Desert', 11, 14, 3], ['Jungle', 10, 9, 4], ['Royal', 17, 12, 4], ['Ember', 16, 14, 4], ['Ocean', 8, 0, 3], ['Gunmetal', 3, 15, 4]];
+const PAINT_PARTS = [['Hull', 'main colour'], ['Stripes', 'bands, spine and accent parts'], ['Trim', 'dark parts and pinstripes']];
+const paintCost = () => Math.max(5000, Math.round((HULLS[G.hull].price * 0.02) / 1000) * 1000);
+const sameRgb = (a, b) => !!a && !!b && a.every((v, i) => v === b[i]);
+const samePaint = (a, b) => (!a && !b) || (!!a && !!b && a.every((c, i) => sameRgb(c, b[i])));
+const rgbCss = (c) => `rgb(${c.join(',')})`;
+const paintColors = () => D.paintSel || hangar.ship?.M?.paint || G.player.ship.M.paint;
+function renderPaint(L, R) {
+  const H = HULLS[G.hull], cur = paintColors(), cost = paintCost();
+  L.innerHTML = `<h3>Paint shop</h3><p class="sub">Pick a scheme or mix your own colours. The hangar shows a preview; you only pay when you apply it.</p>
+    <h3>Schemes</h3><div class="item${D.paintSel ? '' : ' on'}" data-a="paintfactory"><span class="nm">Factory paint</span><span class="ty">${H.name} stock livery</span></div>
+    ${PAINT_SCHEMES.map(([n, a, b, c], i) => `<div class="item${samePaint(D.paintSel, [a, b, c].map((j) => PALETTE[j][1])) ? ' on' : ''}" data-a="paintscheme" data-v="${i}"><span class="nm">${n}</span><span class="sw3">${[a, b, c].map((j) => `<i style="background:${rgbCss(PALETTE[j][1])}"></i>`).join('')}</span></div>`).join('')}
+    ${PAINT_PARTS.map(([n, d], p) => `<h3>${n} <span class="ty">${d}</span></h3><div class="swatches">${PALETTE.map(([cn, c], j) => `<b data-a="paintcol" data-p="${p}" data-v="${j}" title="${cn}" style="background:${rgbCss(c)}"${sameRgb(cur[p], c) ? ' class="on"' : ''}></b>`).join('')}</div>`).join('')}`;
+  const changed = !samePaint(D.paintSel, G.paint[G.hull] || null);
+  R.innerHTML = `<h3>Repaint</h3><h2>${H.name}</h2><div class="sub">${H.cls}</div>
+    <table class="st">${PAINT_PARTS.map(([n], p) => `<tr><td>${n}</td><td><span class="sw3"><i style="background:${rgbCss(cur[p])}"></i></span> ${PALETTE.find(([, c]) => sameRgb(c, cur[p]))?.[0] || 'Factory'}</td></tr>`).join('')}
+    <tr><td>Price</td><td>${fmtIsk(cost)}</td></tr></table>
+    <button data-a="paintapply" class="primary" ${!changed || G.credits < cost ? 'disabled' : ''}>${!changed ? 'Current paint' : D.paintSel ? `Apply paint (${fmtIsk(cost)})` : `Restore factory paint (${fmtIsk(cost)})`}</button>
+    ${changed ? '<button data-a="paintcancel">Cancel preview</button>' : ''}`;
+}
+function paintAction(t) {
+  const a = t.dataset.a;
+  if (a === 'paintapply') {
+    const cost = paintCost();
+    if (G.credits < cost || samePaint(D.paintSel, G.paint[G.hull] || null)) return;
+    G.credits -= cost;
+    if (D.paintSel) G.paint[G.hull] = D.paintSel.map((c) => [...c]);
+    else delete G.paint[G.hull];
+    rebuildPlayer();
+    flashDockMsg(`${HULLS[G.hull].name} repainted`);
+  } else if (a === 'paintfactory') D.paintSel = null;
+  else if (a === 'paintcancel') D.paintSel = G.paint[G.hull] ? G.paint[G.hull].map((c) => [...c]) : null;
+  else if (a === 'paintscheme') D.paintSel = PAINT_SCHEMES[+t.dataset.v].slice(1).map((j) => [...PALETTE[j][1]]);
+  else if (a === 'paintcol') {
+    const sel = paintColors().map((c) => [...c]);
+    sel[+t.dataset.p] = [...PALETTE[+t.dataset.v][1]];
+    D.paintSel = sel;
+  }
+  hangarShow(G.hull, true);
+}
+
 function setDockTab(tab) {
   if (tab === 'shipyard' && !yardOf()) { flashDockMsg('No shipyard here — the star map lists shipyards under Facilities'); return; }
+  if (tab === 'paint' && !G.dockedAt.paint) { flashDockMsg('No paint shop here — look for one at city and cloud-city ports'); return; }
+  if (D.tab === 'paint' || tab === 'paint') D.shown = null;
+  if (tab === 'paint') D.paintSel = G.paint[G.hull] ? G.paint[G.hull].map((c) => [...c]) : null;
   D.tab = tab; D.preview = null; D.cat = null;
   hangar.setOutfit(null);
   if (tab === 'shipyard') { D.browse = D.browse || G.hull; if (D.shown !== D.browse) hangarShow(D.browse); } else if (D.shown !== G.hull) hangarShow(G.hull);
@@ -1594,7 +1652,7 @@ function updateJobs(dt) {
 
 const SAVE_KEY = 'gvcsg-save-v1';
 function snapshot() {
-  return { v: 1, hull: G.hull, owned: G.owned, inventory: G.inventory, credits: G.credits, kills: G.kills, ammo: G.ammo,
+  return { v: 1, hull: G.hull, owned: G.owned, paint: G.paint, inventory: G.inventory, credits: G.credits, kills: G.kills, ammo: G.ammo,
     explored: [...G.explored], dockSys: G.dockSys, dockId: G.dockId, turretsAuto: G.turretsAuto, jobs: G.jobs, access: G.access, jumps: G.jumps,
     hp: G.player ? [G.player.armor / G.player.maxArmor, G.player.hull / G.player.maxHull] : [1, 1] };
 }
@@ -1618,6 +1676,9 @@ function applySave(s) {
   for (const x of spare) G.inventory[x] = (G.inventory[x] || 0) + 1;
   if (!G.owned[s.hull]) G.owned[s.hull] = emptyFit(s.hull);
   G.hull = s.hull;
+  const okRgb = (c) => Array.isArray(c) && c.length === 3 && c.every((v) => Number.isInteger(v) && v >= 0 && v <= 255);
+  G.paint = {};
+  for (const [id, c] of Object.entries(s.paint || {})) if (HULLS[id] && Array.isArray(c) && c.length === 3 && c.every(okRgb)) G.paint[id] = c;
   G.credits = Math.max(0, Number(s.credits) || 0);
   G.kills = Math.max(0, Number(s.kills) || 0);
   G.ammo = { rail: s.ammo?.rail ?? 40, missile: s.ammo?.missile ?? 24 };
@@ -1656,6 +1717,7 @@ for (const id of ['dockleft', 'dockright']) {
     if (!t) return;
     const fit = G.owned[G.hull];
     if (t.dataset.j) { jobAction(t.dataset.a, t.dataset.j); audio.ui(); renderDock(); return; }
+    if (t.dataset.a && t.dataset.a.startsWith('paint')) { paintAction(t); audio.ui(); renderDock(); return; }
     if (t.dataset.a === 'role') {
       const k = t.dataset.slot[0], i = +t.dataset.slot.slice(1);
       fit.r[k][i] = roleOf(fit, k, i) === 'primary' ? 'secondary' : 'primary';
@@ -1719,7 +1781,7 @@ function enterDocked() {
   $('hud').classList.add('hidden');
   $('dockname').textContent = G.dockedAt.name.toUpperCase();
   const L0 = G.dockedAt, Y0 = yardOf();
-  $('docksub').textContent = [L0.type, Y0 ? 'SHIPYARD' : null, L0.dock === 'pirate' ? 'BLACK-MARKET OUTFITTER' : isHigh() ? 'FULL OUTFITTER' : 'BASIC OUTFITTER', 'REPAIR', 'JOB BOARD'].filter(Boolean).join(' · ').toUpperCase();
+  $('docksub').textContent = [L0.type, Y0 ? 'SHIPYARD' : null, L0.paint ? 'PAINT SHOP' : null, L0.dock === 'pirate' ? 'BLACK-MARKET OUTFITTER' : isHigh() ? 'FULL OUTFITTER' : 'BASIC OUTFITTER', 'REPAIR', 'JOB BOARD'].filter(Boolean).join(' · ').toUpperCase();
   D.tab = 'services'; D.preview = null; D.browse = G.hull;
   deliverJobs();
   const bk = `${G.system}:${L0.id}:${G.jumps}`;
@@ -2117,7 +2179,7 @@ starmap.onToggle = (on) => {
 const NAVY_NAMES = ['HNS Vigilant', 'HNS Swift', 'HNS Harrier', 'HNS Bulwark', 'HNS Talon', 'HNS Resolute', 'HNS Aegis', 'HNS Lancer', 'HNS Sentinel', 'HNS Valor'];
 const HAULER_LINES = ['Orca Logistics', 'Kaltos Freight', 'Vexal Trading Co.', 'Helion Supply', 'Aster Bulk Lines'];
 // civilian traffic: the classic hauler plus catalogue freighters and liners
-const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier'], ['tern', 'Shuttle'], ['ox', 'Heavy Hauler'], ['heron', 'Survey Ship'], ['caravel', 'Trader'], ['pelican', 'Tanker'], ['starling', 'Yacht'], ['prospector', 'Mining Barge'], ['mercy', 'Hospital Ship'], ['grapple', 'Salvage Tug'], ['comet', 'Racer'], ['nomad', 'Habitat Trader'], ['skiff', 'Runabout']];
+const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier'], ['tern', 'Shuttle'], ['ox', 'Heavy Hauler'], ['heron', 'Survey Ship'], ['caravel', 'Trader'], ['pelican', 'Tanker'], ['starling', 'Yacht'], ['prospector', 'Mining Barge'], ['mercy', 'Hospital Ship'], ['grapple', 'Salvage Tug'], ['comet', 'Racer'], ['nomad', 'Habitat Trader'], ['skiff', 'Runabout'], ['pearl', 'Liner']];
 const LINER_LINES = ['Aurora Starlines', 'Helion Spaceways', 'Mirel Cruise Lines', 'Tessaly Interstellar'];
 const CORP_CIVIL = [['crate', 'Vanta Logistics Crate'], ['crate', 'Combine Freight Division Crate'], ['commuter', 'Vanta Labour Transit Commuter']];
 const secName = (kind) => `Combine Security ${HULLS[STATS[kind].hullId].name} ${String(100 + Math.floor(Math.random() * 900))}`;
@@ -2128,7 +2190,7 @@ function populate(def, from) {
   if (def.gov === 'gov') {
     let ni = 0;
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
+      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius', 'navyTriad', 'navyGemini', 'navyHalo'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) {
         const n = makeEntity(kind, 'navy', home.clone().add(jitter(6000)), NAVY_NAMES[ni++ % NAVY_NAMES.length]);
@@ -2148,7 +2210,7 @@ function populate(def, from) {
   } else if (def.gov === 'corp') {
     // Combine Security: cheap hulls in numbers, guarding company property; licensed traffic is left alone
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secArbiter', 'secExecutor', 'secLiquidator', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secLiquidator', 'secCollector', 'secBailiff', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secCollector', 'secNotary', 'secBailiff', 'secUnit'];
+      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secArbiter', 'secExecutor', 'secMonolith', 'secLiquidator', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secLiquidator', 'secCollector', 'secBailiff', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secCollector', 'secNotary', 'secBailiff', 'secUnit'];
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) makeEntity(kind, 'corp', home.clone().add(jitter(6000)), secName(kind)).ai.home.copy(home);
     }
