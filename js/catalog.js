@@ -7,6 +7,7 @@ import {
   buildOsprey, buildPelican, buildStarling, buildTempest, buildScorpion, buildBrigand,
   buildKite, buildWasp, buildProspector, buildMercy, buildWarlord, buildBulwark,
   buildRampart, buildGrapple, buildComet, buildRanger, buildMauler, buildJunker,
+  buildGladius, buildHalberd, buildNomad, buildSkiff, buildGorger, buildBanshee,
 } from './ships.js';
 import { Kit, G, mat } from './geo.js';
 
@@ -396,6 +397,48 @@ Object.assign(HULLS, {
     stats: { cargo: 30, bunks: 6, shield: 1100, armor: 1000, hull: 800, speed: 250, boost: 650, accel: 60, turn: [0.8, 0.62, 1.3], cap: 1200, capRegen: 28, shieldRegen: 22, sig: 1.2 },
     bays: ['combinebay'], fit: { w: ['combinecarbine', 'combineturret', 'combineturret', 'pd', 'pd'], sys: 2 },
   },
+  gladius: {
+    name: 'Gladius', cls: 'Gladius Heavy Fighter', price: 300000, build: buildGladius,
+    desc: 'Twin-boom Helion heavy fighter in gunmetal with yellow bands. Two gauss cannons on the booms, a dorsal pulse turret and a micro-missile pod under the pod.',
+    stats: { cargo: 8, bunks: 1, shield: 620, armor: 520, hull: 420, speed: 330, boost: 900, accel: 110, turn: [1.15, 0.9, 2.0], cap: 800, capRegen: 22, shieldRegen: 18, sig: 0.7 },
+    fit: { g: ['gauss', 'gauss'], t: ['pulse'], m: ['micro'], sys: 2 },
+  },
+  halberd: {
+    name: 'Halberd', cls: 'Halberd-class Escort Destroyer', price: 1450000, build: buildHalberd,
+    desc: 'Pale grey escort destroyer with red bands, a squat bridge tower and point-defence sponsons on both flanks. A heavy railgun, five turrets and two long-range missile bays.',
+    stats: { cargo: 40, bunks: 16, shield: 1900, armor: 1800, hull: 1500, speed: 200, boost: 520, accel: 44, turn: [0.55, 0.44, 0.9], cap: 2000, capRegen: 46, shieldRegen: 36, sig: 1.9 },
+    fit: { g: ['hrail'], t: ['heavypulse', 'quadpulse', 'lpd', 'lpd', 'flak'], m: ['lrm', 'lrm'], sys: 4 },
+  },
+  nomad: {
+    name: 'Nomad', cls: 'Nomad Habitat Trader', price: 680000, build: buildNomad,
+    desc: 'A long-haul family trader: a habitat ring around the spine for 30 people, twelve containers aft and a bubble bridge up front. Two defence turrets.',
+    stats: { cargo: 160, bunks: 30, shield: 1000, armor: 900, hull: 1100, speed: 190, boost: 480, accel: 36, turn: [0.5, 0.4, 0.8], cap: 1000, capRegen: 22, shieldRegen: 16, sig: 1.8 },
+    fit: { g: [], t: ['pd', 'twinauto'], m: [], sys: 5 },
+  },
+  skiff: {
+    name: 'Skiff', cls: 'Skiff Runabout', price: 38000, build: buildSkiff,
+    desc: 'A sky-blue rental runabout with a bubble canopy and two thruster pods. The cheapest hull you can buy, with one light gun and room for a little cargo.',
+    stats: { cargo: 12, bunks: 2, shield: 260, armor: 160, hull: 180, speed: 270, boost: 700, accel: 100, turn: [1.2, 0.95, 2.0], cap: 500, capRegen: 14, shieldRegen: 10, sig: 0.45 },
+    fit: { g: ['lpulse'], t: [], m: [], sys: 1 },
+  },
+  gorger: {
+    name: 'Gorger', cls: 'Gorger Clan Ram', price: 180000, build: buildGorger, pirate: true,
+    desc: 'A stolen mining drill welded to the front of a slab-armoured brawler. Two scatter cannons and a flak turret, and thicker armour than anything its size.',
+    stats: { cargo: 30, bunks: 3, shield: 520, armor: 1100, hull: 900, speed: 250, boost: 700, accel: 70, turn: [0.8, 0.62, 1.3], cap: 800, capRegen: 20, shieldRegen: 14, sig: 1.1 },
+    fit: { g: ['scatter', 'scatter'], t: ['clanflak'], m: [], sys: 2 },
+  },
+  banshee: {
+    name: 'Banshee', cls: 'Banshee Clan Stealth Raider', price: 200000, build: buildBanshee, pirate: true,
+    desc: 'A flat faceted wedge in matte black with violet pinstripes and canted tails. The lowest base signature of any hull: a burst laser, a flechette cannon and a rocket rack.',
+    stats: { cargo: 14, bunks: 1, shield: 380, armor: 300, hull: 280, speed: 360, boost: 980, accel: 140, turn: [1.3, 1.0, 2.2], cap: 800, capRegen: 20, shieldRegen: 16, sig: 0.35 },
+    fit: { g: ['burstlaser', 'flechette'], t: [], m: ['rocketrack'], sys: 2 },
+  },
+  executor: {
+    name: 'Executor', cls: 'Combine Executor Battleship', price: 4200000, build: (env, liv) => buildCombine(env, 'executor', liv), corp: true,
+    desc: 'Six standard blocks, turret sponsons, a command tower and four square drives. Combine Enforcement only sends it once the paperwork is finished: three rail turrets, two carbines, five more turrets and three missile racks.',
+    stats: { cargo: 120, bunks: 30, shield: 4600, armor: 5200, hull: 3800, speed: 120, boost: 320, accel: 20, turn: [0.3, 0.24, 0.55], cap: 4200, capRegen: 90, shieldRegen: 70, sig: 3.6 },
+    bays: ['combinebay', 'combinebay', 'srm'], fit: { w: ['combinerailt', 'combinerailt', 'combinerailt', 'combineturret', 'combinecarbine', 'combinecarbine', 'combineturret', 'combineturret', 'flak', 'flak'], sys: 6 },
+  },
   auditor: {
     name: 'Auditor', cls: 'Combine Auditor Corvette', price: 120000, build: (env, liv) => buildCombine(env, 'auditor', liv), corp: true,
     desc: 'Three standard hull blocks, stub wings and two square drives. Combine Security sends it to inspect freighters; it carries a gun, a turret and one missile bay.',
@@ -406,12 +449,12 @@ Object.assign(HULLS, {
 
 // hull catalogues by shipyard type
 export const YARDS = {
-  fed: { name: 'Helion Yards hull catalogue', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'mantis', 'warden', 'sabre', 'aurora', 'atlas', 'bastion', 'paladin', 'sovereign', 'leviathan', 'talon', 'courier', 'vanguard', 'monarch', 'tern', 'ox', 'harbinger', 'lancer', 'heron', 'caravel', 'citadel', 'osprey', 'pelican', 'starling', 'tempest', 'kite', 'prospector', 'mercy', 'bulwark', 'ranger', 'comet', 'grapple', 'rampart'] },
-  light: { name: 'Civilian dealership', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'aurora', 'talon', 'courier', 'monarch', 'tern', 'ox', 'lancer', 'heron', 'caravel', 'pelican', 'starling', 'kite', 'prospector', 'mercy', 'comet', 'grapple'] },
-  corp: { name: 'Vanta Combine asset catalogue', hulls: ['unit', 'enforcer', 'crate', 'commuter', 'compliance', 'auditor', 'liquidator', 'collector', 'arbiter', 'notary', 'bailiff', 'hornet', 'mule'] },
-  pirate: { name: 'Clan black-market hulls', hulls: ['raider', 'cutlass', 'reaver', 'marauder', 'ravager', 'jackal', 'hyena', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'wasp', 'warlord', 'mauler', 'junker', 'hornet', 'mule'] },
+  fed: { name: 'Helion Yards hull catalogue', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'mantis', 'warden', 'sabre', 'aurora', 'atlas', 'bastion', 'paladin', 'sovereign', 'leviathan', 'talon', 'courier', 'vanguard', 'monarch', 'tern', 'ox', 'harbinger', 'lancer', 'heron', 'caravel', 'citadel', 'osprey', 'pelican', 'starling', 'tempest', 'kite', 'prospector', 'mercy', 'bulwark', 'ranger', 'comet', 'grapple', 'rampart', 'gladius', 'halberd', 'nomad', 'skiff'] },
+  light: { name: 'Civilian dealership', hulls: ['wisp', 'hornet', 'kestrel', 'corvid', 'valkyrie', 'mule', 'aurora', 'talon', 'courier', 'monarch', 'tern', 'ox', 'lancer', 'heron', 'caravel', 'pelican', 'starling', 'kite', 'prospector', 'mercy', 'comet', 'grapple', 'nomad', 'skiff'] },
+  corp: { name: 'Vanta Combine asset catalogue', hulls: ['unit', 'enforcer', 'crate', 'commuter', 'compliance', 'auditor', 'liquidator', 'collector', 'arbiter', 'notary', 'bailiff', 'executor', 'hornet', 'mule'] },
+  pirate: { name: 'Clan black-market hulls', hulls: ['raider', 'cutlass', 'reaver', 'marauder', 'ravager', 'jackal', 'hyena', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'wasp', 'warlord', 'mauler', 'junker', 'gorger', 'banshee', 'hornet', 'mule'] },
 };
-export const HULL_ORDER = ['wisp', 'tern', 'hornet', 'lancer', 'starling', 'comet', 'kite', 'kestrel', 'talon', 'osprey', 'heron', 'ranger', 'corvid', 'valkyrie', 'courier', 'mule', 'caravel', 'pelican', 'prospector', 'grapple', 'mantis', 'vanguard', 'tempest', 'harbinger', 'warden', 'sabre', 'aurora', 'mercy', 'monarch', 'atlas', 'ox', 'bastion', 'paladin', 'citadel', 'bulwark', 'rampart', 'sovereign', 'leviathan', 'wasp', 'hyena', 'jackal', 'raider', 'cutlass', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'mauler', 'brigand', 'junker', 'marauder', 'warlord', 'ravager', 'unit', 'notary', 'auditor', 'collector', 'bailiff', 'enforcer', 'liquidator', 'arbiter', 'crate', 'commuter', 'compliance'];
+export const HULL_ORDER = ['wisp', 'skiff', 'tern', 'hornet', 'lancer', 'starling', 'comet', 'kite', 'kestrel', 'talon', 'gladius', 'osprey', 'heron', 'ranger', 'corvid', 'valkyrie', 'courier', 'mule', 'caravel', 'nomad', 'pelican', 'prospector', 'grapple', 'mantis', 'vanguard', 'tempest', 'harbinger', 'halberd', 'warden', 'sabre', 'aurora', 'mercy', 'monarch', 'atlas', 'ox', 'bastion', 'paladin', 'citadel', 'bulwark', 'rampart', 'sovereign', 'leviathan', 'wasp', 'banshee', 'hyena', 'jackal', 'raider', 'cutlass', 'reaver', 'buccaneer', 'gorger', 'vulture', 'scorpion', 'mauler', 'brigand', 'junker', 'marauder', 'warlord', 'ravager', 'unit', 'notary', 'auditor', 'collector', 'bailiff', 'enforcer', 'liquidator', 'arbiter', 'executor', 'crate', 'commuter', 'compliance'];
 
 // mount: gun = forward-fixed with a small gimbal, turret = free-tracking, bay = missile bay (always secondary).
 // group is the default firing role: primary = fires automatically at hostiles, secondary = fires on LMB / U. tech: basic (any station) / high (shipyard stations only)
@@ -603,6 +646,7 @@ const STOCK_ENGINES = {
   osprey: ['fuss', 'fuss', 'ionm'], pelican: ['ionl', 'ionm'], starling: ['fusr'], tempest: ['fusm', 'fusm'], scorpion: ['salvage', 'salvage'], brigand: ['salvage', 'salvage'], arbiter: ['combinedrive', 'combinedrive', 'combinedrive', 'combinedrive'],
   kite: ['fuss'], wasp: ['salvage'], prospector: ['ionl', 'ionl'], mercy: ['ionl', 'ionl'], warlord: ['clanburner', 'clanburner', 'salvage', 'salvage'], bulwark: ['fusl', 'fusl'], notary: ['combinedrive', 'combinedrive'],
   rampart: ['fusl', 'fusl'], grapple: ['ionm', 'ionm'], comet: ['fusr', 'fusr', 'fuss'], ranger: ['fuss', 'fuss'], mauler: ['salvage', 'salvage', 'salvage'], junker: ['salvage', 'salvage'], bailiff: ['combinedrive', 'combinedrive'],
+  gladius: ['fuss', 'fuss', 'ions'], halberd: ['fusm', 'fusm', 'ionm'], nomad: ['ionl', 'ionm'], skiff: ['ions', 'ions'], gorger: ['salvage', 'salvage'], banshee: ['salvage', 'salvage'], executor: ['combinebulk', 'combinebulk', 'combinedrive', 'combinedrive'],
 };
 const ceil5 = (x) => Math.ceil(x / 5) * 5;
 const MOUNT_MIN = { g: 7, t: 8, m: 10 };
