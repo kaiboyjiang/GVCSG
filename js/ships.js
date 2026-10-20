@@ -120,6 +120,13 @@ export function livery(name, env) {
     condor: { base: [226, 228, 230], accent: [24, 26, 30], second: [70, 74, 80], pin: [200, 40, 40], eng: [0.55, 0.85, 1.0], labels: ['CONDOR'], seed: 1161, wear: 0.2, stripes: [0.35, 0.06, 0.03, 0.006] },
     scarab: { base: [30, 70, 56], accent: [200, 160, 50], second: [22, 24, 22], eng: [1.0, 0.55, 0.2], labels: ['SCARAB'], seed: 1171, wear: 0.7, rust: 0.4, stripes: [0.3, 0.06, 0.03, 0] },
     cricket: { base: [120, 150, 40], accent: [70, 50, 30], second: [30, 30, 26], eng: [1.0, 0.5, 0.2], labels: ['CRICKET'], seed: 1181, wear: 0.85, rust: 0.6, stripes: [0.35, 0.07, 0.04, 0] },
+    dragon: { base: [104, 26, 24], accent: [210, 160, 40], second: [28, 20, 18], pin: [230, 190, 80], eng: [1.0, 0.45, 0.12], labels: ['DRAGON'], seed: 1191, wear: 0.6, rust: 0.3, stripes: [0.35, 0.06, 0.03, 0.006] },
+    hellhound: { base: [42, 36, 34], accent: [226, 96, 22], second: [20, 18, 18], eng: [1.0, 0.45, 0.15], labels: ['HELLHOUND'], seed: 1201, wear: 0.8, rust: 0.5, stripes: [0.3, 0.07, 0.035, 0] },
+    wrecker: { base: [112, 118, 122], accent: [230, 180, 30], second: [36, 34, 32], eng: [1.0, 0.5, 0.2], labels: ['WRECKER'], seed: 1211, wear: 0.9, rust: 0.7, stripes: [0.3, 0.08, 0.04, 0] },
+    spider: { base: [30, 28, 32], accent: [190, 24, 28], second: [64, 60, 64], eng: [1.0, 0.35, 0.2], labels: ['SPIDER'], seed: 1221, wear: 0.6, rust: 0.3, stripes: [0.4, 0.06, 0.03, 0] },
+    shark: { base: [72, 86, 100], accent: [212, 216, 212], second: [24, 28, 32], pin: [200, 40, 40], eng: [1.0, 0.5, 0.2], labels: ['SHARK'], seed: 1231, wear: 0.5, rust: 0.2, stripes: [0.35, 0.06, 0.03, 0.005] },
+    harpy: { base: [150, 112, 60], accent: [70, 30, 30], second: [26, 22, 20], pin: [230, 200, 120], eng: [1.0, 0.5, 0.2], labels: ['HARPY'], seed: 1241, wear: 0.7, rust: 0.4, stripes: [0.35, 0.06, 0.03, 0.005] },
+    viper: { base: [36, 116, 68], accent: [22, 22, 20], second: [20, 30, 22], pin: [230, 200, 40], eng: [0.7, 1.0, 0.3], labels: ['VIPER'], seed: 1251, wear: 0.6, rust: 0.3, stripes: [0.3, 0.06, 0.03, 0.005] },
     empyrean: { base: [226, 229, 234], accent: [28, 52, 120], second: [38, 42, 50], pin: [214, 172, 64], eng: [0.7, 0.85, 1.0], labels: ['EMPYREAN'], seed: 1009, wear: 0.12, stripes: [0.3, 0.05, 0.03, 0.007] },
     hive: { base: [88, 98, 92], accent: [220, 170, 40], second: [32, 36, 34], pin: [230, 230, 220], eng: [0.55, 0.8, 1.0], labels: ['HIVE', 'CV-4', 'HELION NAVY', 'DRONE BAY'], seed: 831, wear: 0.3, stripes: [0.35, 0.05, 0.03, 0.006] },
     barnacle: { base: [96, 104, 96], accent: [200, 130, 40], second: [40, 40, 36], eng: [1.0, 0.5, 0.2], labels: ['BARNACLE', 'XX', 'SALVAGE', 'STAY OFF'], seed: 841, wear: 1.0, rust: 0.8, stripes: [0.3, 0.07, 0.04, 0] },
@@ -2124,6 +2131,27 @@ export function buildCricket(env, liv = 'cricket') {
 export function buildAssessor(env, liv = 'combine') {
   return design(env, liv, DESIGNS.assessor);
 }
+export function buildDragon(env, liv = 'dragon') {
+  return design(env, liv, DESIGNS.dragon);
+}
+export function buildHellhound(env, liv = 'hellhound') {
+  return design(env, liv, DESIGNS.hellhound);
+}
+export function buildWrecker(env, liv = 'wrecker') {
+  return design(env, liv, DESIGNS.wrecker);
+}
+export function buildSpider(env, liv = 'spider') {
+  return design(env, liv, DESIGNS.spider);
+}
+export function buildShark(env, liv = 'shark') {
+  return design(env, liv, DESIGNS.shark);
+}
+export function buildHarpy(env, liv = 'harpy') {
+  return design(env, liv, DESIGNS.harpy);
+}
+export function buildViper(env, liv = 'viper') {
+  return design(env, liv, DESIGNS.viper);
+}
 export function buildEmpyrean(env, liv = 'empyrean') {
   return design(env, liv, DESIGNS.empyrean);
 }
@@ -2500,6 +2528,9 @@ function design(env, liv, D) {
   ship.decals = D.decals;
   return addGreebles(ship, surfaceGrid(ship.group));
 }
+
+// viper body: ten overlapping segments snaking back from the head ([x, y, z, r])
+const VIPER_SEGS = Array.from({ length: 10 }, (_, i) => [+(0.6 * Math.sin(i * 0.8)).toFixed(3), 0, 1 - i * 1.6, +(1.5 - i * 0.09).toFixed(2)]);
 
 const DESIGNS = {
   // pathfinder scout: needle fuselage, one oversized main drive and two outrigger engine pods
@@ -4122,6 +4153,154 @@ const DESIGNS = {
     },
     engines: [{ p: [1.85, -0.3, -7.5], r: 0.5, len: 9, mirror: true }, { p: [0, 0, -7], r: 0.7, len: 10 }],
     slots: { g: [[0.5, 8, -1, 0.4], [-0.5, 8, -1, 0.4]], t: [[0, 4.5, 1, 0.5], [0, -5, 1, 0.5]], m: [[0, -2, -1, 0.45]] },
+  },
+  // clan flagship: a long-necked dragon with bat wings, horns, a spiked tail and a glowing maw
+  dragon: {
+    name: 'Dragon', style: 'pirate', radius: 24, cockpit: [0, 3.2, 5.5], nav: [17.2, 5.5, -1], beacon: [0, 3.05, -3.5],
+    parts: [
+      { s: [[-10, 5, 2.2, 2.0, 0, 2.4], [-6, 7, 3, 2.6, 0, 2.4], [2, 7, 3, 2.6, 0, 2.4], [6, 5, 2.4, 2.0, 0.4, 2.4], [9, 3, 1.4, 1.2, 1.0, 2.2]] },
+      { s: [[8, 2.8, 1.3, 1.1, 1.2, 2.2], [12, 2.2, 1.1, 0.9, 2.0, 2.2], [15.5, 2.2, 1.1, 0.9, 2.6, 2.2]] },
+      { s: [[15, 3.0, 1.2, 1.0, 2.8, 2.2], [18, 3.0, 1.0, 1.0, 2.7, 2.2], [21, 1.6, 0.6, 0.6, 2.5, 2], [22.5, 0.6, 0.2, 0.3, 2.4, 2]] },
+      { key: 'dark', s: [[16, 2.4, 0.3, 0.6, 1.4, 2], [21, 1.4, 0.2, 0.4, 1.4, 2], [22, 0.6, 0.1, 0.2, 1.4, 2]] },
+      { s: [[-26, 0.3, 0.2, 0.2, -0.5, 2], [-18, 1.4, 0.8, 0.7, 0, 2], [-10, 2.6, 1.4, 1.2, 0.4, 2.2]] },
+      { key: 'glass', s: [[4, 1.4, 0.05, 0, 2.7, 2], [5.5, 1.2, 0.45, 0, 2.6, 2], [6.8, 0.4, 0.05, 0, 2.4, 2]] },
+    ],
+    fins: [{ pts: [[-7, 0], [3, 0], [5, 6], [2, 13], [-1, 15], [-2, 10], [-5, 12], [-6, 7], [-8, 5]], t: 0.25, at: [3.2, 1.2, 0], roll: -1.27, mirror: true, key: 'dark' }],
+    extra: (k) => {
+      k.add('amber', G.box(1.4, 0.3, 5.5), mat([0, 1.75, 18.7]));
+      k.addMirrored('amber', G.sphere(0.3, 10, 8), mat([1.1, 3.4, 18.5]));
+      k.addMirrored('metal', G.cyl(0.05, 0.3, 3, 8), mat([0.9, 4.25, 15.2], [-1.05, 0, 0]));
+      for (const [z, y, h] of [[9, 2.6, 1.2], [12, 3.0, 1.2], [-12, 1.5, 1.2], [-15, 1.15, 1.0], [-18, 0.8, 0.8], [-21, 0.4, 0.6]]) k.add('accent', G.cyl(0.02, 0.35, h, 8), mat([0, y + h / 2 - 0.1, z]));
+    },
+    engines: [{ p: [2.2, 0, -10], r: 1.1, len: 14, mirror: true }],
+    slots: { g: [[0.8, 19, -1, 0.5], [-0.8, 19, -1, 0.5]], t: [[0, 1, 1, 0.7], [0, -6, 1, 0.7], [0, -2, -1, 0.7], [0, -7, -1, 0.6]], m: [[2, -2, 1, 0.5], [-2, -2, 1, 0.5]] },
+  },
+  // clan gunship with three snarling heads, each carrying a gun
+  hellhound: {
+    name: 'Hellhound', style: 'pirate', radius: 11, cockpit: [0, 2.0, -1], nav: [2.75, 0, -2.5], beacon: [0, 1.75, -6],
+    parts: [
+      { s: [[-7, 3.6, 1.4, 1.2, 0, 2.4], [-4, 5.2, 1.9, 1.6, 0, 2.4], [1, 5.6, 1.8, 1.5, 0, 2.4], [3, 5.0, 1.4, 1.2, 0, 2.4]] },
+      { s: [[2, 1.8, 1.0, 0.9, 0.1, 2.2], [5, 1.9, 0.9, 0.8, 0.1, 2.2], [7.5, 1.2, 0.5, 0.5, 0, 2], [8.8, 0.4, 0.15, 0.2, 0, 2]] },
+      { at: [1.9, -0.2, 0], mirror: true, s: [[1.5, 1.6, 0.9, 0.8, 0, 2.2], [4, 1.7, 0.8, 0.7, 0, 2.2], [6.2, 1.1, 0.45, 0.45, 0, 2], [7.4, 0.4, 0.15, 0.2, 0, 2]] },
+      { key: 'glass', s: [[-2.5, 1.6, 0.05, 0, 1.7, 2], [-1, 1.4, 0.45, 0, 1.6, 2], [0.5, 0.5, 0.05, 0, 1.45, 2]] },
+    ],
+    extra: (k) => {
+      k.add('accent', G.torus(0.95, 0.12, 6, 20), mat([0, 0.1, 3.4]));
+      k.addMirrored('accent', G.torus(0.85, 0.12, 6, 20), mat([1.9, -0.2, 3.4]));
+      for (const [x, y] of [[0.5, 1.3], [-0.5, 1.3], [1.45, 0.9], [2.35, 0.9]]) k.addMirrored('dark', G.cyl(0.02, 0.25, 0.8, 6), mat([x, y, 3.6], [-0.4, 0, 0]));
+      k.addMirrored('amber', G.sphere(0.14, 8, 6), mat([0.55, 0.55, 6.3]));
+      for (const x of [1.4, 2.4]) k.addMirrored('amber', G.sphere(0.13, 8, 6), mat([x, 0.2, 5.2]));
+      for (const z of [-6, -2.5]) k.add('dark', G.cyl(0.02, 0.3, 1.0, 6), mat([0, 1.9, z], [-0.5, 0, 0]));
+    },
+    engines: [{ p: [1.1, 0, -7], r: 0.7, len: 9, mirror: true }],
+    slots: { g: [[0, 7, -1, 0.45], [1.9, 5.8, -1, 0.4], [-1.9, 5.8, -1, 0.4]], t: [[0, -4.5, 1, 0.55]], m: [[0, -3, -1, 0.45]] },
+  },
+  // clan brawler swinging a spiked wrecking ball on a chain from a forward boom
+  wrecker: {
+    name: 'Wrecker', style: 'pirate', radius: 13, cockpit: [0, 2.4, -3], nav: [2.25, 0.8, -6.2], beacon: [0, 3.95, 11],
+    parts: [
+      { s: [[-7, 4.2, 1.8, 1.6, 0, 3.2], [-3, 4.8, 2.2, 1.8, 0, 3.2], [3, 4.6, 2.0, 1.7, 0, 3.2], [5, 3.6, 1.4, 1.3, 0, 3]] },
+      { key: 'glass', s: [[-4.5, 2.4, 0.05, 0, 2.15, 2.4], [-3, 2.2, 0.6, 0, 2.1, 2.4], [-1.5, 1.0, 0.1, 0, 1.9, 2.4]] },
+    ],
+    extra: (k) => {
+      k.add('accent', G.box(0.6, 0.6, 10), mat([0, 2.9, 6.4], [-0.15, 0, 0]));
+      k.addMirrored('metal', G.box(0.25, 0.25, 4), mat([0.5, 2.6, 4], [-0.35, 0.12, 0]));
+      [3.2, 2.65, 2.1, 1.55, 1.0, 0.45].forEach((y, i) => k.add('metal', G.torus(0.35, 0.09, 5, 12), mat([0, y, 11.1], [0, i % 2 ? Math.PI / 2 : 0, 0], [0.7, 1, 1])));
+      k.add('dark', G.sphere(1.6, 16, 12), mat([0, -1.4, 11.1]));
+      for (const r of [[0, 0, -Math.PI / 2], [0, 0, Math.PI / 2], [Math.PI / 2, 0, 0], [-Math.PI / 2, 0, 0], [Math.PI, 0, 0]]) {
+        const d = new THREE.Vector3(0, 1, 0).applyEuler(new THREE.Euler(...r));
+        k.add('metal', G.cyl(0.02, 0.25, 0.9, 6), mat([d.x * 1.9, -1.4 + d.y * 1.9, 11.1 + d.z * 1.9], r));
+      }
+      k.addMirrored('dark', G.rbox(0.3, 2.2, 7, 0.1), mat([2.35, -0.2, -1]));
+    },
+    engines: [{ p: [1.3, 0, -7], r: 0.8, len: 10, mirror: true }],
+    slots: { g: [[0.8, 3.5, -1, 0.45], [-0.8, 3.5, -1, 0.45]], t: [[0, -6, 1, 0.55], [0, -3, -1, 0.55]] },
+  },
+  // clan boarding craft: a black abdomen and thorax on eight jointed legs, with fangs and a cluster of eyes
+  spider: {
+    name: 'Spider', style: 'pirate', radius: 10, cockpit: [0, 1.6, 2.4], nav: [2.3, 0.4, -3], beacon: [0, 2.05, -6],
+    parts: [
+      { s: [[-7, 2.4, 1.2, 1.0, 0.4, 2], [-5, 4.4, 2.2, 1.8, 0.4, 2], [-2, 4.6, 2.3, 1.9, 0.4, 2], [0, 3.0, 1.4, 1.2, 0.2, 2]] },
+      { s: [[-0.5, 2.6, 1.2, 1.0, 0, 2.2], [2, 3.2, 1.4, 1.1, 0, 2.2], [4.5, 2.6, 1.1, 0.9, 0, 2.2], [6, 1.4, 0.6, 0.5, 0, 2]] },
+      { key: 'glass', s: [[1, 1.4, 0.05, 0, 1.15, 2], [2.4, 1.3, 0.5, 0, 1.15, 2], [3.8, 0.6, 0.1, 0, 1.0, 2]] },
+    ],
+    extra: (k) => {
+      const seg = (key, a, b, t) => {
+        const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length();
+        d.normalize();
+        k.addMirrored(key, G.box(L + t, t, t), mat([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2], [0, Math.atan2(-d.z, d.x), Math.asin(d.y)]));
+      };
+      [[3.6, 1.6, 3.0], [2.2, 0.5, 1.0], [0.6, -0.5, -1.0], [-1.0, -1.6, -3.0]].forEach(([z, sk, sf]) => {
+        const root = [1.0, 0.2, z], knee = [4.0, 2.1, z + sk], foot = [5.6, -2.0, z + sf];
+        seg('hull', root, knee, 0.36);
+        seg('dark', knee, foot, 0.3);
+        k.addMirrored('accent', G.sphere(0.3, 8, 6), mat(knee));
+      });
+      k.addMirrored('metal', G.cyl(0.03, 0.15, 0.8, 6), mat([0.35, -0.58, 5.88], [2.36, 0, 0]));
+      for (const p of [[0.3, 0.45, 5.6], [0.6, 0.3, 5.3], [0.25, 0.65, 5.2]]) k.addMirrored('amber', G.sphere(0.13, 8, 6), mat(p));
+    },
+    engines: [{ p: [0, 0.4, -7], r: 0.8, len: 9 }],
+    slots: { g: [[0.5, 4.5, -1, 0.4], [-0.5, 4.5, -1, 0.4]], t: [[0, -3.5, 1, 0.5]], m: [[0, -3.5, -1, 0.45]] },
+  },
+  // clan raider shaped like a shark: dorsal fin, pectoral fins, a forked tail and gill slits
+  shark: {
+    name: 'Shark', style: 'pirate', radius: 12, cockpit: [0, 1.7, 2.6], nav: [4.9, -1.38, -3], beacon: [0, 4.75, -1.5],
+    parts: [
+      { s: [[-9, 0.9, 0.5, 0.5, 0.2, 2], [-6, 2.4, 1.2, 1.1, 0.1, 2.2], [-1, 3.4, 1.7, 1.5, 0, 2.2], [4, 3.0, 1.5, 1.3, 0, 2.2], [7, 1.8, 1.0, 0.9, -0.1, 2.2], [9.5, 0.4, 0.3, 0.3, -0.2, 2]] },
+      { key: 'glass', s: [[1, 1.6, 0.05, 0, 1.4, 2], [2.6, 1.4, 0.45, 0, 1.35, 2], [4.2, 0.5, 0.05, 0, 1.2, 2]] },
+    ],
+    fins: [
+      { pts: [[-4.5, 0], [-2, 3.4], [-1, 3.4], [0.5, 0]], t: 0.3, at: [0, 1.4, 0] },
+      { pts: [[-1, 0], [-3.5, 3.6], [-2.5, 3.8], [2, 0]], t: 0.22, at: [1.4, -0.5, 0], roll: -1.82, mirror: true },
+      { pts: [[-7.5, 0], [-11, 3.4], [-10, 3.4], [-6.5, 0]], t: 0.22, at: [0, 0.2, 0] },
+      { pts: [[-7.5, 0], [-10.5, 2.2], [-9.6, 2.2], [-6.5, 0]], t: 0.22, at: [0, 0.2, 0], roll: Math.PI },
+    ],
+    extra: (k) => {
+      for (const z of [4.6, 5.1, 5.6]) k.addMirrored('dark', G.box(0.12, 0.9, 0.12), mat([1.5 - (z - 4) * 0.2, 0, z], [0.3, 0, 0]));
+      k.addMirrored('amber', G.sphere(0.16, 8, 6), mat([0.92, 0.35, 6.4]));
+      k.add('dark', G.box(1.4, 0.12, 1.2), mat([0, -0.8, 7.6]));
+      k.addMirrored('dark', G.rbox(0.9, 0.9, 3, 0.15), mat([1.35, -0.3, -4.2]));
+    },
+    engines: [{ p: [1.35, -0.3, -5.7], r: 0.5, len: 9, mirror: true }],
+    slots: { g: [[0.6, 5, -1, 0.4], [-0.6, 5, -1, 0.4]], t: [[0, -6, 1, 0.5]], m: [[0, -3, -1, 0.45]] },
+  },
+  // clan fighter on forward-swept wings ending in talons
+  harpy: {
+    name: 'Harpy', style: 'pirate', radius: 8, cockpit: [0, 1.0, 1.5], nav: [5.2, 0.45, 1.2], beacon: [0, 0.9, -4.3],
+    parts: [
+      { s: [[-5, 1.4, 0.8, 0.7, 0, 2.2], [-2, 2.0, 1.0, 0.8, 0, 2.2], [2, 1.8, 0.9, 0.7, 0, 2.2], [4.5, 0.9, 0.5, 0.4, -0.05, 2], [6, 0.2, 0.1, 0.1, -0.1, 2]] },
+      { key: 'glass', s: [[0, 1.0, 0.05, 0, 0.85, 2], [1.5, 0.9, 0.4, 0, 0.8, 2], [3, 0.3, 0.05, 0, 0.5, 2]] },
+    ],
+    fins: [
+      { pts: [[-4, 0], [-1, 0], [2.6, 4.6], [1.4, 4.8]], t: 0.22, at: [0.8, 0, 0], roll: -1.47, mirror: true },
+      { pts: [[-1, 0], [-3, 1.4], [-2.2, 1.5], [0, 0]], t: 0.15, at: [0, 0.8, -0.5], key: 'accent' },
+      { pts: [[-5, 0], [-7, 1.6], [-6.3, 1.7], [-3.8, 0]], t: 0.15, at: [0.4, 0.5, 0], roll: -0.6, mirror: true, key: 'accent' },
+    ],
+    extra: (k) => {
+      for (const [x, z] of [[5.3, 2.4], [4.8, 2.2], [5.7, 2.0]]) k.addMirrored('metal', G.cyl(0.02, 0.12, 1.0, 6), mat([x, 0.15, z + 0.43], [2.09, 0, 0]));
+    },
+    engines: [{ p: [0, 0, -5], r: 0.65, len: 8 }],
+    slots: { g: [[2.5, -1, -1, 0.35], [-2.5, -1, -1, 0.35]], m: [[0, -1, -1, 0.35]] },
+  },
+  // clan torpedo boat: a snaking segmented body behind a hooded cobra head with fangs
+  viper: {
+    name: 'Viper', style: 'pirate', radius: 15, cockpit: [0, 1.4, 3.5], nav: [1.38, 0, 3.5], beacon: [0, 2.15, 1.5], hs: VIPER_SEGS,
+    parts: [
+      { s: [[0.5, 2.4, 1.2, 1.1, 0, 2.2], [3.5, 2.8, 1.1, 1.0, 0, 2.2], [6.5, 2.0, 0.75, 0.7, -0.05, 2.2], [8.6, 0.6, 0.25, 0.25, -0.1, 2]] },
+      { key: 'glass', s: [[2, 1.4, 0.05, 0, 1.0, 2], [3.5, 1.3, 0.45, 0, 1.0, 2], [5, 0.5, 0.05, 0, 0.9, 2]] },
+    ],
+    extra: (k) => {
+      VIPER_SEGS.forEach(([x, y, z, r], i) => {
+        k.add(i % 2 ? 'dark' : 'hull', G.sphere(r, 14, 10), mat([x, y, z], [0, 0, 0], [1, 0.9, 1.25]));
+        if (i % 2 === 0) k.add('accent', G.torus(r * 0.98, 0.09, 5, 16), mat([x, y, z], [0, 0, 0], [1, 0.9, 1]));
+      });
+      k.add('accent', G.sphere(1, 16, 10), mat([0, 0.2, 1.6], [-0.25, 0, 0], [2.6, 2.0, 0.3]));
+      k.addMirrored('amber', G.sphere(0.3, 8, 6), mat([1.1, 0.6, 1.3], [-0.25, 0, 0], [1, 1, 0.4]));
+      k.addMirrored('amber', G.sphere(0.15, 8, 6), mat([0.85, 0.45, 6.2]));
+      k.addMirrored('metal', G.cyl(0.02, 0.1, 0.7, 6), mat([0.4, -0.85, 7.6], [Math.PI, 0, 0]));
+    },
+    engines: [{ p: [0.48, 0, -14.1], r: 0.55, len: 9 }],
+    slots: { g: [[0.5, 5.5, -1, 0.4], [-0.5, 5.5, -1, 0.4]], t: [[-0.6, -8.6, 1, 0.5]], m: [[0.6, -2.2, 1, 0.5], [-0.03, -5.4, 1, 0.5]] },
   },
   empyrean: {
     name: 'Empyrean', style: 'sleek', radius: 46, tile: 9, cockpit: [0, 10.2, -9.4], nav: [15.6, -1, -27], beacon: [0, 12.6, -14],

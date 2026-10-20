@@ -160,6 +160,13 @@ const STATS = {
   navyGladius: { cls: 'Helion Navy Gladius', shield: 600, armor: 500, hull: 400, speed: 320, accel: 105, turn: 1.05, bounty: 0, sig: 0.7 },
   navyHalberd: { cls: 'Helion Navy Halberd', shield: 1800, armor: 1700, hull: 1400, speed: 190, accel: 42, turn: 0.45, bounty: 0, sig: 1.9 },
   secExecutor: { cls: 'Combine Executor Battleship', shield: 4400, armor: 5000, hull: 3600, speed: 115, accel: 19, turn: 0.22, bounty: 0, sig: 3.6, hullId: 'executor' },
+  dragon: { cls: 'Dragon Clan Flagship', shield: 2700, armor: 4000, hull: 3000, speed: 160, accel: 28, turn: 0.32, bounty: 340000, sig: 3.0, hullId: 'dragon', ai: 'gunship', gunDmg: 44, orbit: 3000 },
+  hellhound: { cls: 'Hellhound Clan Gunship', shield: 660, armor: 1300, hull: 1050, speed: 235, accel: 58, turn: 0.65, bounty: 60000, sig: 1.4, hullId: 'hellhound', ai: 'gunship', gunDmg: 20, orbit: 1300 },
+  wrecker: { cls: 'Wrecker Clan Brawler', shield: 480, armor: 1600, hull: 1250, speed: 210, accel: 48, turn: 0.55, bounty: 42000, sig: 1.5, hullId: 'wrecker', ai: 'gunship', gunDmg: 18, orbit: 900 },
+  spider: { cls: 'Spider Clan Boarding Craft', shield: 430, armor: 860, hull: 720, speed: 265, accel: 78, turn: 0.85, bounty: 30000, sig: 1.0, hullId: 'spider', ai: 'fighter', gunDmg: 13 },
+  shark: { cls: 'Shark Clan Raider', shield: 400, armor: 680, hull: 580, speed: 340, accel: 98, turn: 0.95, bounty: 34000, sig: 0.9, hullId: 'shark', ai: 'fighter', gunDmg: 14 },
+  harpy: { cls: 'Harpy Clan Talon Fighter', shield: 210, armor: 300, hull: 250, speed: 335, accel: 120, turn: 1.2, bounty: 18000, sig: 0.7, hullId: 'harpy', ai: 'fighter', gunDmg: 10 },
+  viper: { cls: 'Viper Clan Torpedo Boat', shield: 580, armor: 960, hull: 820, speed: 255, accel: 62, turn: 0.7, bounty: 56000, sig: 1.2, hullId: 'viper', ai: 'gunship', gunDmg: 16, orbit: 2200 },
   cricket: { cls: 'Cricket Clan Hopper', shield: 190, armor: 280, hull: 240, speed: 315, accel: 105, turn: 1.1, bounty: 14000, sig: 0.7, hullId: 'cricket', ai: 'fighter', gunDmg: 9 },
   scarab: { cls: 'Scarab Clan Beetle Gunship', shield: 560, armor: 1200, hull: 950, speed: 225, accel: 54, turn: 0.6, bounty: 52000, sig: 1.4, hullId: 'scarab', ai: 'gunship', gunDmg: 16, orbit: 1200 },
   navyMarlin: { cls: 'Helion Navy Marlin', shield: 440, armor: 330, hull: 320, speed: 360, accel: 115, turn: 1.2, bounty: 0, sig: 0.7 },
@@ -206,7 +213,7 @@ const STATS = {
   secEnforcer: { cls: 'Combine Security Enforcer', shield: 650, armor: 550, hull: 450, speed: 215, accel: 62, turn: 0.6, bounty: 0, sig: 1.0, hullId: 'enforcer' },
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
-const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.78 ? 'banshee' : r < 0.86 ? 'scythe' : r < 0.92 ? 'leech' : r < 0.95 ? 'ratchet' : r < 0.98 ? 'cricket' : 'raider'; };
+const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.78 ? 'banshee' : r < 0.86 ? 'scythe' : r < 0.92 ? 'leech' : r < 0.94 ? 'ratchet' : r < 0.955 ? 'cricket' : r < 0.97 ? 'harpy' : r < 0.98 ? 'shark' : r < 0.99 ? 'spider' : 'raider'; };
 const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini', navyHammerhead: 'hammerhead', navyTrident: 'trident', navyAegis: 'aegis', navyManta: 'manta', navyCorona: 'corona', navyPike: 'pike', navyHive: 'hive', navyEmpyrean: 'empyrean', navyWyvern: 'wyvern', navyBasilisk: 'basilisk', navyMirage: 'mirage', navyPhalanx: 'phalanx', navyHarpoon: 'harpoon', navyMarlin: 'marlin', navyCyclops: 'cyclops', navyCondor: 'condor' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
@@ -744,7 +751,7 @@ function buildEncounters(def) {
   if (dg > 0) for (const loc of LOCATIONS.filter((l) => l.icon === 'belt')) {
     out.push({ loc, ships: [], timer: 0, wave: 0, spawn() {
       const n = 2 + dg + Math.min(3, this.wave), o = [];
-      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger', 'gantry', 'scythe', 'hermit', 'leech', 'totem', 'kraken', 'barnacle', 'furnace', 'magpie', 'anvil', 'galleon', 'scarab'][Math.floor(Math.random() * 23)], 3500]);
+      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger', 'gantry', 'scythe', 'hermit', 'leech', 'totem', 'kraken', 'barnacle', 'furnace', 'magpie', 'anvil', 'galleon', 'scarab', 'hellhound', 'wrecker', 'viper', 'dragon'][Math.floor(Math.random() * 27)], 3500]);
       for (let i = 0; i < n; i++) o.push([lightPirate(), 2500 + Math.random() * 3000]);
       return o;
     } });
