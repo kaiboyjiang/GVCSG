@@ -160,6 +160,11 @@ const STATS = {
   navyGladius: { cls: 'Helion Navy Gladius', shield: 600, armor: 500, hull: 400, speed: 320, accel: 105, turn: 1.05, bounty: 0, sig: 0.7 },
   navyHalberd: { cls: 'Helion Navy Halberd', shield: 1800, armor: 1700, hull: 1400, speed: 190, accel: 42, turn: 0.45, bounty: 0, sig: 1.9 },
   secExecutor: { cls: 'Combine Executor Battleship', shield: 4400, armor: 5000, hull: 3600, speed: 115, accel: 19, turn: 0.22, bounty: 0, sig: 3.6, hullId: 'executor' },
+  magpie: { cls: 'Magpie Clan Scavenger', shield: 440, armor: 740, hull: 740, speed: 215, accel: 48, turn: 0.65, bounty: 34000, sig: 1.3, hullId: 'magpie', ai: 'gunship', gunDmg: 12, orbit: 1300 },
+  anvil: { cls: 'Anvil Clan Ram', shield: 480, armor: 1650, hull: 1200, speed: 235, accel: 60, turn: 0.55, bounty: 60000, sig: 1.7, hullId: 'anvil', ai: 'gunship', gunDmg: 18, orbit: 1100 },
+  navyWyvern: { cls: 'Helion Navy Wyvern', shield: 2000, armor: 1800, hull: 1400, speed: 210, accel: 44, turn: 0.5, bounty: 0, sig: 1.9 },
+  navyBasilisk: { cls: 'Helion Navy Basilisk', shield: 2300, armor: 3000, hull: 2100, speed: 160, accel: 28, turn: 0.38, bounty: 0, sig: 2.3 },
+  secTribunal: { cls: 'Combine Tribunal Cruiser', shield: 2900, armor: 3300, hull: 2500, speed: 165, accel: 28, turn: 0.32, bounty: 0, sig: 2.6, hullId: 'tribunal' },
   barnacle: { cls: 'Barnacle Clan Salvage Brawler', shield: 460, armor: 1000, hull: 920, speed: 185, accel: 38, turn: 0.55, bounty: 40000, sig: 1.5, hullId: 'barnacle', ai: 'gunship', gunDmg: 14, orbit: 1300 },
   furnace: { cls: 'Furnace Clan Torch Bomber', shield: 380, armor: 560, hull: 560, speed: 265, accel: 76, turn: 0.75, bounty: 52000, sig: 1.6, hullId: 'furnace', ai: 'gunship', gunDmg: 16, orbit: 1500 },
   navyPike: { cls: 'Helion Navy Pike', shield: 400, armor: 280, hull: 280, speed: 325, accel: 115, turn: 1.4, bounty: 0, sig: 0.7 },
@@ -190,7 +195,7 @@ const STATS = {
   secCompliance: { cls: 'Combine Compliance Cruiser', shield: 1500, armor: 1400, hull: 1100, speed: 130, accel: 26, turn: 0.3, bounty: 0, sig: 2.2, hullId: 'compliance' },
 };
 const lightPirate = () => { const r = Math.random(); return r < 0.22 ? 'cutlass' : r < 0.4 ? 'jackal' : r < 0.55 ? 'hyena' : r < 0.68 ? 'wasp' : r < 0.78 ? 'banshee' : r < 0.86 ? 'scythe' : r < 0.92 ? 'leech' : 'raider'; };
-const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini', navyHammerhead: 'hammerhead', navyTrident: 'trident', navyAegis: 'aegis', navyManta: 'manta', navyCorona: 'corona', navyPike: 'pike', navyHive: 'hive', navyEmpyrean: 'empyrean' };
+const NAVY_HULL = { navyKestrel: 'kestrel', navyWarden: 'warden', navyBastion: 'bastion', navyMantis: 'mantis', navySabre: 'sabre', navyHarbinger: 'harbinger', navyCitadel: 'citadel', navyLancer: 'lancer', navyOsprey: 'osprey', navyTempest: 'tempest', navyKite: 'kite', navyBulwark: 'bulwark', navyRanger: 'ranger', navyRampart: 'rampart', navyGladius: 'gladius', navyHalberd: 'halberd', navyHalo: 'halo', navyTriad: 'triad', navyGemini: 'gemini', navyHammerhead: 'hammerhead', navyTrident: 'trident', navyAegis: 'aegis', navyManta: 'manta', navyCorona: 'corona', navyPike: 'pike', navyHive: 'hive', navyEmpyrean: 'empyrean', navyWyvern: 'wyvern', navyBasilisk: 'basilisk' };
 const pirateName = (kind) => (kind === 'raider' ? PIRATE_NAMES[Math.floor(Math.random() * PIRATE_NAMES.length)] : kind === 'cruiser' ? 'Corsair Marauder' : `Corsair ${HULLS[STATS[kind].hullId].name}`);
 const PIRATE_NAMES = ['Corsair Raider', 'Corsair Cutthroat', 'Corsair Wrecker', 'Corsair Outlaw', 'Corsair Plunderer', 'Corsair Despoiler'];
 const PROFILES = { em: { s: 1.25, a: 0.7, h: 1 }, kinetic: { s: 0.85, a: 1.2, h: 1 }, explosive: { s: 0.9, a: 1.1, h: 1.2 }, thermal: { s: 1.0, a: 0.95, h: 1.1 } };
@@ -727,7 +732,7 @@ function buildEncounters(def) {
   if (dg > 0) for (const loc of LOCATIONS.filter((l) => l.icon === 'belt')) {
     out.push({ loc, ships: [], timer: 0, wave: 0, spawn() {
       const n = 2 + dg + Math.min(3, this.wave), o = [];
-      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger', 'gantry', 'scythe', 'hermit', 'leech', 'totem', 'kraken', 'barnacle', 'furnace'][Math.floor(Math.random() * 19)], 3500]);
+      if (dg >= 2 && this.wave >= 1) o.push([['cruiser', 'reaver', 'buccaneer', 'vulture', 'scorpion', 'brigand', 'warlord', 'mauler', 'junker', 'gorger', 'gorger', 'gantry', 'scythe', 'hermit', 'leech', 'totem', 'kraken', 'barnacle', 'furnace', 'magpie', 'anvil'][Math.floor(Math.random() * 21)], 3500]);
       for (let i = 0; i < n; i++) o.push([lightPirate(), 2500 + Math.random() * 3000]);
       return o;
     } });
@@ -2219,7 +2224,7 @@ starmap.onToggle = (on) => {
 const NAVY_NAMES = ['HNS Vigilant', 'HNS Swift', 'HNS Harrier', 'HNS Bulwark', 'HNS Talon', 'HNS Resolute', 'HNS Aegis', 'HNS Lancer', 'HNS Sentinel', 'HNS Valor'];
 const HAULER_LINES = ['Orca Logistics', 'Kaltos Freight', 'Vexal Trading Co.', 'Helion Supply', 'Aster Bulk Lines'];
 // civilian traffic: the classic hauler plus catalogue freighters and liners
-const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier'], ['tern', 'Shuttle'], ['ox', 'Heavy Hauler'], ['heron', 'Survey Ship'], ['caravel', 'Trader'], ['pelican', 'Tanker'], ['starling', 'Yacht'], ['prospector', 'Mining Barge'], ['mercy', 'Hospital Ship'], ['grapple', 'Salvage Tug'], ['comet', 'Racer'], ['nomad', 'Habitat Trader'], ['skiff', 'Runabout'], ['pearl', 'Liner'], ['orchard', 'Farm Ship'], ['zephyr', 'Sail Yacht'], ['convoy', 'Road Train'], ['spindle', 'Express Courier'], ['prism', 'Science Vessel']];
+const CIVIL_TYPES = [[null, 'Hauler'], ['mule', 'Freighter'], ['atlas', 'Bulk Freighter'], ['aurora', 'Liner'], ['courier', 'Express Courier'], ['tern', 'Shuttle'], ['ox', 'Heavy Hauler'], ['heron', 'Survey Ship'], ['caravel', 'Trader'], ['pelican', 'Tanker'], ['starling', 'Yacht'], ['prospector', 'Mining Barge'], ['mercy', 'Hospital Ship'], ['grapple', 'Salvage Tug'], ['comet', 'Racer'], ['nomad', 'Habitat Trader'], ['skiff', 'Runabout'], ['pearl', 'Liner'], ['orchard', 'Farm Ship'], ['zephyr', 'Sail Yacht'], ['convoy', 'Road Train'], ['spindle', 'Express Courier'], ['prism', 'Science Vessel'], ['albatross', 'Explorer'], ['lantern', 'Observation Liner']];
 const LINER_LINES = ['Aurora Starlines', 'Helion Spaceways', 'Mirel Cruise Lines', 'Tessaly Interstellar'];
 const CORP_CIVIL = [['crate', 'Vanta Logistics Crate'], ['crate', 'Combine Freight Division Crate'], ['commuter', 'Vanta Labour Transit Commuter']];
 const secName = (kind) => `Combine Security ${HULLS[STATS[kind].hullId].name} ${String(100 + Math.floor(Math.random() * 900))}`;
@@ -2230,7 +2235,7 @@ function populate(def, from) {
   if (def.gov === 'gov') {
     let ni = 0;
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius', 'navyTriad', 'navyGemini', 'navyHalo', 'navyHammerhead', 'navyTrident', 'navyAegis', 'navyManta', 'navyCorona', 'navyPike', 'navyHive', 'navyEmpyrean'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
+      const kinds = st.dock === 'high' ? ['navyWarden', 'navyKestrel', 'navyKestrel', 'navyBastion', 'navyMantis', 'navySabre', 'navyHarbinger', 'navyCitadel', 'navyLancer', 'navyTempest', 'navyOsprey', 'navyBulwark', 'navyKite', 'navyRanger', 'navyRampart', 'navyHalberd', 'navyGladius', 'navyTriad', 'navyGemini', 'navyHalo', 'navyHammerhead', 'navyTrident', 'navyAegis', 'navyManta', 'navyCorona', 'navyPike', 'navyHive', 'navyEmpyrean', 'navyWyvern', 'navyBasilisk'] : st.kind === 'station' ? ['navyKestrel', 'navyGladius', 'navyRanger', 'navyMantis', 'navyOsprey', 'navyKite', 'navyWarden'].slice(0, Math.round(def.sec * 3)) : ['navyKestrel'].slice(0, def.sec >= 0.5 ? 1 : 0);
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) {
         const n = makeEntity(kind, 'navy', home.clone().add(jitter(6000)), NAVY_NAMES[ni++ % NAVY_NAMES.length]);
@@ -2250,7 +2255,7 @@ function populate(def, from) {
   } else if (def.gov === 'corp') {
     // Combine Security: cheap hulls in numbers, guarding company property; licensed traffic is left alone
     for (const st of LOCATIONS.filter((l) => l.dock)) {
-      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secArbiter', 'secExecutor', 'secMonolith', 'secLiquidator', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secLiquidator', 'secCollector', 'secBailiff', 'secLedger', 'secBinder', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secCollector', 'secNotary', 'secBailiff', 'secUnit'];
+      const kinds = st.kind === 'tower' ? (def.hq ? ['secCompliance', 'secArbiter', 'secExecutor', 'secTribunal', 'secMonolith', 'secLiquidator', 'secEnforcer', 'secEnforcer', 'secUnit', 'secUnit', 'secUnit'] : ['secCompliance', 'secLiquidator', 'secCollector', 'secBailiff', 'secLedger', 'secBinder', 'secEnforcer', 'secUnit', 'secUnit']) : ['secEnforcer', 'secAuditor', 'secCollector', 'secNotary', 'secBailiff', 'secUnit'];
       const home = st.up ? st.pos.clone().addScaledVector(st.up, 5000) : st.pos;
       for (const kind of kinds) makeEntity(kind, 'corp', home.clone().add(jitter(6000)), secName(kind)).ai.home.copy(home);
     }

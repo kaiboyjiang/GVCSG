@@ -102,6 +102,12 @@ export function livery(name, env) {
     pike: { base: [190, 196, 204], accent: [200, 40, 50], second: [36, 38, 44], pin: [240, 240, 240], eng: [0.55, 0.85, 1.0], labels: ['PIKE', 'LF-2', 'HELION', 'MUZZLE'], seed: 801, wear: 0.2, stripes: [0.4, 0.05, 0.03, 0.006] },
     spindle: { base: [236, 236, 240], accent: [20, 130, 160], second: [50, 54, 62], pin: [230, 170, 50], eng: [0.6, 0.85, 1.0], labels: ['SPINDLE', 'CX-9', 'PRIORITY', 'EXPRESS'], seed: 811, wear: 0.08, stripes: [0.45, 0.05, 0.03, 0.005] },
     prism: { base: [176, 186, 200], accent: [120, 70, 190], second: [40, 42, 50], pin: [220, 230, 240], eng: [0.6, 0.8, 1.0], labels: ['PRISM', 'SV-3', 'SCIENCE', 'LASER RADIATION'], seed: 821, wear: 0.15, stripes: [0.4, 0.05, 0.03, 0.006] },
+    albatross: { base: [226, 222, 210], accent: [30, 110, 150], second: [44, 46, 52], pin: [220, 120, 40], eng: [0.6, 0.85, 1.0], labels: ['ALBATROSS'], seed: 1011, wear: 0.15, stripes: [0.4, 0.05, 0.03, 0.006] },
+    wyvern: { base: [104, 112, 120], accent: [170, 40, 40], second: [34, 36, 42], pin: [220, 220, 220], eng: [0.55, 0.8, 1.0], labels: ['WYVERN'], seed: 1021, wear: 0.3, stripes: [0.35, 0.06, 0.03, 0.006] },
+    lantern: { base: [236, 232, 222], accent: [200, 150, 50], second: [60, 50, 40], pin: [120, 30, 30], eng: [0.7, 0.85, 1.0], labels: ['LANTERN'], seed: 1031, wear: 0.06, stripes: [0.45, 0.05, 0.02, 0.006] },
+    basilisk: { base: [86, 94, 82], accent: [210, 180, 60], second: [30, 32, 30], pin: [20, 20, 20], eng: [0.55, 0.8, 1.0], labels: ['BASILISK'], seed: 1041, wear: 0.4, stripes: [0.3, 0.07, 0.04, 0] },
+    magpie: { base: [52, 54, 60], accent: [236, 236, 236], second: [22, 24, 28], eng: [1.0, 0.5, 0.2], labels: ['MAGPIE'], seed: 1051, wear: 0.9, rust: 0.6, stripes: [0.3, 0.06, 0.04, 0] },
+    anvil: { base: [80, 72, 66], accent: [220, 170, 30], second: [28, 26, 24], eng: [1.0, 0.45, 0.15], labels: ['ANVIL'], seed: 1061, wear: 1.0, rust: 0.9, stripes: [0.2, 0.07, 0.04, 0] },
     empyrean: { base: [226, 229, 234], accent: [28, 52, 120], second: [38, 42, 50], pin: [214, 172, 64], eng: [0.7, 0.85, 1.0], labels: ['EMPYREAN'], seed: 1009, wear: 0.12, stripes: [0.3, 0.05, 0.03, 0.007] },
     hive: { base: [88, 98, 92], accent: [220, 170, 40], second: [32, 36, 34], pin: [230, 230, 220], eng: [0.55, 0.8, 1.0], labels: ['HIVE', 'CV-4', 'HELION NAVY', 'DRONE BAY'], seed: 831, wear: 0.3, stripes: [0.35, 0.05, 0.03, 0.006] },
     barnacle: { base: [96, 104, 96], accent: [200, 130, 40], second: [40, 40, 36], eng: [1.0, 0.5, 0.2], labels: ['BARNACLE', 'XX', 'SALVAGE', 'STAY OFF'], seed: 841, wear: 1.0, rust: 0.8, stripes: [0.3, 0.07, 0.04, 0] },
@@ -2043,6 +2049,27 @@ export function buildSpindle(env, liv = 'spindle') {
 export function buildPrism(env, liv = 'prism') {
   return design(env, liv, DESIGNS.prism);
 }
+export function buildAlbatross(env, liv = 'albatross') {
+  return design(env, liv, DESIGNS.albatross);
+}
+export function buildWyvern(env, liv = 'wyvern') {
+  return design(env, liv, DESIGNS.wyvern);
+}
+export function buildLantern(env, liv = 'lantern') {
+  return design(env, liv, DESIGNS.lantern);
+}
+export function buildBasilisk(env, liv = 'basilisk') {
+  return design(env, liv, DESIGNS.basilisk);
+}
+export function buildMagpie(env, liv = 'magpie') {
+  return design(env, liv, DESIGNS.magpie);
+}
+export function buildAnvil(env, liv = 'anvil') {
+  return design(env, liv, DESIGNS.anvil);
+}
+export function buildTribunal(env, liv = 'combine') {
+  return design(env, liv, DESIGNS.tribunal);
+}
 export function buildEmpyrean(env, liv = 'empyrean') {
   return design(env, liv, DESIGNS.empyrean);
 }
@@ -3666,6 +3693,138 @@ const DESIGNS = {
     },
     engines: [{ p: [1.2, 0, -10.6], r: 0.7, len: 9, mirror: true }],
     slots: { t: [[0, -4, 1, 0.45], [0.3, -6, -1, 0.45]] },
+  },
+  // long-range explorer: slim fuselage on a huge high-aspect wing with tip fuel pods
+  albatross: {
+    name: 'Albatross', style: 'sleek', radius: 20, cockpit: [0, 1.5, 9.3], nav: [16.3, 0.2, -1], beacon: [0, 3.7, -8.5],
+    parts: [
+      { s: [[-10, 2.2, 1.2, 1.0, 0, 2.3], [-6, 2.8, 1.5, 1.2, 0, 2.3], [4, 2.6, 1.4, 1.1, 0, 2.3], [9, 1.8, 1.0, 0.8, 0, 2.3], [12, 0.6, 0.4, 0.3, 0, 2]] },
+      { s: [[-4, 34, 0.22, 0.2, 0.2, 2], [-2.5, 36, 0.3, 0.26, 0.2, 2], [0, 33, 0.3, 0.24, 0.2, 2], [1.5, 26, 0.2, 0.18, 0.2, 2]] },
+      { key: 'glass', s: [[7, 1.4, 0.05, 0, 1.0, 2], [9, 1.3, 0.5, 0, 0.9, 2], [11, 0.4, 0.05, 0, 0.45, 2]] },
+    ],
+    windows: [{ part: 0, ys: [0.3], z0: -6, z1: 6, step: 2, h: 0.35 }],
+    extra: (k) => {
+      k.addMirrored('accent', G.lathe([[0.05, -3], [0.6, -2.4], [0.7, 0], [0.6, 2.4], [0.05, 3]], 16), mat([15.5, 0.2, -1], ALONG_Z));
+      k.addMirrored('dark', G.box(9, 0.12, 1.6), mat([8.5, 0.45, -1.2]));
+      k.add('hull', G.box(0.22, 2.6, 3), mat([0, 2.4, -8.5]));
+      k.add('accent', G.box(0.26, 0.5, 3.04), mat([0, 3.5, -8.5]));
+      k.add('metal', G.cyl(0.08, 0.1, 1.2, 6), mat([0, 1.9, -3]));
+      k.add('metal', G.lathe([[0.02, 0], [0.7, 0.2], [1.0, 0.45], [1.05, 0.5]], 18), mat([0, 2.4, -3], [0.4, 0, 0]));
+    },
+    engines: [{ p: [0, 0, -10], r: 1.0, len: 12 }, { p: [15.5, 0.2, -4], r: 0.45, len: 6, mirror: true }],
+    slots: { t: [[0, 2, 1, 0.4], [0, -3, -1, 0.4]] },
+  },
+  // assault frigate: drooping canards, dorsal hump bridge, splayed twin tails
+  wyvern: {
+    name: 'Wyvern', style: 'std', radius: 18, cockpit: [0, 3.0, 3.2], nav: [3.0, 0, -7], beacon: [0, 3.4, -8],
+    parts: [
+      { s: [[-13, 4.4, 2.0, 1.8, 0, 2.6], [-8, 5.6, 2.6, 2.2, 0, 2.6], [2, 5.2, 2.4, 2.0, 0, 2.6], [9, 3.4, 1.6, 1.3, 0, 2.4], [14, 1.4, 0.7, 0.6, 0, 2.2], [16, 0.3, 0.2, 0.2, 0, 2]] },
+      { at: [0, 1.8, 0], s: [[-10, 2.6, 1.4, 0.4, 0, 2.4], [-4, 3.2, 1.8, 0.4, 0, 2.4], [2, 2.6, 1.4, 0.4, 0, 2.4], [5, 0.8, 0.4, 0.2, 0, 2]] },
+      { key: 'glass', at: [0, 1.8, 0], s: [[1.6, 2.2, 0.05, 0, 1.2, 2.2], [3, 1.9, 0.5, 0, 1.0, 2.2], [4.4, 0.6, 0.05, 0, 0.4, 2.2]] },
+    ],
+    windows: [{ part: 0, ys: [0.4], z0: -6, z1: 8, step: 2, h: 0.4 }],
+    extra: (k) => {
+      k.addMirrored('hull', G.box(4.5, 0.25, 2.4), mat([3.6, -0.6, 8.5], [0, 0, -0.35]));
+      k.addMirrored('accent', G.box(0.5, 0.32, 2.5), mat([5.55, -1.32, 8.5], [0, 0, -0.35]));
+      k.addMirrored('hull', G.box(0.3, 3.6, 4), mat([1.6, 3.6, -10], [0, 0, -0.35]));
+      k.addMirrored('accent', G.box(0.34, 0.5, 4.1), mat([2.15, 5.2, -10], [0, 0, -0.35]));
+      k.addMirrored('dark', G.box(0.4, 1.4, 10), mat([2.75, 0, -2]));
+    },
+    engines: [{ p: [0, 0, -13], r: 1.5, len: 16 }, { p: [2.4, -0.4, -12.4], r: 0.9, len: 10, mirror: true }],
+    slots: { g: [[0.8, 9, -1, 0.5], [-0.8, 9, -1, 0.5]], t: [[0, -5, 1, 0.65], [0, 7, 1, 0.55], [0, -3, -1, 0.65]], m: [[1.8, -6, 1, 0.5], [-1.8, -6, 1, 0.5]] },
+  },
+  // observation liner: a long glass gallery on top and a glass nose
+  lantern: {
+    name: 'Lantern', style: 'sleek', radius: 20, cockpit: [0, 1.6, 13.5], nav: [4.6, -1, -6], beacon: [0, 2.9, -12],
+    parts: [
+      { s: [[-14, 5, 2, 2.2, 0, 2.4], [-8, 6.4, 2.6, 2.6, 0, 2.4], [6, 6.2, 2.4, 2.4, 0, 2.4], [12, 4.4, 1.8, 1.8, 0, 2.4], [15, 2, 0.9, 0.9, 0, 2.2]] },
+      { mirror: true, at: [3.6, -1, 0], s: [[-12, 1.6, 0.9, 0.9, 0, 2], [-8, 1.9, 1.0, 1.0, 0, 2], [0, 1.8, 1.0, 1, 0, 2], [3, 0.6, 0.3, 0.3, 0, 2]] },
+      { key: 'glass', s: [[-9, 4.4, 0.05, 0, 2.1, 2.4], [-7, 4.8, 1.6, 0, 2.0, 2.4], [7, 4.6, 1.5, 0, 1.9, 2.4], [10, 3.6, 0.05, 0, 1.5, 2.4]] },
+    ],
+    windows: [{ part: 0, ys: [0.6, -0.8], z0: -8, z1: 10, step: 1.8, h: 0.5 }],
+    extra: (k) => {
+      k.add('glass', G.sphere(1.6, 18, 10), mat([0, 0, 14.4], [0, 0, 0], [1.2, 0.8, 1.2]));
+      for (const z of [-6, -2, 2, 6]) k.add('metal', G.box(0.14, 0.14, 0.14), mat([0, 3.55, z]));
+      k.add('accent', G.box(6.5, 0.3, 0.6), mat([0, 1.5, -10.5]));
+      k.add('metal', G.cyl(0.05, 0.08, 1.6, 6), mat([0, 2.6, -12]));
+    },
+    engines: [{ p: [3.6, -1, -12], r: 0.8, len: 10, mirror: true }, { p: [0, 0, -14], r: 1.3, len: 12 }],
+    slots: { t: [[0, -11.5, 1, 0.4], [0, 2, -1, 0.45]] },
+  },
+  // heavy gunboat: squat armoured brick with a prow shield and radiator fins
+  basilisk: {
+    name: 'Basilisk', style: 'armor', radius: 17, cockpit: [0, 4.4, -3.4], nav: [5.1, 0, -1], beacon: [0, 5, -6],
+    parts: [
+      { s: [[-11, 8, 3, 2.6, 0, 3.2], [-6, 9, 3.4, 3, 0, 3.2], [4, 8.6, 3.2, 2.8, 0, 3.2], [9, 6.4, 2.6, 2.2, 0, 3], [12, 4, 1.6, 1.4, 0, 2.6]] },
+      { at: [0, 3, 0], s: [[-9, 3, 1.6, 0.4, 0, 2.6], [-5, 3.4, 1.8, 0.4, 0, 2.6], [-3, 2.4, 1.2, 0.4, 0, 2.4]] },
+      { key: 'glass', at: [0, 3, 0], s: [[-4.6, 2.8, 0.05, 0, 1.2, 2.4], [-3.6, 2.4, 0.45, 0, 1.0, 2.4], [-2.8, 1, 0.05, 0, 0.5, 2.4]] },
+    ],
+    extra: (k) => {
+      k.add('dark', G.rbox(7, 4.6, 2.2, 0.3), mat([0, 0.2, 10.4]));
+      k.add('accent', G.box(7.1, 0.6, 2.3), mat([0, 1.6, 10.4]));
+      k.addMirrored('dark', G.rbox(1, 4, 12, 0.2), mat([4.6, 0, -1]));
+      k.addMirrored('metal', G.box(3, 0.15, 5), mat([5.4, 1.5, -8]));
+      k.addMirrored('metal', G.box(3, 0.15, 5), mat([5.4, 0.9, -8]));
+    },
+    engines: [{ p: [2.4, 0, -11], r: 1.4, len: 14, mirror: true }],
+    slots: { g: [[1.2, 10, 1, 0.7], [-1.2, 10, 1, 0.7]], t: [[0, 3, 1, 0.8], [0, -2, -1, 0.8], [0, 6, -1, 0.8]], m: [[2.6, -1, 1, 0.6]] },
+  },
+  // clan scavenger: a salvage crane with a magnet over the nose
+  magpie: {
+    name: 'Magpie', style: 'pirate', radius: 13, cockpit: [0, 2.0, 6.4], nav: [3.5, -0.4, -2], beacon: [0, 3.4, -3],
+    parts: [
+      { s: [[-8, 5, 2.4, 2.2, 0, 2.2], [-4, 6, 2.8, 2.6, 0, 2.2], [3, 5.4, 2.6, 2.3, 0, 2.2], [7, 3.4, 1.8, 1.6, 0, 2.2], [9, 1.4, 0.8, 0.7, 0, 2]] },
+      { key: 'glass', s: [[5.4, 2.4, 0.05, 0, 1.8, 2], [6.8, 2, 0.4, 0, 1.5, 2], [8.4, 0.6, 0.05, 0, 0.7, 2]] },
+    ],
+    extra: (k) => {
+      k.add('dark', G.cyl(1.0, 1.2, 0.8, 16), mat([0, 3.0, -3.6]));
+      k.add('accent', G.box(0.5, 0.5, 10), mat([0, 4.78, 1.18], [-0.3, 0, 0]));
+      k.add('metal', G.box(0.3, 3.2, 0.3), mat([0, 4.7, 6.0]));
+      k.add('metal', G.cyl(1, 1, 0.3, 16), mat([0, 3.0, 6.0]));
+      k.add('accent', G.rbox(1.6, 1.2, 2, 0.1), mat([2.2, 1.8, -6], [0, 0, -0.3]));
+      k.add('dark', G.rbox(1.4, 1.4, 1.8, 0.1), mat([-2.1, 1.7, -5.2], [0, 0, 0.35]));
+      k.addMirrored('dark', G.rbox(1.2, 2.2, 7, 0.15), mat([2.9, -0.4, -2]));
+    },
+    engines: [{ p: [1.6, 0, -8], r: 0.9, len: 10, mirror: true }],
+    slots: { g: [[0, 8, -1, 0.4]], t: [[0, -1, -1, 0.5], [1.5, 1, 1, 0.5]], m: [[0, -6.5, -1, 0.45]] },
+  },
+  // clan ram: an armoured anvil prow with spikes on a short burner body
+  anvil: {
+    name: 'Anvil', style: 'pirate', radius: 14, cockpit: [0, 2.6, -2.4], nav: [4.8, 0, -4], beacon: [0, 2.8, 7.5],
+    parts: [
+      { s: [[-9, 4.6, 2.2, 2, 0, 2.4], [-5, 5.4, 2.6, 2.4, 0, 2.4], [2, 5, 2.4, 2.2, 0, 2.4], [5, 4, 2, 1.8, 0, 2.4]] },
+      { mirror: true, at: [3.6, 0, 0], s: [[-10, 2.2, 1.1, 1.1, 0, 2], [-6, 2.4, 1.2, 1.2, 0, 2], [0, 2, 1, 1, 0, 2], [3, 0.8, 0.4, 0.4, 0, 2]] },
+      { key: 'glass', s: [[-4, 2.2, 0.05, 0, 2.2, 2], [-2.8, 2, 0.45, 0, 2.0, 2], [-1.6, 0.6, 0.05, 0, 1.2, 2]] },
+    ],
+    extra: (k) => {
+      k.add('dark', G.box(9, 5.4, 3.6), mat([0, 0, 6.6]));
+      k.add('metal', G.rbox(8, 4.4, 1.2, 0.2), mat([0, 0, 8.8]));
+      for (const y of [1.6, -1.6]) k.add('accent', G.box(9.1, 0.8, 3.7), mat([0, y, 6.6]));
+      k.addMirrored('accent', G.cyl(0.05, 0.7, 3, 8), mat([3.2, 1.4, 10.6], ALONG_Z));
+      k.addMirrored('accent', G.cyl(0.05, 0.7, 3, 8), mat([3.2, -1.4, 10.6], ALONG_Z));
+      k.addMirrored('metal', G.cyl(0.2, 0.2, 4, 8), mat([1.6, 2.35, -5], ALONG_Z));
+    },
+    engines: [{ p: [0, 0, -9], r: 1.3, len: 14 }, { p: [3.6, 0, -10], r: 0.9, len: 10, mirror: true }],
+    slots: { g: [[2.6, 7, 1, 0.55], [-2.6, 7, 1, 0.55]], t: [[0, 1.5, 1, 0.6], [0, -2, -1, 0.6]], m: [[0, -6, -1, 0.5]] },
+  },
+  // combine cruiser: three stepped slabs like a ziggurat
+  tribunal: {
+    name: 'Tribunal', style: 'armor', radius: 20, cockpit: [0, 7.4, -3.2], nav: [7.6, -0.4, 0], beacon: [0, 8.1, -6],
+    hs: [[0, 0, -8, 6], [0, 0, 0, 6], [0, 0, 8, 6], [0, 4, -3, 5], [0, 0, 14, 4]],
+    parts: [],
+    extra: (k) => {
+      k.add('hull', G.rbox(12, 4, 26, 0.3), mat([0, 0, 0]));
+      k.add('hull', G.rbox(9, 3, 20, 0.3), mat([0, 3.2, -1]));
+      k.add('hull', G.rbox(5.6, 2.4, 12, 0.3), mat([0, 5.6, -3]));
+      k.add('dark', G.rbox(3.6, 1.4, 4, 0.2), mat([0, 7.3, -5]));
+      k.add('glass', G.box(3.2, 0.4, 0.2), mat([0, 7.4, -3.05]));
+      for (const z of [-8, 8]) k.add('accent', G.box(12.1, 0.5, 1.2), mat([0, 0, z]));
+      k.add('accent', G.box(5.7, 0.4, 12.1), mat([0, 5.6, -3]));
+      k.add('dark', G.rbox(10, 3, 4, 0.3), mat([0, -0.2, 14]));
+      k.addMirrored('dark', G.rbox(2, 2.4, 14, 0.2), mat([6.6, -0.4, 0]));
+    },
+    engines: [{ p: [3.5, 1, -13], r: 0.9, len: 10, mirror: true }, { p: [3.5, -1, -13], r: 0.9, len: 10, mirror: true }],
+    slots: { g: [[2.4, 14.5, 1, 0.5], [-2.4, 14.5, 1, 0.5]], t: [[5.3, 4, 1, 0.55], [-5.3, 4, 1, 0.55], [0, -8, -1, 0.65], [0, 6, -1, 0.65], [0, 7, 1, 0.6]], m: [[3, -10, 1, 0.5], [-3, -10, 1, 0.5]] },
   },
   empyrean: {
     name: 'Empyrean', style: 'sleek', radius: 46, tile: 9, cockpit: [0, 10.2, -9.4], nav: [15.6, -1, -27], beacon: [0, 12.6, -14],
