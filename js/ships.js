@@ -114,6 +114,12 @@ export function livery(name, env) {
     harpoon: { base: [40, 58, 92], accent: [230, 190, 40], second: [24, 28, 36], pin: [220, 220, 220], eng: [0.55, 0.8, 1.0], labels: ['HARPOON'], seed: 1101, wear: 0.25, stripes: [0.45, 0.05, 0.03, 0.005] },
     ratchet: { base: [120, 50, 36], accent: [220, 180, 40], second: [30, 28, 26], eng: [1.0, 0.5, 0.2], labels: ['RATCHET'], seed: 1111, wear: 0.9, rust: 0.7, stripes: [0.3, 0.07, 0.04, 0] },
     galleon: { base: [70, 50, 40], accent: [150, 30, 30], second: [26, 22, 20], pin: [200, 160, 60], eng: [1.0, 0.45, 0.15], labels: ['GALLEON'], seed: 1121, wear: 0.8, rust: 0.6, stripes: [0.35, 0.06, 0.03, 0.006] },
+    marlin: { base: [52, 92, 150], accent: [200, 206, 214], second: [26, 30, 38], pin: [240, 200, 60], eng: [0.55, 0.85, 1.0], labels: ['MARLIN'], seed: 1131, wear: 0.15, stripes: [0.4, 0.05, 0.025, 0.005] },
+    carrack: { base: [196, 180, 146], accent: [40, 100, 70], second: [60, 52, 44], pin: [230, 230, 220], eng: [0.6, 0.85, 1.0], labels: ['CARRACK'], seed: 1141, wear: 0.4, stripes: [0.3, 0.07, 0.03, 0] },
+    cyclops: { base: [96, 102, 110], accent: [190, 40, 36], second: [34, 36, 40], pin: [230, 230, 230], eng: [0.55, 0.8, 1.0], labels: ['CYCLOPS'], seed: 1151, wear: 0.3, stripes: [0.45, 0.06, 0.03, 0.006] },
+    condor: { base: [226, 228, 230], accent: [24, 26, 30], second: [70, 74, 80], pin: [200, 40, 40], eng: [0.55, 0.85, 1.0], labels: ['CONDOR'], seed: 1161, wear: 0.2, stripes: [0.35, 0.06, 0.03, 0.006] },
+    scarab: { base: [30, 70, 56], accent: [200, 160, 50], second: [22, 24, 22], eng: [1.0, 0.55, 0.2], labels: ['SCARAB'], seed: 1171, wear: 0.7, rust: 0.4, stripes: [0.3, 0.06, 0.03, 0] },
+    cricket: { base: [120, 150, 40], accent: [70, 50, 30], second: [30, 30, 26], eng: [1.0, 0.5, 0.2], labels: ['CRICKET'], seed: 1181, wear: 0.85, rust: 0.6, stripes: [0.35, 0.07, 0.04, 0] },
     empyrean: { base: [226, 229, 234], accent: [28, 52, 120], second: [38, 42, 50], pin: [214, 172, 64], eng: [0.7, 0.85, 1.0], labels: ['EMPYREAN'], seed: 1009, wear: 0.12, stripes: [0.3, 0.05, 0.03, 0.007] },
     hive: { base: [88, 98, 92], accent: [220, 170, 40], second: [32, 36, 34], pin: [230, 230, 220], eng: [0.55, 0.8, 1.0], labels: ['HIVE', 'CV-4', 'HELION NAVY', 'DRONE BAY'], seed: 831, wear: 0.3, stripes: [0.35, 0.05, 0.03, 0.006] },
     barnacle: { base: [96, 104, 96], accent: [200, 130, 40], second: [40, 40, 36], eng: [1.0, 0.5, 0.2], labels: ['BARNACLE', 'XX', 'SALVAGE', 'STAY OFF'], seed: 841, wear: 1.0, rust: 0.8, stripes: [0.3, 0.07, 0.04, 0] },
@@ -2097,6 +2103,27 @@ export function buildGalleon(env, liv = 'galleon') {
 export function buildWarrant(env, liv = 'combine') {
   return design(env, liv, DESIGNS.warrant);
 }
+export function buildMarlin(env, liv = 'marlin') {
+  return design(env, liv, DESIGNS.marlin);
+}
+export function buildCarrack(env, liv = 'carrack') {
+  return design(env, liv, DESIGNS.carrack);
+}
+export function buildCyclops(env, liv = 'cyclops') {
+  return design(env, liv, DESIGNS.cyclops);
+}
+export function buildCondor(env, liv = 'condor') {
+  return design(env, liv, DESIGNS.condor);
+}
+export function buildScarab(env, liv = 'scarab') {
+  return design(env, liv, DESIGNS.scarab);
+}
+export function buildCricket(env, liv = 'cricket') {
+  return design(env, liv, DESIGNS.cricket);
+}
+export function buildAssessor(env, liv = 'combine') {
+  return design(env, liv, DESIGNS.assessor);
+}
 export function buildEmpyrean(env, liv = 'empyrean') {
   return design(env, liv, DESIGNS.empyrean);
 }
@@ -3977,6 +4004,124 @@ const DESIGNS = {
     },
     engines: [{ p: [2.89, 1.98, -6.5], r: 0.55, len: 9, mirror: true }, { p: [2.89, -1.98, -6.5], r: 0.55, len: 9, mirror: true }],
     slots: { g: [[0.4, 7.5, 1, 0.4], [-0.4, 7.5, 1, 0.4]], t: [[0, -2, 1, 0.5]], m: [[0, -1, -1, 0.45]] },
+  },
+  // billfish interceptor: a long spear nose and a tall dorsal sail
+  marlin: {
+    name: 'Marlin', style: 'sleek', radius: 9, cockpit: [0, 0.9, 2.0], nav: [3.75, -0.2, -2.5], beacon: [0, 2.45, -1.5],
+    parts: [
+      { s: [[-6, 1.8, 0.9, 0.8, 0, 2.2], [-2, 2.2, 1.1, 0.9, 0, 2.2], [3, 1.8, 0.9, 0.7, 0, 2.2], [6, 0.8, 0.4, 0.35, 0, 2.2]] },
+      { key: 'glass', s: [[0.5, 1.0, 0.05, 0, 0.75, 2], [2, 0.9, 0.4, 0, 0.7, 2], [3.6, 0.3, 0.05, 0, 0.4, 2]] },
+    ],
+    extra: (k) => {
+      k.add('metal', G.cyl(0.03, 0.3, 7, 8), mat([0, 0, 9.3], ALONG_Z));
+      k.add('accent', G.box(0.12, 1.6, 6), mat([0, 1.6, -1.5]));
+      k.addMirrored('hull', G.box(3.2, 0.15, 2.2), mat([2.2, -0.2, -2.5], [0, 0.35, 0]));
+      k.addMirrored('hull', G.box(0.12, 1.0, 1.4), mat([0.5, -0.9, -4.8], [0, 0, -0.5]));
+    },
+    engines: [{ p: [0, 0, -6], r: 0.7, len: 9 }],
+    slots: { g: [[0.5, 3, -1, 0.4], [-0.5, 3, -1, 0.4]], m: [[0, -2, -1, 0.4]] },
+  },
+  // bulk trader with outrigger container racks on struts
+  carrack: {
+    name: 'Carrack', style: 'std', radius: 18, tile: 7, cockpit: [0, 2.8, 8.8], nav: [7.25, 0, 0], beacon: [0, 3.4, 8],
+    parts: [
+      { s: [[-12, 4, 2.2, 2, 0, 3], [-8, 4.6, 2.4, 2.2, 0, 3], [8, 4.4, 2.2, 2, 0, 3], [12, 3, 1.6, 1.4, 0, 2.6], [14, 1.2, 0.6, 0.6, 0, 2.2]] },
+    ],
+    windows: [{ part: 0, ys: [0.6], z0: 4, z1: 10, step: 1.5, h: 0.4 }],
+    extra: (k) => {
+      k.add('hull', G.rbox(3, 1.4, 3, 0.2), mat([0, 2.6, 8]));
+      k.add('glass', G.box(2.6, 0.4, 0.15), mat([0, 2.8, 9.52]));
+      for (const z of [-6, 0, 6]) k.addMirrored('metal', G.box(3, 0.4, 0.6), mat([3.6, 0, z]));
+      k.addMirrored('dark', G.box(0.3, 0.3, 18), mat([5.2, 0, 0]));
+      for (const [z, m] of [[-6, 'accent'], [-1.6, 'dark'], [2.8, 'accent']]) k.addMirrored(m, G.box(2, 2, 4), mat([6.2, 0, z]));
+    },
+    engines: [{ p: [1.6, 0, -12], r: 1.1, len: 12, mirror: true }],
+    slots: { t: [[0, -4, 1, 0.45], [0, 4, -1, 0.45]] },
+  },
+  // gunship built behind one huge armoured sensor eye
+  cyclops: {
+    name: 'Cyclops', style: 'armor', radius: 16, cockpit: [0, 3.5, -2.6], nav: [3.1, 0, -4], beacon: [0, 4.1, -4], hs: [[0, 0, 5.5, 3.4]],
+    parts: [
+      { s: [[-12, 4, 2, 2, 0, 2.4], [-8, 5, 2.6, 2.6, 0, 2.4], [2, 5, 2.8, 2.8, 0, 2.4], [4, 4.6, 2.6, 2.6, 0, 2.4]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.sphere(3.4, 24, 16), mat([0, 0, 5.5]));
+      k.add('dark', G.cyl(1.6, 1.6, 0.6, 24), mat([0, 0, 8.7], ALONG_Z));
+      k.add('glass', G.sphere(1.2, 16, 12), mat([0, 0, 8.9]));
+      k.add('accent', G.torus(1.7, 0.12, 8, 32), mat([0, 0, 9.0]));
+      k.add('hull', G.rbox(2, 1.6, 3, 0.2), mat([0, 3.3, -4]));
+      k.add('glass', G.box(1.6, 0.35, 0.15), mat([0, 3.5, -2.48]));
+      k.addMirrored('dark', G.rbox(1, 2.6, 10, 0.2), mat([2.6, 0, -4]));
+      k.addMirrored('hull', G.box(0.2, 2.4, 3), mat([1.6, 2.2, -10.5], [0, 0, -0.4]));
+    },
+    engines: [{ p: [1.2, 1.0, -12], r: 0.9, len: 12, mirror: true }, { p: [1.2, -1.0, -12], r: 0.9, len: 12, mirror: true }],
+    slots: { g: [[1.2, 5, 1, 0.55], [-1.2, 5, 1, 0.55]], t: [[0, -7, 1, 0.6], [0, -1, 1, 0.6], [0, -4, -1, 0.6]], m: [[1.4, -6.5, 1, 0.5], [-1.4, -6.5, 1, 0.5]] },
+  },
+  // heavy cruiser on inverted gull wings with drive pods at the knees
+  condor: {
+    name: 'Condor', style: 'std', radius: 20, cockpit: [0, 3.7, -4.1], nav: [12.2, 0.55, -5], beacon: [0, 4.4, -6],
+    parts: [
+      { s: [[-16, 4, 2.4, 2.2, 0, 2.4], [-10, 5, 3, 2.6, 0, 2.4], [8, 4.6, 2.8, 2.4, 0, 2.4], [14, 2.6, 1.6, 1.4, 0, 2.4], [17, 0.8, 0.5, 0.5, 0, 2]] },
+    ],
+    extra: (k) => {
+      k.addMirrored('hull', G.box(5, 0.4, 8), mat([4.2, -1.0, -4], [0, 0, -0.4]));
+      k.addMirrored('hull', G.box(6, 0.35, 6), mat([9.4, -1.23, -4], [0, 0, 0.25]));
+      k.addMirrored('dark', G.cyl(0.8, 0.8, 7, 12), mat([6.5, -2.0, -3], ALONG_Z));
+      k.addMirrored('accent', G.box(0.25, 2, 3), mat([12.2, -0.5, -5]));
+      k.add('hull', G.rbox(2.6, 1.8, 4, 0.2), mat([0, 3.4, -6]));
+      k.add('glass', G.box(2.2, 0.4, 0.15), mat([0, 3.7, -3.98]));
+    },
+    engines: [{ p: [1.4, 0, -16], r: 1.1, len: 14, mirror: true }, { p: [6.5, -2.0, -6.5], r: 0.75, len: 10, mirror: true }],
+    slots: { g: [[0.9, 12, 1, 0.55], [-0.9, 12, 1, 0.55]], t: [[0, 4, 1, 0.65], [0, -12, 1, 0.6], [0, 0, -1, 0.65], [0, -9, -1, 0.6]], m: [[1.4, 8, -1, 0.5], [-1.4, 8, -1, 0.5], [0, -1, 1, 0.5]] },
+  },
+  // clan beetle: a round body under two raised shell plates, with six legs and mandibles
+  scarab: {
+    name: 'Scarab', style: 'pirate', radius: 10, cockpit: [0, 0.7, 8.6], nav: [3.75, -1.5, 3], beacon: [0, 2.0, -5.5],
+    parts: [
+      { s: [[-7, 3, 1.2, 1.0, 0, 2], [-4, 5, 2.2, 1.4, 0, 2], [3, 5, 2.2, 1.4, 0, 2], [6, 3.4, 1.4, 1.0, 0, 2], [8, 1.8, 0.8, 0.6, 0, 2]] },
+    ],
+    extra: (k) => {
+      k.add('hull', G.sphere(1.1, 16, 12), mat([0, 0.1, 8.3]));
+      k.add('glass', G.sphere(0.6, 12, 8), mat([0, 0.7, 8.6]));
+      k.addMirrored('metal', G.box(0.3, 0.3, 2.4), mat([0.8, -0.2, 9.6], [0, -0.4, 0]));
+      k.addMirrored('accent', G.rbox(2.4, 0.35, 8, 0.15), mat([1.4, 1.9, -0.5], [0, 0, -0.35]));
+      for (const z of [-3, 0, 3]) k.addMirrored('dark', G.box(2.2, 0.25, 0.3), mat([2.8, -1.0, z], [0, 0, -0.5]));
+    },
+    engines: [{ p: [0.9, 0, -7], r: 0.6, len: 9, mirror: true }],
+    slots: { g: [[0.6, 6, -1, 0.45], [-0.6, 6, -1, 0.45]], t: [[0, 4.5, 1, 0.5], [0, -2, -1, 0.55]], m: [[0, -5.5, 1, 0.45]] },
+  },
+  // clan hopper fighter with long folded hind legs and antennae
+  cricket: {
+    name: 'Cricket', style: 'pirate', radius: 7, cockpit: [0, 0.8, 1.6], nav: [0.9, -1.35, -0.6], beacon: [0, 0.85, -3],
+    parts: [
+      { s: [[-4, 1.6, 0.8, 0.7, 0, 2], [-1, 2.0, 1.0, 0.8, 0, 2], [2.5, 1.6, 0.8, 0.6, 0, 2], [4, 0.8, 0.4, 0.3, 0, 2]] },
+      { key: 'glass', s: [[0.5, 1.0, 0.05, 0, 0.75, 2], [1.6, 0.9, 0.35, 0, 0.7, 2], [2.8, 0.3, 0.05, 0, 0.4, 2]] },
+    ],
+    extra: (k) => {
+      k.addMirrored('accent', G.box(0.3, 0.35, 3.2), mat([0.85, 1.0, -2.0], [0.5, 0, 0]));
+      k.addMirrored('dark', G.box(0.25, 0.25, 3.8), mat([0.9, 0.28, -2.2], [0.89, 0, 0]));
+      k.addMirrored('dark', G.box(0.5, 0.15, 1.2), mat([0.9, -1.25, -0.6]));
+      k.addMirrored('metal', G.cyl(0.02, 0.04, 3, 6), mat([0.3, 0.5, 5.2], [1.2, 0, -0.2]));
+    },
+    engines: [{ p: [0, 0, -4], r: 0.6, len: 8 }],
+    slots: { g: [[0.5, 1.5, -1, 0.35], [-0.5, 1.5, -1, 0.35]] },
+  },
+  // combine sensor corvette with a stack of flat sensor plates on its back
+  assessor: {
+    name: 'Assessor', style: 'armor', radius: 10, cockpit: [0, 0.75, 8.5], nav: [2.45, -0.3, -5], beacon: [0, 2.8, -1],
+    hs: [[0, 0, -3.5, 3], [0, 0, 3.5, 3], [0, 0, 8.2, 1.6]],
+    parts: [],
+    extra: (k) => {
+      k.add('hull', G.rbox(2.6, 2, 14, 0.2), mat([0, 0, 0]));
+      k.add('hull', G.rbox(2, 1.4, 3, 0.2), mat([0, 0, 8.2]));
+      k.add('glass', G.box(1.4, 0.35, 1.4), mat([0, 0.75, 8.5]));
+      k.add('accent', G.box(2.64, 0.3, 1), mat([0, 0.86, 4]));
+      k.add('metal', G.box(0.4, 1.7, 0.4), mat([0, 1.85, -1]));
+      for (let i = 0; i < 4; i++) k.add('dark', G.box(4.5, 0.12, 3), mat([0, 1.3 + i * 0.45, -1]));
+      k.addMirrored('hull', G.rbox(1.2, 1.2, 5, 0.2), mat([1.85, -0.3, -5]));
+    },
+    engines: [{ p: [1.85, -0.3, -7.5], r: 0.5, len: 9, mirror: true }, { p: [0, 0, -7], r: 0.7, len: 10 }],
+    slots: { g: [[0.5, 8, -1, 0.4], [-0.5, 8, -1, 0.4]], t: [[0, 4.5, 1, 0.5], [0, -5, 1, 0.5]], m: [[0, -2, -1, 0.45]] },
   },
   empyrean: {
     name: 'Empyrean', style: 'sleek', radius: 46, tile: 9, cockpit: [0, 10.2, -9.4], nav: [15.6, -1, -27], beacon: [0, 12.6, -14],
