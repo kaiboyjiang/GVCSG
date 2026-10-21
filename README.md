@@ -44,7 +44,7 @@ Every hull has three capacities, shown in the outfitter and shipyard:
 
 Weapons and engines use their own capacity *and* outfit space, so a small hull cannot carry the heaviest weapons, and big guns leave less room for systems. Guns, turrets and missile bays still need a matching mount; engines and systems need only capacity. Engine thrust sets acceleration and top speed, and steering sets turn rate, relative to the hull's stock engines. A ship with no engines cannot undock.
 
-The outfitter sells guns, turrets, missile bays, engines, reactors, shields, armour, batteries, sensors and other systems. High-tech items are sold at high-tech stations, and Clan or Combine gear only at their own ports.
+The outfitter sells guns, turrets, missile bays, engines, reactors, shields, armour, batteries, sensors and other systems. High-tech items are sold at high-tech stations, and Clan or Combine gear only at their own ports. Each maker's gear looks like it: Helion high-tech kit has white fairings with glowing seams, Clan gear is welded scrap with spikes and hazard tape, Combine gear is boxed in slab armour with vents, warning beacons and hazard chevrons, and civilian kit is plain stock hardware.
 
 ## Saving
 

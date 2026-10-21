@@ -966,6 +966,28 @@ export const OUTFITS = {
   suites: { name: 'Luxury Suites', type: 'utility', cat: 'system', model: 'bunkmod', space: 22, price: 420000, tech: 'high', mods: { bunks: 36 }, desc: '+36 passenger berths.' },
   afterburner: { name: 'Afterburner Injector', type: 'utility', cat: 'system', model: 'caprecharger', space: 8, price: 130000, tech: 'basic', mods: { boostMul: 1.3 }, desc: '+30% boost velocity.' },
 
+  // Helion high-tech: faired white housings with glowing seams
+  lancegun: { name: 'Helion Lance Projector', type: 'weapon', look: 'lance', space: 16, mount: 'gun', group: 'primary', turret: 'beam', scale: 1.05, price: 240000, tech: 'high', bolt: 'laser', dmg: 72, rof: 0.5, cap: 15, speed: 5600, range: 8500, track: 3, spread: 0.0008, profile: 'em', flash: 0x9ad8ff, sound: 'laser', desc: 'Focused-lens lance on a faired Helion mount. Long reach, pinpoint accuracy, hungry for capacitor.' },
+  lanceturret: { name: 'Helion Lance Turret', type: 'weapon', look: 'lance', space: 24, mount: 'turret', group: 'primary', turret: 'beam', price: 300000, tech: 'high', bolt: 'laser', dmg: 64, rof: 0.55, cap: 15, speed: 5400, range: 8200, track: 1.6, spread: 0.0012, profile: 'em', flash: 0x9ad8ff, sound: 'laser', desc: 'Tracking version of the lance projector in a smooth Helion cowl.' },
+  helionbay: { name: 'Helion Seeker Bay', type: 'weapon', space: 16, mount: 'bay', group: 'secondary', bay: 'srm', price: 260000, tech: 'high', tubes: 4, salvo: 2, dmg: 170, rof: 4, mspeed: 1050, range: 12000, ammoPer: 1, desc: 'Fast smart seekers in a faired, white-shrouded launcher. Navy surplus, high-tech stations only.' },
+  phaseshield: { name: 'Helion Phase Shield', type: 'utility', cat: 'shield', model: 'shieldbooster', space: 16, price: 380000, tech: 'high', mods: { shield: 900, shieldRegen: 8 }, desc: '+900 shield HP, +8 HP/s shield regen.' },
+  uplink: { name: 'Helion Tactical Uplink', type: 'utility', cat: 'sensor', model: 'sensor', space: 12, price: 260000, tech: 'high', mods: { lockRange: 20000, lockMul: 0.6 }, desc: '+20 km lock range, locks 40% faster.' },
+  ionnozzle: { name: 'Helion Ion Drive', type: 'engine', cat: 'engine', space: 16, thrust: 34, steer: 26, price: 320000, tech: 'high', mods: { sigMul: 0.95 }, desc: 'Quiet, efficient navy drive. −5% signature.' },
+  // civilian: plain stock hardware
+  rivetgun: { name: 'Rivet Driver', type: 'weapon', look: 'driver', space: 6, mount: 'gun', group: 'primary', turret: 'driver', scale: 0.8, price: 26000, tech: 'basic', bolt: 'tracer', dmg: 26, rof: 0.35, cap: 0, speed: 2600, range: 3600, track: 3, spread: 0.004, profile: 'kinetic', flash: 0xffc070, sound: 'cannon', desc: 'Converted hull-riveting gun. Cheap, no capacitor draw.' },
+  homeguard: { name: 'Homeguard Defence Turret', type: 'weapon', look: 'pd', space: 7, mount: 'turret', group: 'primary', turret: 'pd', price: 32000, tech: 'basic', bolt: 'tracer', dmg: 6, rof: 0.1, cap: 0, speed: 2800, range: 3000, track: 4, spread: 0.01, profile: 'kinetic', flash: 0xffc070, sound: 'cannon', desc: 'Light civilian turret sold to traders for pirate deterrence.' },
+  cargonet: { name: 'Cargo Net Frame', type: 'utility', cat: 'system', model: 'cargopod', space: 12, price: 50000, tech: 'basic', mods: { cargo: 55, speedMul: 0.97 }, desc: '+55 t cargo capacity, −3% max velocity.' },
+  // Clan: welded scrap, spikes and hazard paint
+  bombard: { name: 'Clan Bombard', type: 'weapon', look: 'mortar', space: 16, mount: 'gun', group: 'primary', turret: 'flak', scale: 1.05, price: 90000, tech: 'basic', shop: 'pirate', bolt: 'tracer', dmg: 210, rof: 2.2, cap: 0, speed: 1800, range: 4500, track: 3, spread: 0.003, profile: 'kinetic', flash: 0xff8030, sound: 'cannon', desc: 'Fat-barrelled shell gun welded out of a mining charge launcher. Slow, heavy hits. Clan ports only.' },
+  bombardt: { name: 'Clan Bombard Turret', type: 'weapon', look: 'mortar', space: 20, mount: 'turret', group: 'primary', turret: 'flak', price: 110000, tech: 'basic', shop: 'pirate', bolt: 'tracer', dmg: 190, rof: 2.4, cap: 0, speed: 1800, range: 4300, track: 1.4, spread: 0.004, profile: 'kinetic', flash: 0xff8030, sound: 'cannon', desc: 'The bombard on a scrap turntable. Clan ports only.' },
+  scrapcrate: { name: 'Clan Scrap Missile Crate', type: 'weapon', space: 14, mount: 'bay', group: 'secondary', bay: 'srm', price: 80000, tech: 'basic', shop: 'pirate', tubes: 4, salvo: 4, dmg: 100, rof: 6, mspeed: 850, range: 7000, ammoPer: 1, desc: 'Four stolen missiles in a crate with spikes on it, fired all at once. Clan ports only.' },
+  patchshield: { name: 'Clan Patchwork Shield', type: 'utility', cat: 'shield', model: 'shieldext', space: 14, price: 45000, tech: 'basic', shop: 'pirate', mods: { shield: 520, sigMul: 1.05 }, desc: '+520 shield HP, +5% signature. Clan ports only.' },
+  rigcap: { name: 'Clan Jury-Rigged Capacitor', type: 'utility', cat: 'battery', model: 'capbattery', space: 12, price: 35000, tech: 'basic', shop: 'pirate', mods: { cap: 700, sigMul: 1.05 }, desc: '+700 capacitor, +5% signature. Clan ports only.' },
+  // Combine: boxed, stencilled, mass-produced
+  repeater: { name: 'Combine Repeater Mk.II', type: 'weapon', look: 'repeater', space: 9, mount: 'gun', group: 'primary', turret: 'auto', price: 45000, tech: 'basic', shop: 'corp', bolt: 'tracer', dmg: 10, rof: 0.08, cap: 0, speed: 3000, range: 4200, track: 3, spread: 0.006, profile: 'kinetic', flash: 0xffb050, sound: 'cannon', desc: 'Four-barrel box repeater, stamped out by the thousand. Combine ports only.' },
+  repeatert: { name: 'Combine Repeater Turret Mk.II', type: 'weapon', look: 'repeater', space: 12, mount: 'turret', group: 'primary', turret: 'auto', price: 60000, tech: 'basic', shop: 'corp', bolt: 'tracer', dmg: 9, rof: 0.08, cap: 0, speed: 3000, range: 4000, track: 2.6, spread: 0.007, profile: 'kinetic', flash: 0xffb050, sound: 'cannon', desc: 'The Mk.II repeater on a square tracking turret. Combine ports only.' },
+  auditscan: { name: 'Combine Audit Scanner', type: 'utility', cat: 'sensor', model: 'sensor', space: 8, price: 35000, tech: 'basic', shop: 'corp', mods: { lockRange: 15000 }, desc: '+15 km lock range. Combine ports only.' },
+  combineexpress: { name: 'Combine Express Drive Unit', type: 'engine', cat: 'engine', space: 16, thrust: 28, steer: 18, price: 70000, tech: 'basic', shop: 'corp', desc: 'Faster drive for priority freight. Combine ports only.' },
 };
 
 export const MOUNT_KEYS = ['g', 't', 'm'];
@@ -1153,6 +1175,9 @@ export function mountSlots(ship, hullId) {
   return ship.slots;
 }
 
+// where an outfit is sold decides whose design it looks like
+export const styleOf = (O) => (O.shop === 'pirate' ? 'clan' : O.shop === 'corp' ? 'combine' : O.tech === 'high' ? 'helion' : 'civ');
+
 export function buildFitted(hullId, fit0, env, liv, paint) {
   const fit = fit0 && Array.isArray(fit0.g) && Array.isArray(fit0.e) && fit0.r ? fit0 : normFit(hullId, fit0);
   const ship = paint ? withPaint(paint, () => HULLS[hullId].build(env, liv)) : HULLS[hullId].build(env, liv);
@@ -1164,7 +1189,7 @@ export function buildFitted(hullId, fit0, env, liv, paint) {
       if (!hp) return;
       if (!id) { ship.group.add(socket(ship.M, hp, k)); return; }
       const O = OUTFITS[id];
-      const t = k === 'g' ? buildGun(ship.M, O.look || O.turret, hp.s * (O.scale || 1)) : buildTurret(ship.M, O.look || O.turret, hp.s * (O.scale || 1));
+      const t = k === 'g' ? buildGun(ship.M, O.look || O.turret, hp.s * (O.scale || 1), styleOf(O)) : buildTurret(ship.M, O.look || O.turret, hp.s * (O.scale || 1), false, styleOf(O));
       t.root.position.fromArray(hp.p);
       if (hp.flip) t.root.rotation.z = Math.PI;
       t.weapon = O; t.mount = SLOT_MOUNT[k]; t.role = roleOf(fit, k, i); t.slot = i;
@@ -1178,7 +1203,7 @@ export function buildFitted(hullId, fit0, env, liv, paint) {
     if (!hp) return;
     if (!id) { ship.group.add(socket(ship.M, hp, 'm')); return; }
     const O = OUTFITS[id];
-    const b = buildMissileBay(ship.M, O, hp.s);
+    const b = buildMissileBay(ship.M, O, hp.s, styleOf(O));
     b.root.position.fromArray(hp.p);
     if (hp.flip) b.root.rotation.z = Math.PI;
     b.weapon = O; b.mount = 'bay'; b.role = 'secondary'; b.slot = i;
@@ -1190,8 +1215,9 @@ export function buildFitted(hullId, fit0, env, liv, paint) {
 
 export function outfitPreview(id, M) {
   const O = OUTFITS[id];
-  if (O.type !== 'weapon') return buildOutfitModel(O.model || (O.type === 'engine' ? 'engine' : id), M);
-  return O.mount === 'bay' ? buildMissileBay(M, O, 1).root : O.mount === 'gun' ? buildGun(M, O.look || O.turret, 1).root : buildTurret(M, O.look || O.turret, 1).root;
+  const st = styleOf(O);
+  if (O.type !== 'weapon') return buildOutfitModel(O.model || (O.type === 'engine' ? 'engine' : id), M, st);
+  return O.mount === 'bay' ? buildMissileBay(M, O, 1, st).root : O.mount === 'gun' ? buildGun(M, O.look || O.turret, 1, st).root : buildTurret(M, O.look || O.turret, 1, false, st).root;
 }
 
 export function fittedStats(hullId, fit) {

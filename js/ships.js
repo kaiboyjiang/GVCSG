@@ -271,7 +271,7 @@ function addLight(ship, pos, color, size, blink = 0, phase = 0) {
 }
 
 // ---------------------------------------------------------------- turrets
-export function buildTurret(M, kind = 'laser', scale = 1, fixed = false) {
+export function buildTurret(M, kind = 'laser', scale = 1, fixed = false, style = '') {
   const root = new THREE.Group();
   const yaw = new THREE.Group();
   const pitch = new THREE.Group();
@@ -577,6 +577,62 @@ export function buildTurret(M, kind = 'laser', scale = 1, fixed = false) {
     muzzles.push(mz); barrels.push(b);
     kp.add('dark', G.rbox(1.6, 1.0, 1.4, 0.12), mat([0, 0, 0.1]));
     pitch.position.set(0, 1.15, 0.3);
+  } else if (kind === 'lance') {
+    // Helion lance projector: smooth lathed housing, one slender finned emitter and a glowing focus tip
+    kb.add('dark', G.cyl(1.0, 1.2, 0.35, 32), mat([0, 0.17, 0]));
+    kb.add('coil', G.torus(0.98, 0.03, 6, 40), mat([0, 0.36, 0], [Math.PI / 2, 0, 0]));
+    ky.add('hull', G.lathe([[1.05, 0], [1.0, 0.35], [0.8, 0.7], [0.45, 0.9], [0, 0.95]], 32), mat([0, 0.35, -0.1]));
+    ky.addMirrored('accent', G.rbox(0.18, 0.5, 1.4, 0.08), mat([0.78, 0.75, -0.2]));
+    const b = new THREE.Group();
+    const k2 = new Kit();
+    k2.add('hull', G.lathe([[0.42, 0], [0.4, 0.6], [0.24, 1.6], [0.16, 4.6], [0.2, 5.0]], 20), mat([0, 0, -0.3], [Math.PI / 2, 0, 0]));
+    for (let i = 0; i < 3; i++) k2.add('coil', G.torus(0.2 - i * 0.015, 0.025, 6, 20), mat([0, 0, 2.2 + i * 0.8]));
+    for (let i = 0; i < 4; i++) k2.add('accent', G.box(0.04, 0.34, 1.4), mat([0, 0, 1.2], [0, 0, i * Math.PI / 2 + Math.PI / 4]));
+    k2.add('coil', G.sphere(0.14, 14, 10), mat([0, 0, 4.8]));
+    b.add(k2.build(M));
+    pitch.add(b);
+    const mz = new THREE.Object3D(); mz.position.set(0, 0, 5.0); b.add(mz);
+    muzzles.push(mz); barrels.push(b);
+    kp.add('dark', G.rbox(0.9, 0.7, 0.9, 0.2), mat([0, 0, 0]));
+    pitch.position.set(0, 1.05, 0.2);
+  } else if (kind === 'mortar') {
+    // Clan bombard: squat welded box, one fat banded barrel and a flared muzzle
+    kb.add('dark', G.cyl(1.05, 1.3, 0.45, 8), mat([0, 0.22, 0], [0, 0.2, 0]));
+    ky.add('hull', G.box(2.0, 1.0, 1.8), mat([0, 0.95, -0.3], [0, 0.05, 0.03]));
+    ky.add('dark', G.box(0.7, 0.6, 0.9), mat([0.9, 1.25, -0.6], [0.1, 0.2, 0.1]));
+    ky.add('metal', G.box(1.9, 0.1, 0.2), mat([0, 1.48, 0.3], [0, 0, -0.04]));
+    const b = new THREE.Group();
+    const k2 = new Kit();
+    k2.add('dark', G.cyl(0.62, 0.62, 1.0, 10), mat([0, 0, 0.2], [Math.PI / 2, 0, 0]));
+    k2.add('gun', G.cyl(0.42, 0.5, 2.4, 12), mat([0, 0, 1.6], [Math.PI / 2, 0, 0]));
+    for (let i = 0; i < 3; i++) k2.add('metal', G.cyl(0.56, 0.56, 0.16, 10), mat([0, 0, 0.9 + i * 0.6], [Math.PI / 2, 0, 0]));
+    k2.add('dark', G.lathe([[0.4, 0], [0.5, 0.2], [0.68, 0.5], [0.62, 0.55]], 12), mat([0, 0, 2.75], [Math.PI / 2, 0, 0]));
+    k2.add('amber', G.cyl(0.3, 0.3, 0.03, 12), mat([0, 0, 2.6], [Math.PI / 2, 0, 0]));
+    b.add(k2.build(M));
+    pitch.add(b);
+    const mz = new THREE.Object3D(); mz.position.set(0, 0, 3.3); b.add(mz);
+    muzzles.push(mz); barrels.push(b);
+    kp.add('dark', G.box(1.1, 0.8, 0.8), mat([0, 0, -0.1]));
+    pitch.position.set(0, 1.0, 0.4);
+  } else if (kind === 'repeater') {
+    // Combine repeater: square housing, four square-bored barrels in one block, stamped cooling fins
+    kb.add('dark', G.box(2.0, 0.4, 2.0), mat([0, 0.2, 0]));
+    kb.add('metal', G.box(1.5, 0.16, 1.5), mat([0, 0.48, 0]));
+    ky.add('hull', G.box(1.8, 0.9, 1.8), mat([0, 0.95, -0.2]));
+    ky.add('accent', G.box(1.84, 0.16, 0.5), mat([0, 1.3, -0.95]));
+    ky.addMirrored('dark', G.box(0.22, 0.7, 1.4), mat([0.98, 0.9, -0.2]));
+    const b = new THREE.Group();
+    const k2 = new Kit();
+    k2.add('dark', G.box(0.9, 0.9, 1.0), mat([0, 0, 0.3]));
+    for (const [x, y] of [[0.2, 0.2], [-0.2, 0.2], [0.2, -0.2], [-0.2, -0.2]]) k2.add('gun', G.box(0.22, 0.22, 2.6), mat([x, y, 1.9]));
+    for (let i = 0; i < 4; i++) k2.add('metal', G.box(0.74, 0.74, 0.08), mat([0, 0, 1.0 + i * 0.38]));
+    k2.add('dark', G.box(0.7, 0.7, 0.2), mat([0, 0, 3.1]));
+    b.add(k2.build(M));
+    pitch.add(b);
+    const mz = new THREE.Object3D(); mz.position.set(0, 0, 3.3); b.add(mz);
+    muzzles.push(mz); barrels.push(b);
+    kp.add('dark', G.box(1.0, 0.7, 0.8), mat([0, 0, 0]));
+    pitch.position.set(0, 0.95, 0.3);
   } else {
     // railgun: long twin-rail barrel with glowing magnetic coils
     kb.add('dark', G.cyl(1.3, 1.5, 0.45, 24), mat([0, 0.22, 0]));
@@ -602,18 +658,19 @@ export function buildTurret(M, kind = 'laser', scale = 1, fixed = false) {
     pitch.position.set(0, 1.0, 0.4);
   }
   if (fixed) { kb = gunCasing(kind, pitch.position.y); ky = new Kit(); }
+  dress(Object.keys(ky.parts).length ? ky : kb, style, kind);
   root.add(kb.build(M));
   if (Object.keys(ky.parts).length) yaw.add(ky.build(M));
   pitch.add(kp.build(M));
   root.scale.setScalar(scale);
-  const recoilDist = { laser: 0.35, rail: 0.8, auto: 0.06, plasma: 0.55, flak: 0.25, beam: 0.15, gauss: 0.9, scatter: 0.4, ion: 0.3, pd: 0.15, gatling: 0.05, clan: 0.45, driver: 0.7, neutron: 0.6 }[kind] ?? 0.3;
+  const recoilDist = { laser: 0.35, rail: 0.8, auto: 0.06, plasma: 0.55, flak: 0.25, beam: 0.15, gauss: 0.9, scatter: 0.4, ion: 0.3, pd: 0.15, gatling: 0.05, clan: 0.45, driver: 0.7, neutron: 0.6, lance: 0.2, mortar: 0.9, repeater: 0.12 }[kind] ?? 0.3;
   return { root, yaw, pitch, muzzles, barrels, kind, recoil: barrels.map(() => 0), baseZ: barrels.map((b) => b.position.z), recoilDist, rotor: kind === 'auto' || kind === 'gatling' ? barrels[0] : null, spin: 0, next: 0, fixed };
 }
 
 // Fixed gun: a low armoured casing faired into the hull; only the barrels gimbal a few degrees inside it.
 function gunCasing(kind, h) {
   const k = new Kit();
-  const heavy = kind === 'gauss' || kind === 'plasma' || kind === 'rail' || kind === 'driver' || kind === 'neutron';
+  const heavy = kind === 'gauss' || kind === 'plasma' || kind === 'rail' || kind === 'driver' || kind === 'neutron' || kind === 'lance' || kind === 'mortar';
   const w = heavy ? 2.1 : 1.6, L = heavy ? 4.4 : 3.4, z0 = -L * 0.62;
   k.add('hull', G.loft([[z0, w * 0.55, h * 0.45, 0.02, 0, 2.6], [z0 + L * 0.3, w, h + 0.32, 0.02, 0, 3.2], [z0 + L * 0.78, w, h + 0.28, 0.02, 0, 3.2], [z0 + L, w * 0.62, h + 0.12, 0.02, 0, 2.6]], 20), mat());
   k.add('accent', G.box(w * 0.28, 0.06, L * 0.5), mat([0, h + 0.33, z0 + L * 0.5]));
@@ -623,12 +680,60 @@ function gunCasing(kind, h) {
   return k;
 }
 
-export function buildGun(M, kind = 'laser', scale = 1) {
-  return buildTurret(M, kind, scale, true);
+// Maker's styling dressed onto an outfit model, so kit from each seller looks like it came from there:
+// Helion high-tech is faired and glowing, Combine kit is boxed and stencilled, Clan kit is welded scrap.
+const _kb = new THREE.Box3();
+function kitBox(k) {
+  _kb.makeEmpty();
+  for (const list of Object.values(k.parts)) for (const g of list) { g.computeBoundingBox(); _kb.union(g.boundingBox); }
+  return _kb;
+}
+function dress(k, style, tag = '', top = true) {
+  if (style !== 'helion' && style !== 'combine' && style !== 'clan') return;
+  const b = kitBox(k);
+  if (b.isEmpty()) return;
+  const s = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3());
+  const w = s.x, d = s.z, y0 = b.min.y, y1 = b.max.y, u = Math.min(w, d);
+  const sh = top ? s.y * 0.6 : Math.min(s.y * 0.6, u * 0.28);
+  const r = rng(Array.from(String(tag) + style).reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 99991, 7));
+  if (style === 'helion') {
+    k.addMirrored('hull', G.rbox(u * 0.07, sh, d * 0.78, u * 0.03), mat([b.max.x + u * 0.02, y0 + sh * 0.55, c.z - d * 0.04]));
+    k.addMirrored('coil', G.box(u * 0.02, u * 0.025, d * 0.6), mat([b.max.x + u * 0.06, y0 + sh * 0.75, c.z - d * 0.04]));
+    k.addMirrored('accent', G.box(u * 0.025, sh * 0.5, u * 0.18), mat([b.max.x + u * 0.04, y0 + sh * 0.55, b.min.z + d * 0.12], [0.5, 0, 0]));
+    if (top) {
+      const ch = Math.max(0.08, s.y * 0.12);
+      k.add('accent', G.box(u * 0.04, ch * 1.6, d * 0.2), mat([c.x, y1 + ch * 0.3, c.z - d * 0.1], [0.3, 0, 0]));
+      k.add('coil', G.box(u * 0.05, ch * 0.5, d * 0.14), mat([c.x, y1 - ch * 0.1, c.z + d * 0.04]));
+    }
+  } else if (style === 'combine') {
+    k.addMirrored('gun', G.box(u * 0.06, sh, d * 0.9), mat([b.max.x + u * 0.03, y0 + sh * 0.5, c.z]));
+    for (let i = 0; i < 3; i++) k.addMirrored('dark', G.box(u * 0.02, sh * 0.12, d * 0.5), mat([b.max.x + u * 0.065, y0 + sh * (0.3 + i * 0.2), c.z]));
+    const n = 6, cl = d * 0.8 / n;
+    for (let i = 0; i < n; i++) k.addMirrored(i % 2 ? 'dark' : 'accent', G.box(u * 0.065, u * 0.03, cl), mat([b.max.x + u * 0.03, y0 + sh + u * 0.012, b.min.z + d * 0.1 + (i + 0.5) * cl]));
+    k.add('amber', G.box(u * 0.07, u * 0.06, u * 0.07), mat([b.max.x + u * 0.03, y0 + sh + u * 0.03, b.min.z + d * 0.1]));
+    k.addMirrored('metal', G.box(u * 0.09, sh * 0.3, u * 0.09), mat([b.max.x + u * 0.07, y0 + sh * 0.5, b.max.z - d * 0.08]));
+    k.addMirrored('metal', G.box(u * 0.09, sh * 0.3, u * 0.09), mat([b.max.x + u * 0.07, y0 + sh * 0.5, b.min.z + d * 0.08]));
+  } else {
+    for (let i = 0; i < 3; i++) {
+      const side = i % 2 ? 1 : -1, pw = d * (0.25 + r() * 0.25), ph = sh * (0.5 + r() * 0.4);
+      k.add(r() < 0.5 ? 'metal' : 'dark', G.box(u * 0.05, ph, pw), mat([side * (b.max.x + u * 0.02), y0 + ph * 0.5 + r() * sh * 0.3, b.min.z + d * (0.2 + r() * 0.6)], [r() * 0.2 - 0.1, 0, side * (0.06 + r() * 0.1)]));
+    }
+    k.add('accent', G.box(u * 0.06, sh * 0.8, u * 0.14), mat([b.max.x + u * 0.05, y0 + sh * 0.5, c.z + d * 0.1], [0.6, 0, 0]));
+    k.add('accent', G.box(u * 0.06, sh * 0.8, u * 0.14), mat([b.max.x + u * 0.05, y0 + sh * 0.5, c.z - d * 0.1], [0.6, 0, 0]));
+    for (let i = 0; i < 5; i++) k.add('metal', G.cyl(u * 0.025, u * 0.025, u * 0.03, 6), mat([-b.max.x - u * 0.04, y0 + sh * 0.8, b.min.z + d * (0.15 + i * 0.17)], [0, 0, Math.PI / 2]));
+    for (let i = 0; i < 4; i++) {
+      const side = i % 2 ? 1 : -1, L = u * (0.16 + r() * 0.12), z = b.min.z + d * (0.15 + i * 0.2 + r() * 0.05);
+      k.add('gun', G.cyl(0, u * 0.045, L, 6), mat([side * (b.max.x + u * 0.04 + L * 0.4), y0 + sh * (0.5 + r() * 0.3), z], [0, 0, side * (-Math.PI / 2 + (r() - 0.5) * 0.5)]));
+    }
+  }
+}
+
+export function buildGun(M, kind = 'laser', scale = 1, style = '') {
+  return buildTurret(M, kind, scale, true, style);
 }
 
 // Missile bay: armoured box flush with the hull, a grid of hatched launch cells and hazard trim.
-export function buildMissileBay(M, O, scale = 1) {
+export function buildMissileBay(M, O, scale = 1, style = '') {
   const root = new THREE.Group(), k = new Kit(), tubes = [];
   const n = O.tubes, cols = n >= 6 ? 3 : n >= 2 ? 2 : 1, rows = Math.ceil(n / cols);
   const torp = O.bay === 'torp';
@@ -649,6 +754,7 @@ export function buildMissileBay(M, O, scale = 1) {
     }
   }
   k.add('amber', G.box(0.16, 0.08, 0.16), mat([W / 2 - 0.1, H + 0.1, L / 2 + 0.05]));
+  dress(k, style, O.bay + n, false);
   root.add(k.build(M));
   root.scale.setScalar(scale);
   return { root, tubes, next: 0, side: 0 };
@@ -1729,7 +1835,7 @@ export function buildBastion(env, liv = 'bastion') {
 }
 
 // ---------------------------------------------------------------- outfit models (utility modules face +Y, ~2.5 m across)
-export function buildOutfitModel(id, M) {
+export function buildOutfitModel(id, M, style = '') {
   const k = new Kit();
   const up = [0, 0, 0];
   switch (id) {
@@ -1818,6 +1924,7 @@ export function buildOutfitModel(id, M) {
     default:
       k.add('dark', G.box(1, 1, 1), mat(up));
   }
+  dress(k, style, id, false);
   return k.build(M, { uvTile: { hull: 3, accent: 3, dark: 3 } });
 }
 
