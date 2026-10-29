@@ -246,3 +246,15 @@ table.st .up { color: #7fe0a0; } table.st .dn { color: #ff7a66; }
 .caps .cap i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(110, 118, 128, 0.35), rgba(150, 158, 168, 0.55)); }
 .caps .cap.over { border-color: #ff7a66; } .caps .cap.over i { background: rgba(255, 122, 102, 0.45); }
 .ocats { flex-wrap: wrap; margin: 4px 0 10px; } .ocats b { padding: 4px 8px; font-size: 10px; letter-spacing: 1px; }
+#conv { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.55); }
+#conv .cbox { width: min(720px, 92vw); max-height: 86vh; overflow-y: auto; padding: 26px 32px 22px; background: rgba(14, 15, 17, 0.96); border: 1px solid rgba(164, 169, 176, 0.35); box-shadow: 0 0 60px rgba(0, 0, 0, 0.7); }
+#conv .ctitle { font-family: "Chakra Petch", sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #adb2b8; }
+#conv .cwho { font-family: "Chakra Petch", sans-serif; font-weight: 600; font-size: 20px; color: #fd8; margin: 4px 0 12px; }
+#conv .ctext, #conv .cchoices button { font-family: system-ui, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif; font-weight: 500; letter-spacing: 0; }
+#conv .ctext { font-size: 17px; line-height: 1.6; color: #eceef0; }
+#conv .ctext p { margin: 0 0 12px; }
+#conv .cchoices { margin-top: 16px; display: flex; flex-direction: column; gap: 7px; }
+#conv .cchoices button { text-align: left; font-size: 16px; line-height: 1.4; padding: 9px 12px; color: #f2f3f4; background: rgba(60, 64, 70, 0.55); }
+#conv .cchoices button:hover { background: rgba(98, 104, 112, 0.75); border-color: #fd8; }
+#conv .cn { display: inline-block; min-width: 22px; color: #fd8; font-weight: 700; }
+.job.story { border-left-color: #fd8; }

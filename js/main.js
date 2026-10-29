@@ -14,6 +14,7 @@ import { Audio } from './audio.js';
 import { HUD, fmtDist } from './hud.js';
 import { TargetHolo } from './holo.js';
 import { UPSCALE, upscaleSharp } from './shaders.js';
+import { MISSION, MISSIONS, playConv, convOpen, newStory, loadStory, curStep, available } from './story.js';
 
 const $ = (id) => document.getElementById(id);
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
@@ -117,7 +118,7 @@ const G = {
   aimDir: new THREE.Vector3(0, 0, 1), aimPoint: new THREE.Vector3(), aimActive: false, mouseLocked: false,
   hull: 'valkyrie', owned: { valkyrie: emptyFit('valkyrie') }, paint: {}, inventory: {}, dockedAt: null,
   system: 'kaltos', explored: new Set(['kaltos']), routeTo: null, autoJump: null, autoRoute: null, autoT: 0, dockSys: 'kaltos', dockId: 'station',
-  jobs: [], access: {}, jumps: 0, ambush: null, boardT: 0, bribe: null, bribeT: 0,
+  jobs: [], story: newStory(), access: {}, jumps: 0, ambush: null, boardT: 0, bribe: null, bribeT: 0,
   nearestName: '', time: 0, shake: 0, hitFlash: 0,
 };
 
@@ -340,6 +341,7 @@ function destroy(e, source) {
   }
   if (e === G.player) { playerDied(); return; }
   if (e.ai.bountyJob) bountyKilled(e, source);
+  if (e.ai.storyKill) storyKilled(e);
   if (source === G.player) {
     if (e.stats.bounty) {
       G.credits += e.stats.bounty; G.kills++;
@@ -1482,7 +1484,7 @@ function servicesText() {
   parts.push(Y0 ? `Its shipyard sells the ${Y0.name.toLowerCase()}.` : 'There is no shipyard here.');
   parts.push(L0.dock === 'pirate' ? 'The black-market outfitter carries everything, no questions asked.' : isHigh() ? 'The outfitter stocks high-tech modules.' : 'The outfitter only stocks basic modules.');
   if (SYSTEMS[G.system].gov === 'corp') parts.push('Property of the Vanta Combine: every dock, rock and lane in this system belongs to the company, and Combine Security patrols it.');
-  parts.push('Check the Job Board for freight, passenger and bounty contracts.');
+  parts.push('Check the Job Board for freight, passenger and bounty contracts, and your storyline mission.');
   return parts.join(' ');
 }
 
@@ -1579,6 +1581,7 @@ function renderJobs(L, R) {
   L.innerHTML = `<h3>Job board — ${G.dockedAt.name}</h3>${D.board.length ? D.board.map((j) => jobRow(j, 'accept')).join('') : '<p>No contracts left. Check back after your next trip.</p>'}`;
   R.innerHTML = `<h3>Capacity — ${HULLS[G.hull].name}</h3><table class="st"><tr><td>Cargo hold</td><td>${usedCargo()} / ${c.cargo} t</td></tr><tr><td>Passenger bunks</td><td>${usedBunks()} / ${c.bunks}</td></tr></table>
     <p>Freighters (Mule, Atlas) carry bulk cargo; liners (Aurora) carry many passengers. Cargo pods and passenger modules add space to any hull.</p>
+    ${storyPanel()}
     <h3>Active jobs</h3>${G.jobs.length ? G.jobs.map((j) => jobRow(j, 'abandon')).join('') : '<p>None.</p>'}`;
 }
 function jobAction(a, id) {
@@ -1616,6 +1619,101 @@ function jobDestHere() {
   const j = G.jobs.find((x) => x.to.sys === G.system);
   if (!j) return null;
   return isHunt(j) ? LOCATIONS.find((l) => l.id === huntLoc(j)) : LOCATIONS.find((l) => l.id === j.to.id);
+}
+
+// ---------------------------------------------------------------- storyline missions (data and conversations in story.js)
+const stepSys = (st) => (st.go ? st.go.split(':')[0] : st.kill.sys);
+function stepText(st) {
+  if (st.kill) return `Destroy ${st.kill.name} in ${SYSTEMS[st.kill.sys].name}`;
+  const [sys, id] = st.go.split(':');
+  return `Travel to ${dockStationName(sys, id)} (${SYSTEMS[sys].name})`;
+}
+function storyRoute() {
+  const st = curStep(G.story);
+  if (!st) return;
+  const sys = stepSys(st);
+  for (const x of fullRoute(G.system, sys) || []) G.explored.add(x);
+  G.routeTo = sys !== G.system ? sys : null;
+  hud.log(`Mission objective: ${stepText(st)}.`, 'i');
+}
+function storyDestHere() {
+  const st = curStep(G.story);
+  if (!st || stepSys(st) !== G.system) return null;
+  return st.kill ? LOCATIONS.find((l) => l.id === 'story') || null : LOCATIONS.find((l) => l.id === st.go.split(':')[1]) || null;
+}
+function storyPanel() {
+  const S = G.story, m = S.active && MISSION[S.active], st = curStep(S);
+  if (m) return `<h3>Storyline</h3><div class="job story"><div class="jh"><span class="nm">${m.title}</span>${m.pay ? `<span class="pr">${fmtIsk(m.pay)}</span>` : ''}</div>
+    <div class="ty">${m.brief}</div>${st ? `<div class="jr">Next: <b>${stepText(st)}</b></div>` : ''}</div>`;
+  if (S.done.length === MISSIONS.length || S.done.includes('s7')) return '<h3>Storyline</h3><p>The ledger affair is over — for now.</p>';
+  const next = MISSIONS.find((x) => x.at.some((a) => available(S, a) === x));
+  if (!next) return '';
+  const [sys, id] = next.at[0].split(':');
+  return `<h3>Storyline</h3><p>Next: <b>${next.title}</b>, offered at ${dockStationName(sys, id)} (${SYSTEMS[sys].name}).</p>`;
+}
+function storyChoice(m, c) {
+  const S = G.story;
+  if (c.set) S.flags[c.set] = true;
+  if (c.pay) { G.credits += c.pay; hud.log(`Received ${fmtIsk(c.pay)}.`, 'g'); }
+  if (c.act === 'accept' && S.active !== m.id && !S.done.includes(m.id)) {
+    S.active = m.id; S.step = 0;
+    hud.log(`Mission accepted: ${m.title}.`, 'i');
+    if (!m.steps.length) { S.done.push(m.id); S.active = null; hud.log(`Mission complete: ${m.title}.`, 'g'); } else { storyRoute(); storySpawn(); }
+  }
+  return true;
+}
+function storyOffer() {
+  const here = `${G.system}:${G.dockedAt.id}`, m = available(G.story, here);
+  if (m) playConv(m.title, m.offer, G.story.flags, (c) => storyChoice(m, c), () => { saveGame(); renderDock(); });
+}
+function storyFinish() {
+  const S = G.story, m = MISSION[S.active];
+  playConv(m.title, m.end, S.flags, (c) => storyChoice(m, c), () => {
+    if (S.active !== m.id) return;
+    S.done.push(m.id); S.active = null; S.step = 0;
+    if (m.pay) G.credits += m.pay;
+    hud.log(`Mission complete: ${m.title}.${m.pay ? ` Paid ${fmtIsk(m.pay)}.` : ''}`, 'g');
+    if (m.pay) flashDockMsg(`Mission complete: +${fmtIsk(m.pay)}`);
+    audio.beep(880, 0.12);
+    saveGame(); renderDock();
+    storyOffer();
+  });
+}
+function storyDock() {
+  const S = G.story;
+  if (S.active) {
+    const st = curStep(S);
+    if (st && st.go === `${G.system}:${G.dockedAt.id}`) { S.step++; if (curStep(S)) { storyRoute(); saveGame(); renderDock(); } }
+    if (!curStep(S)) { storyFinish(); return; }
+  }
+  storyOffer();
+}
+function storySpawn() {
+  const S = G.story, st = curStep(S);
+  if (!st?.kill || st.kill.sys !== G.system || !world || G.entities.some((e) => e.alive && e.ai.storyKill === S.active)) return;
+  const K = st.kill;
+  const anchor = (K.anchor === 'belt' && LOCATIONS.find((l) => l.icon === 'belt')) || LOCATIONS.find((l) => l.jump) || LOCATIONS[0];
+  const pos = anchor.pos.clone().add(_v.set(Math.random() - 0.5, 0, Math.random() - 0.5).normalize().multiplyScalar(9000));
+  K.kinds.forEach((kind, i) => {
+    const e = makeEntity(kind, 'pirate', i ? pos.clone().add(jitter(2500)) : pos.clone(), i ? `${K.name} ${HULLS[STATS[kind].hullId || 'raider']?.name || 'Escort'}` : K.name);
+    e.className = `MISSION · ${STATS[kind].cls}`;
+    e.ai.storyKill = S.active; e.ai.home.copy(pos);
+  });
+  const i = LOCATIONS.findIndex((l) => l.id === 'story');
+  if (i >= 0) LOCATIONS.splice(i, 1);
+  LOCATIONS.push({ id: 'story', name: `Mission: ${K.name}`, type: MISSION[S.active].title, pos, arrive: 10000, icon: 'bounty' });
+  hud.log(`Mission intel: ${K.name} is in this system. Warp to "Mission: ${K.name}".`, 'w');
+}
+function storyKilled(e) {
+  const S = G.story;
+  if (e.ai.storyKill !== S.active) return;
+  const left = G.entities.filter((x) => x !== e && x.alive && x.ai.storyKill === S.active).length;
+  if (left) { hud.log(`${left} mission target${left > 1 ? 's' : ''} left.`, 'i'); return; }
+  S.step++;
+  const i = LOCATIONS.findIndex((l) => l.id === 'story');
+  if (i >= 0) { if (G.navTarget === LOCATIONS[i]) G.navTarget = null; if (G.selected === LOCATIONS[i]) G.selected = null; LOCATIONS.splice(i, 1); }
+  hud.notice('MISSION TARGETS DESTROYED', 3.5);
+  storyRoute();
 }
 
 // a jump ticks deadlines and may tip off hijackers about valuable loads
@@ -1714,7 +1812,7 @@ function updateJobs(dt) {
 const SAVE_KEY = 'gvcsg-save-v1';
 function snapshot() {
   return { v: 1, hull: G.hull, owned: G.owned, paint: G.paint, inventory: G.inventory, credits: G.credits, kills: G.kills, ammo: G.ammo,
-    explored: [...G.explored], dockSys: G.dockSys, dockId: G.dockId, turretsAuto: G.turretsAuto, jobs: G.jobs, access: G.access, jumps: G.jumps,
+    explored: [...G.explored], dockSys: G.dockSys, dockId: G.dockId, turretsAuto: G.turretsAuto, jobs: G.jobs, story: G.story, access: G.access, jumps: G.jumps,
     hp: G.player ? [G.player.armor / G.player.maxArmor, G.player.hull / G.player.maxHull] : [1, 1] };
 }
 function saveGame(force = false) {
@@ -1748,6 +1846,7 @@ function applySave(s) {
   G.dockId = systemDef(s.dockSys).stations.some((st) => st.id === s.dockId) ? s.dockId : (systemDef(s.dockSys).stations[0]?.id || 'station');
   G.turretsAuto = s.turretsAuto !== false;
   G.jobs = Array.isArray(s.jobs) ? s.jobs.filter((j) => j && j.id && j.to && SYSTEMS[j.to.sys] && (j.type === 'bounty' ? STATS[j.target?.hull] : j.type === 'hit' ? HULLS[j.target?.hull] && SYSTEMS[j.target.sys] : true)) : [];
+  G.story = loadStory(s.story);
   G.access = s.access && typeof s.access === 'object' ? { ...s.access } : {};
   G.jumps = Math.max(0, Number(s.jumps) || 0);
   G.ambush = null; G.boardT = 0;
@@ -1852,6 +1951,7 @@ function enterDocked() {
   saveGame();
   hangar.snap();
   renderDock();
+  storyDock();
 }
 $('undock').onclick = () => {
   if (!G.player.stats.thrust) { flashDockMsg('Fit an engine before undocking'); return; }
@@ -2353,7 +2453,8 @@ function enterSystem(to, from) {
   populate(def, from);
   if (from) jumpedInto(def);
   spawnBounties(def);
-  G.navTarget = (G.autoRoute && nextHop()) || jobDestHere() || nextHop() || LOCATIONS.find((l) => l.dock) || LOCATIONS.find((l) => l.icon === 'belt') || LOCATIONS[0];
+  storySpawn();
+  G.navTarget = (G.autoRoute && nextHop()) || storyDestHere() || jobDestHere() || nextHop() || LOCATIONS.find((l) => l.dock) || LOCATIONS.find((l) => l.icon === 'belt') || LOCATIONS[0];
   if (G.navTarget && G.navTarget === jobDestHere()) { G.selected = G.navTarget; if (from) hud.notice(`JOB DESTINATION: ${G.navTarget.name.toUpperCase()}`, 3.5); }
   updateSysInfo(def);
   hud.ovT = 0;
@@ -2556,6 +2657,7 @@ async function boot() {
       const num = (f) => LOCATIONS.findIndex(f) + 1;
       hud.log('Welcome to GVCSG - Generic Vibe Coded Space Game. Pirates reported at Kaltos III - Asteroid Belt 1.', 'i');
       hud.log(`Press ${num((l) => l.icon === 'belt')} then Space to warp to the belt. Hold MMB and drag to steer, hold R-Ctrl to target.`, 'i');
+      hud.log(`Someone at Ardent Relay Station (${num((l) => l.id === 'station')}) is asking for a pilot. Dock there with G to start the storyline.`, 'i');
       hud.log(`New hulls and high-tech outfits: Helion Orbital Shipyard (${num((l) => l.id === 'shipyard')}). Jump gates lead to other systems; M opens the star map, H jumps.`, 'i');
       undock();
     };
