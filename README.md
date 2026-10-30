@@ -50,6 +50,8 @@ The outfitter sells guns, turrets, missile bays, engines, reactors, shields, arm
 
 **Storyline:** a chain of linked missions starts at Ardent Relay Station in Kaltos. Missions are offered in text conversations where you pick your replies (press 1–9 or click); some choices change which mission comes next. Each mission sends you to a station or to destroy a target, and the Job Board shows your current objective and where the next mission is offered.
 
+**Side missions:** four side storylines (The Wheel's Children, Ghost Signal, Company Town, Pilgrims of the Blue Star) and a handful of odd jobs are offered at stations around the map. They don't pop up on their own: when someone at a station is asking for a pilot, the Services tab says so and the Job Board lists them under Side missions with a Talk button. Side missions run alongside the main storyline, and several have choices that change how they end.
+
 Every port has a job board: freight and passenger contracts to other ports (freighters like the Mule and Atlas have big cargo holds, the Aurora liner has 160 bunks, and cargo pods or passenger modules add space), sometimes at high risk of Clan hijackers who will board you and steal the load if your shields drop, plus bounties on Clan warlords flying Reavers and Ravager battleships. Accepted jobs mark their destination on the star map and have a jump deadline.
 
 The game auto-saves to browser local storage whenever you are docked (on docking and after every purchase, fitting or repair). Reloading resumes from that save. If your ship is destroyed, everything — ships, fittings, credits, ammo, kills and charted systems — reverts to your last docked save. Use **New Game** on the start menu to wipe the save.

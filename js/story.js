@@ -2,6 +2,8 @@
 // A mission is offered at a dock once its predecessors are done; its steps are travel ("go") or combat ("kill");
 // finishing the last step plays its closing conversation and unlocks whatever follows.
 
+import { SIDE } from './sidestory.js';
+
 const P = (sys, id) => `${sys}:${id}`;
 
 export const MISSIONS = [
@@ -186,6 +188,7 @@ export const MISSIONS = [
     },
   },
 ];
+MISSIONS.push(...SIDE);
 export const MISSION = Object.fromEntries(MISSIONS.map((m) => [m.id, m]));
 
 // ---------------------------------------------------------------- conversation panel
@@ -195,14 +198,14 @@ export const convOpen = () => !!el;
 function esc(s) { return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
 
 // Plays a conversation tree; onChoice(choice) applies effects and returns false to stop the conversation.
-export function playConv(title, tree, flags, onChoice, onEnd) {
+export function playConv(title, tree, flags, onChoice, onEnd, ok) {
   closeConv();
   el = document.createElement('div');
   el.id = 'conv';
   document.body.appendChild(el);
   const show = (key) => {
     const n = tree[key];
-    const ch = n.choices.filter((c) => (!c.if || flags[c.if]) && (!c.ifnot || !flags[c.ifnot]));
+    const ch = n.choices.filter((c) => (!c.if || flags[c.if]) && (!c.ifnot || !flags[c.ifnot]) && (!ok || ok(c)));
     el.innerHTML = `<div class="cbox"><div class="ctitle">${esc(title)}</div><div class="cwho">${esc(n.who)}</div>
       <div class="ctext">${n.text.split('\n\n').map((p) => `<p>${esc(p)}</p>`).join('')}</div>
       <div class="cchoices">${ch.map((c, i) => `<button data-i="${i}"><span class="cn">${i + 1}</span>${esc(c.t)}</button>`).join('')}</div></div>`;
@@ -231,21 +234,20 @@ export function closeConv() {
 }
 
 // ---------------------------------------------------------------- mission state
-export function newStory() { return { done: [], active: null, step: 0, flags: {} }; }
+// active maps mission id -> current step index, so side missions run alongside the main storyline
+export function newStory() { return { done: [], active: {}, flags: {} }; }
 export function loadStory(s) {
   const o = newStory();
   if (!s || typeof s !== 'object') return o;
   o.done = Array.isArray(s.done) ? s.done.filter((x) => MISSION[x]) : [];
-  if (s.active && MISSION[s.active] && !o.done.includes(s.active)) { o.active = s.active; o.step = Math.max(0, Math.min(MISSION[s.active].steps.length, Number(s.step) || 0)); }
+  const act = typeof s.active === 'string' ? { [s.active]: s.step } : s.active && typeof s.active === 'object' ? s.active : {};
+  for (const [id, n] of Object.entries(act)) if (MISSION[id] && !o.done.includes(id)) o.active[id] = Math.max(0, Math.min(MISSION[id].steps.length, Number(n) || 0));
   o.flags = s.flags && typeof s.flags === 'object' ? { ...s.flags } : {};
   return o;
 }
-export const curStep = (S) => (S.active ? MISSION[S.active].steps[S.step] || null : null);
-
-export function available(S, here) {
-  if (S.active) return null;
-  return MISSIONS.find((m) => !S.done.includes(m.id) && m.at.includes(here)
-    && (!m.after || m.after.every((x) => S.done.includes(x)))
-    && (!m.afterAny || m.afterAny.some((x) => S.done.includes(x)))
-    && (!m.need || S.flags[m.need])) || null;
-}
+export const curStep = (S, id) => (id in S.active ? MISSION[id].steps[S.active[id]] || null : null);
+export const canOffer = (S, m) => !S.done.includes(m.id) && !(m.id in S.active)
+  && (!m.after || m.after.every((x) => S.done.includes(x)))
+  && (!m.afterAny || m.afterAny.some((x) => S.done.includes(x)))
+  && (!m.need || S.flags[m.need]) && (!m.unless || !S.flags[m.unless]);
+export const offersAt = (S, here) => MISSIONS.filter((m) => m.at.includes(here) && canOffer(S, m));

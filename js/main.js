@@ -14,7 +14,7 @@ import { Audio } from './audio.js';
 import { HUD, fmtDist } from './hud.js';
 import { TargetHolo } from './holo.js';
 import { UPSCALE, upscaleSharp } from './shaders.js';
-import { MISSION, MISSIONS, playConv, convOpen, newStory, loadStory, curStep, available } from './story.js';
+import { MISSION, MISSIONS, playConv, newStory, loadStory, curStep, canOffer, offersAt } from './story.js';
 
 const $ = (id) => document.getElementById(id);
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
@@ -1484,7 +1484,8 @@ function servicesText() {
   parts.push(Y0 ? `Its shipyard sells the ${Y0.name.toLowerCase()}.` : 'There is no shipyard here.');
   parts.push(L0.dock === 'pirate' ? 'The black-market outfitter carries everything, no questions asked.' : isHigh() ? 'The outfitter stocks high-tech modules.' : 'The outfitter only stocks basic modules.');
   if (SYSTEMS[G.system].gov === 'corp') parts.push('Property of the Vanta Combine: every dock, rock and lane in this system belongs to the company, and Combine Security patrols it.');
-  parts.push('Check the Job Board for freight, passenger and bounty contracts, and your storyline mission.');
+  parts.push('Check the Job Board for freight, passenger and bounty contracts, your storyline mission and side missions.');
+  if (offersAt(G.story, hereKey()).some((m) => m.side)) parts.push('Someone here is asking for a pilot: see Side missions on the Job Board.');
   return parts.join(' ');
 }
 
@@ -1578,7 +1579,7 @@ function jobRow(j, act) {
 }
 function renderJobs(L, R) {
   const c = shipCap();
-  L.innerHTML = `<h3>Job board — ${G.dockedAt.name}</h3>${D.board.length ? D.board.map((j) => jobRow(j, 'accept')).join('') : '<p>No contracts left. Check back after your next trip.</p>'}`;
+  L.innerHTML = `${sideOffers()}<h3>Job board — ${G.dockedAt.name}</h3>${D.board.length ? D.board.map((j) => jobRow(j, 'accept')).join('') : '<p>No contracts left. Check back after your next trip.</p>'}`;
   R.innerHTML = `<h3>Capacity — ${HULLS[G.hull].name}</h3><table class="st"><tr><td>Cargo hold</td><td>${usedCargo()} / ${c.cargo} t</td></tr><tr><td>Passenger bunks</td><td>${usedBunks()} / ${c.bunks}</td></tr></table>
     <p>Freighters (Mule, Atlas) carry bulk cargo; liners (Aurora) carry many passengers. Cargo pods and passenger modules add space to any hull.</p>
     ${storyPanel()}
@@ -1621,99 +1622,133 @@ function jobDestHere() {
   return isHunt(j) ? LOCATIONS.find((l) => l.id === huntLoc(j)) : LOCATIONS.find((l) => l.id === j.to.id);
 }
 
-// ---------------------------------------------------------------- storyline missions (data and conversations in story.js)
+// ---------------------------------------------------------------- storyline and side missions (data and conversations in story.js / sidestory.js)
 const stepSys = (st) => (st.go ? st.go.split(':')[0] : st.kill.sys);
+const hereKey = () => `${G.system}:${G.dockedAt.id}`;
+const convTitle = (m) => (m.side ? `${m.side} · ${m.title}` : m.title);
+const affordable = (c) => !(c.pay < 0) || G.credits >= -c.pay;
 function stepText(st) {
   if (st.kill) return `Destroy ${st.kill.name} in ${SYSTEMS[st.kill.sys].name}`;
   const [sys, id] = st.go.split(':');
   return `Travel to ${dockStationName(sys, id)} (${SYSTEMS[sys].name})`;
 }
-function storyRoute() {
-  const st = curStep(G.story);
+function storyRoute(id) {
+  const st = curStep(G.story, id);
   if (!st) return;
   const sys = stepSys(st);
   for (const x of fullRoute(G.system, sys) || []) G.explored.add(x);
   G.routeTo = sys !== G.system ? sys : null;
-  hud.log(`Mission objective: ${stepText(st)}.`, 'i');
+  hud.log(`${MISSION[id].title}: ${stepText(st)}.`, 'i');
 }
 function storyDestHere() {
-  const st = curStep(G.story);
-  if (!st || stepSys(st) !== G.system) return null;
-  return st.kill ? LOCATIONS.find((l) => l.id === 'story') || null : LOCATIONS.find((l) => l.id === st.go.split(':')[1]) || null;
+  for (const id of Object.keys(G.story.active)) {
+    const st = curStep(G.story, id);
+    if (!st || stepSys(st) !== G.system) continue;
+    const l = st.kill ? LOCATIONS.find((x) => x.id === `story-${id}`) : LOCATIONS.find((x) => x.id === st.go.split(':')[1]);
+    if (l) return l;
+  }
+  return null;
+}
+function missionRow(id) {
+  const m = MISSION[id], st = curStep(G.story, id);
+  return `<div class="job story${m.side ? ' side' : ''}"><div class="jh"><span class="nm">${m.title}</span>${m.pay ? `<span class="pr">${fmtIsk(m.pay)}</span>` : ''}</div>
+    ${m.side ? `<div class="jr">${m.side}</div>` : ''}<div class="ty">${m.brief}</div>${st ? `<div class="jr">Next: <b>${stepText(st)}</b></div>` : ''}</div>`;
 }
 function storyPanel() {
-  const S = G.story, m = S.active && MISSION[S.active], st = curStep(S);
-  if (m) return `<h3>Storyline</h3><div class="job story"><div class="jh"><span class="nm">${m.title}</span>${m.pay ? `<span class="pr">${fmtIsk(m.pay)}</span>` : ''}</div>
-    <div class="ty">${m.brief}</div>${st ? `<div class="jr">Next: <b>${stepText(st)}</b></div>` : ''}</div>`;
-  if (S.done.length === MISSIONS.length || S.done.includes('s7')) return '<h3>Storyline</h3><p>The ledger affair is over — for now.</p>';
-  const next = MISSIONS.find((x) => x.at.some((a) => available(S, a) === x));
-  if (!next) return '';
-  const [sys, id] = next.at[0].split(':');
-  return `<h3>Storyline</h3><p>Next: <b>${next.title}</b>, offered at ${dockStationName(sys, id)} (${SYSTEMS[sys].name}).</p>`;
+  const S = G.story, ids = Object.keys(S.active);
+  const main = ids.filter((id) => !MISSION[id].side), side = ids.filter((id) => MISSION[id].side);
+  let h = '<h3>Storyline</h3>';
+  if (main.length) h += main.map(missionRow).join('');
+  else if (S.done.includes('s7')) h += '<p>The ledger affair is over — for now.</p>';
+  else {
+    const next = MISSIONS.find((m) => !m.side && canOffer(S, m));
+    if (next) { const [sys, id] = next.at[0].split(':'); h += `<p>Next: <b>${next.title}</b>, offered at ${dockStationName(sys, id)} (${SYSTEMS[sys].name}).</p>`; }
+  }
+  if (side.length) h += `<h3>Side missions</h3>${side.map(missionRow).join('')}`;
+  return h;
+}
+function sideOffers() {
+  const list = offersAt(G.story, hereKey()).filter((m) => m.side);
+  if (!list.length) return '';
+  return `<h3>Side missions — ask around</h3>${list.map((m) => `<div class="job story side"><div class="jh"><span class="nm">${m.title}</span>${m.pay ? `<span class="pr">${fmtIsk(m.pay)}</span>` : ''}</div>
+    <div class="jr">${m.side}</div><button data-a="talk" data-m="${m.id}">Talk</button></div>`).join('')}`;
 }
 function storyChoice(m, c) {
   const S = G.story;
   if (c.set) S.flags[c.set] = true;
-  if (c.pay) { G.credits += c.pay; hud.log(`Received ${fmtIsk(c.pay)}.`, 'g'); }
-  if (c.act === 'accept' && S.active !== m.id && !S.done.includes(m.id)) {
-    S.active = m.id; S.step = 0;
+  if (c.pay) { G.credits = Math.max(0, G.credits + c.pay); hud.log(c.pay > 0 ? `Received ${fmtIsk(c.pay)}.` : `Paid ${fmtIsk(-c.pay)}.`, c.pay > 0 ? 'g' : 'w'); }
+  if (c.act === 'accept' && !(m.id in S.active) && !S.done.includes(m.id)) {
+    S.active[m.id] = 0;
     hud.log(`Mission accepted: ${m.title}.`, 'i');
-    if (!m.steps.length) { S.done.push(m.id); S.active = null; hud.log(`Mission complete: ${m.title}.`, 'g'); } else { storyRoute(); storySpawn(); }
+    if (!m.steps.length) { delete S.active[m.id]; S.done.push(m.id); hud.log(`Mission complete: ${m.title}.`, 'g'); } else { storyRoute(m.id); storySpawn(); }
   }
   return true;
 }
-function storyOffer() {
-  const here = `${G.system}:${G.dockedAt.id}`, m = available(G.story, here);
-  if (m) playConv(m.title, m.offer, G.story.flags, (c) => storyChoice(m, c), () => { saveGame(); renderDock(); });
+function storyTalk(id) {
+  const m = MISSION[id];
+  if (!m || !canOffer(G.story, m)) return;
+  playConv(convTitle(m), m.offer, G.story.flags, (c) => storyChoice(m, c), () => { saveGame(); renderDock(); }, affordable);
 }
-function storyFinish() {
-  const S = G.story, m = MISSION[S.active];
-  playConv(m.title, m.end, S.flags, (c) => storyChoice(m, c), () => {
-    if (S.active !== m.id) return;
-    S.done.push(m.id); S.active = null; S.step = 0;
-    if (m.pay) G.credits += m.pay;
-    hud.log(`Mission complete: ${m.title}.${m.pay ? ` Paid ${fmtIsk(m.pay)}.` : ''}`, 'g');
-    if (m.pay) flashDockMsg(`Mission complete: +${fmtIsk(m.pay)}`);
-    audio.beep(880, 0.12);
-    saveGame(); renderDock();
-    storyOffer();
-  });
+function storyOffer() {
+  const m = offersAt(G.story, hereKey()).find((x) => !x.side);
+  if (m) storyTalk(m.id);
+}
+function storyFinish(list) {
+  const id = list.shift();
+  if (!id) { storyOffer(); return; }
+  const S = G.story, m = MISSION[id];
+  playConv(convTitle(m), m.end, S.flags, (c) => storyChoice(m, c), () => {
+    if (id in S.active) {
+      delete S.active[id]; S.done.push(id);
+      if (m.pay) G.credits += m.pay;
+      hud.log(`Mission complete: ${m.title}.${m.pay ? ` Paid ${fmtIsk(m.pay)}.` : ''}`, 'g');
+      if (m.pay) flashDockMsg(`Mission complete: +${fmtIsk(m.pay)}`);
+      audio.beep(880, 0.12);
+      saveGame(); renderDock();
+    }
+    storyFinish(list);
+  }, affordable);
 }
 function storyDock() {
-  const S = G.story;
-  if (S.active) {
-    const st = curStep(S);
-    if (st && st.go === `${G.system}:${G.dockedAt.id}`) { S.step++; if (curStep(S)) { storyRoute(); saveGame(); renderDock(); } }
-    if (!curStep(S)) { storyFinish(); return; }
+  const S = G.story, here = hereKey(), fin = [];
+  for (const id of Object.keys(S.active)) {
+    const st = curStep(S, id);
+    if (st && st.go === here) { S.active[id]++; if (curStep(S, id)) storyRoute(id); }
+    if (!curStep(S, id)) fin.push(id);
   }
-  storyOffer();
+  saveGame(); renderDock();
+  storyFinish(fin);
 }
 function storySpawn() {
-  const S = G.story, st = curStep(S);
-  if (!st?.kill || st.kill.sys !== G.system || !world || G.entities.some((e) => e.alive && e.ai.storyKill === S.active)) return;
-  const K = st.kill;
-  const anchor = (K.anchor === 'belt' && LOCATIONS.find((l) => l.icon === 'belt')) || LOCATIONS.find((l) => l.jump) || LOCATIONS[0];
-  const pos = anchor.pos.clone().add(_v.set(Math.random() - 0.5, 0, Math.random() - 0.5).normalize().multiplyScalar(9000));
-  K.kinds.forEach((kind, i) => {
-    const e = makeEntity(kind, 'pirate', i ? pos.clone().add(jitter(2500)) : pos.clone(), i ? `${K.name} ${HULLS[STATS[kind].hullId || 'raider']?.name || 'Escort'}` : K.name);
-    e.className = `MISSION · ${STATS[kind].cls}`;
-    e.ai.storyKill = S.active; e.ai.home.copy(pos);
-  });
-  const i = LOCATIONS.findIndex((l) => l.id === 'story');
-  if (i >= 0) LOCATIONS.splice(i, 1);
-  LOCATIONS.push({ id: 'story', name: `Mission: ${K.name}`, type: MISSION[S.active].title, pos, arrive: 10000, icon: 'bounty' });
-  hud.log(`Mission intel: ${K.name} is in this system. Warp to "Mission: ${K.name}".`, 'w');
+  const S = G.story;
+  if (!world) return;
+  for (const id of Object.keys(S.active)) {
+    const st = curStep(S, id);
+    if (!st?.kill || st.kill.sys !== G.system || G.entities.some((e) => e.alive && e.ai.storyKill === id)) continue;
+    const K = st.kill;
+    const anchor = (K.anchor === 'belt' && LOCATIONS.find((l) => l.icon === 'belt')) || LOCATIONS.find((l) => l.jump) || LOCATIONS[0];
+    const pos = anchor.pos.clone().add(_v.set(Math.random() - 0.5, 0, Math.random() - 0.5).normalize().multiplyScalar(9000));
+    K.kinds.forEach((kind, i) => {
+      const e = makeEntity(kind, 'pirate', i ? pos.clone().add(jitter(2500)) : pos.clone(), i ? `${K.name} ${HULLS[STATS[kind].hullId || 'raider']?.name || 'Escort'}` : K.name);
+      e.className = `MISSION · ${STATS[kind].cls}`;
+      e.ai.storyKill = id; e.ai.home.copy(pos);
+    });
+    const i = LOCATIONS.findIndex((l) => l.id === `story-${id}`);
+    if (i >= 0) LOCATIONS.splice(i, 1);
+    LOCATIONS.push({ id: `story-${id}`, name: `Mission: ${K.name}`, type: MISSION[id].title, pos, arrive: 10000, icon: 'bounty' });
+    hud.log(`Mission intel: ${K.name} is in this system. Warp to "Mission: ${K.name}".`, 'w');
+  }
 }
 function storyKilled(e) {
-  const S = G.story;
-  if (e.ai.storyKill !== S.active) return;
-  const left = G.entities.filter((x) => x !== e && x.alive && x.ai.storyKill === S.active).length;
+  const S = G.story, id = e.ai.storyKill;
+  if (!(id in S.active)) return;
+  const left = G.entities.filter((x) => x !== e && x.alive && x.ai.storyKill === id).length;
   if (left) { hud.log(`${left} mission target${left > 1 ? 's' : ''} left.`, 'i'); return; }
-  S.step++;
-  const i = LOCATIONS.findIndex((l) => l.id === 'story');
+  S.active[id]++;
+  const i = LOCATIONS.findIndex((l) => l.id === `story-${id}`);
   if (i >= 0) { if (G.navTarget === LOCATIONS[i]) G.navTarget = null; if (G.selected === LOCATIONS[i]) G.selected = null; LOCATIONS.splice(i, 1); }
   hud.notice('MISSION TARGETS DESTROYED', 3.5);
-  storyRoute();
+  storyRoute(id);
 }
 
 // a jump ticks deadlines and may tip off hijackers about valuable loads
@@ -1876,6 +1911,7 @@ for (const id of ['dockleft', 'dockright']) {
     const t = ev.target.closest('[data-a],[data-hull],[data-slot],[data-out],[data-cat]');
     if (!t) return;
     const fit = G.owned[G.hull];
+    if (t.dataset.a === 'talk') { audio.ui(); storyTalk(t.dataset.m); return; }
     if (t.dataset.j) { jobAction(t.dataset.a, t.dataset.j); audio.ui(); renderDock(); return; }
     if (t.dataset.a && t.dataset.a.startsWith('paint')) { paintAction(t); audio.ui(); renderDock(); return; }
     if (t.dataset.a === 'role') {

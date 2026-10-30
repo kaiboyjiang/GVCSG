@@ -258,3 +258,4 @@ table.st .up { color: #7fe0a0; } table.st .dn { color: #ff7a66; }
 #conv .cchoices button:hover { background: rgba(98, 104, 112, 0.75); border-color: #fd8; }
 #conv .cn { display: inline-block; min-width: 22px; color: #fd8; font-weight: 700; }
 .job.story { border-left-color: #fd8; }
+.job.story.side { border-left-color: #8fc8a0; }
